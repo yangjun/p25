@@ -1,0 +1,5 @@
+申请账号：yangjun.chengdu@gmail.com/hunter1030
+测试号： gh_93bddafeb0c3
+appId: wxd1a9eba03a82e959
+appsecret: b4b9046fec83e67e4436f17ecfe4c74e
+
