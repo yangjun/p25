@@ -1,3 +1,13 @@
+下载JDK8
+下载 Scala 2.11
+
+设置JAVA_HOME 和 SCALA_HOME
+
+设置PATH
+
+开始运行 activator
+
+
 This is your new Play application
 =================================
 
