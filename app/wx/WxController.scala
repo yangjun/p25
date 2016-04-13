@@ -18,12 +18,12 @@ import scala.xml.NodeSeq
 @Singleton
 class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(implicit exec: ExecutionContext) extends Controller {
 
-  val logger = LoggerFactory.getLogger(this.getClass)
+  val logger = LoggerFactory.getLogger(classOf[WxController])
 
   val token = WXClient.token
 
   /**
-   *
+   * WX验证服务器地址有效性
    * @param signature  微信加密签名，signature结合了开发者填写的token参数和请求中的timestamp参数、nonce参数。
    * @param timestamp  时间戳
    * @param nonce   随机数
@@ -32,26 +32,10 @@ class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(impli
    */
   def valid(signature: String, timestamp: String, nonce: String, echostr: String) = Action.async {
     Future {
-      val list = List(token, timestamp, nonce)
-      // 字典排序
-      val sort = list.sortWith((s, t) => s.compareTo(t) < 0)
-      // 拼接为一个字符串
-      var v = ""
-      sort.foreach(f => {
-        v = v.concat(f)
-      })
-      logger.debug("v -> {}", v)
-      // sha1 加密
-      val v1 = Utils.sha1(v)
-      logger.debug("signature -> {}", v1)
-      // 验证
-      val b = v1.equals(signature)
-
+      val b = WXClient.checkSignature(timestamp, nonce, signature)
       if (b) {
-        logger.debug("验证成功...")
         Ok(echostr)
       } else {
-        logger.debug("验证失败...")
         Ok(Json.obj("result" -> b))
       }
     }
@@ -63,31 +47,30 @@ class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(impli
    * @param signature
    * @param timestamp
    * @param nonce
-   * @param echostr
    * @return
    */
-  def receiveEvent(signature: String, timestamp: String, nonce: String, echostr: String) = Action { request =>
-    val body: AnyContent = request.body
-    val jsonBody: Option[NodeSeq] = body.asXml
-    logger.debug("xml -> {}", jsonBody)
-    Ok("")
-  }
-
-
-  def accessToken(appId: String, secret: String) = Action.async {
-    wxClient.accessToken(appId, secret).map {
-      f =>
-        implicit val reads = Json.reads[AccessToken]
-        val j: JsResult[AccessToken] = f.json.validate[AccessToken]
-        if (j.isError) {
-          logger.debug("error -> {}", f.json)
-          Ok(f.json)
-        } else {
-          implicit val writes = Json.writes[AccessToken]
-          Ok(Json.toJson(j.get))
-        }
+  def receiveEvent(signature: String, timestamp: String, nonce: String, echostr: String) = Action.async { request =>
+    Future {
+      val b = WXClient.checkSignature(timestamp, nonce, signature)
+      if (b) {
+        val body: AnyContent = request.body
+        val jsonBody: Option[NodeSeq] = body.asXml
+        logger.debug("xml -> {}", jsonBody)
+        Ok("")
+      } else {
+        Ok(Json.obj("result" -> "非法请求"))
+      }
     }
   }
 
+  /**
+   * 测试微信接口
+   * @return
+   */
+  def ip = Action.async {
+    wxClient.callbackIp map {
+      f => Ok(f)
+    }
+  }
 
 }

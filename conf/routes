@@ -18,10 +18,14 @@ GET     /mongo                              controllers.DBController.findByName(
 
 
 #
-GET     /wx/valid                           wx.WxController.valid(signature, timestamp, nonce, echostr)
+GET     /wx/valid                      wx.WxController.valid(signature, timestamp, nonce, echostr)
 
 #
-GET     /wx/accessToken                     wx.WxController.accessToken(appId, secret)
+POST     /wx/valid                     wx.WxController.receiveEvent(signature, timestamp, nonce, echostr)
+
+#
+GET      /wx/ip                        wx.WxController.ip
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

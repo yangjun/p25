@@ -12,7 +12,12 @@ object Utils {
    def sha1(v: String): String = {
      val md = MessageDigest.getInstance("SHA-1")
      val digest = md.digest(v.getBytes())
-     val result = new BASE64Encoder().encode(digest)
+     val result = Hex.valueOf(digest).toLowerCase
      result
    }
+
+  object Hex {
+    def valueOf(buf: Array[Byte]): String = buf.map("%02X" format _).mkString
+  }
+
 }

@@ -13,6 +13,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 /**
+ *
  * Created by 军 on 2016/4/13.
  */
 
@@ -37,7 +38,7 @@ class AccessTokenActor @Inject()(wxClient: WXClient)() extends Actor {
       val response = wxClient.accessToken(nextToken.appId, nextToken.secret)
       implicit val exec: ExecutionContext = context.dispatcher
       response.map {
-        f =>
+          f =>
           implicit val reads = (
             (__ \ "access_token").read[String] and
               (__ \ "expires_in").read[Int]
@@ -54,13 +55,13 @@ class AccessTokenActor @Inject()(wxClient: WXClient)() extends Actor {
               if (next < 0) {
                 next = 0
               }
-              logger.debug("{}秒 后取下一个token", next)
-              context.system.scheduler.scheduleOnce(next microseconds, self, nextToken)
+              logger.debug("{} 秒后取下一个token", next)
+              context.system.scheduler.scheduleOnce(next seconds, self, nextToken)
             }
             case e: JsError => {
               logger.error("获取accessToken失败。 -> {}", f.json)
-              logger.debug("{}秒 后取下一个token", 5)
-              context.system.scheduler.scheduleOnce(5 seconds, self, nextToken)
+              logger.debug("{} 秒后取下一个token", 15)
+              context.system.scheduler.scheduleOnce(15 seconds, self, nextToken)
             }
           }
       }
@@ -69,8 +70,8 @@ class AccessTokenActor @Inject()(wxClient: WXClient)() extends Actor {
       response onFailure {
         case e: Exception => {
           logger.error("获取accessToken失败。", e)
-          logger.debug("{}秒 后取下一个token", 5)
-          context.system.scheduler.scheduleOnce(5 seconds, self, nextToken)
+          logger.debug("{} 秒后取下一个token", 15)
+          context.system.scheduler.scheduleOnce(15 seconds, self, nextToken)
         }
       }
     }
