@@ -5,10 +5,11 @@ import javax.inject.{Inject, Singleton}
 import akka.actor.ActorSystem
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsResult, Json}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{AnyContent, Action, Controller}
 import utils.Utils
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.NodeSeq
 
 /**
  * Created by 军 on 2016/4/11.
@@ -57,13 +58,29 @@ class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(impli
 
   }
 
+  /**
+   * 接收WX消息和事件
+   * @param signature
+   * @param timestamp
+   * @param nonce
+   * @param echostr
+   * @return
+   */
+  def receiveEvent(signature: String, timestamp: String, nonce: String, echostr: String) = Action { request =>
+    val body: AnyContent = request.body
+    val jsonBody: Option[NodeSeq] = body.asXml
+    logger.debug("xml -> {}", jsonBody)
+    Ok("")
+  }
+
+
   def accessToken(appId: String, secret: String) = Action.async {
     wxClient.accessToken(appId, secret).map {
       f =>
         implicit val reads = Json.reads[AccessToken]
         val j: JsResult[AccessToken] = f.json.validate[AccessToken]
         if (j.isError) {
-           logger.debug("error -> {}", f.json)
+          logger.debug("error -> {}", f.json)
           Ok(f.json)
         } else {
           implicit val writes = Json.writes[AccessToken]

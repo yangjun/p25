@@ -17,10 +17,10 @@ GET     /stream                             controllers.StreamController.m
 GET     /mongo                              controllers.DBController.findByName(name)
 
 
-# 验证
+#
 GET     /wx/valid                           wx.WxController.valid(signature, timestamp, nonce, echostr)
 
-# 取 accessToken
+#
 GET     /wx/accessToken                     wx.WxController.accessToken(appId, secret)
 
 # Map static resources from the /public folder to the /assets URL path

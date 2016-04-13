@@ -2,8 +2,15 @@ package services
 
 import java.time.{Clock, Instant}
 import javax.inject._
+
+import akka.actor.{ActorRef, ActorSystem}
+import play.Configuration
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
+import wx.WXClient
+import wx.actor.AccessTokenActor
+import wx.actor.AccessTokenActor.NextToken
+
 import scala.concurrent.Future
 
 /**
@@ -21,14 +28,21 @@ import scala.concurrent.Future
  * application's [[ApplicationLifecycle]] to register a stop hook.
  */
 @Singleton
-class ApplicationTimer @Inject() (clock: Clock, appLifecycle: ApplicationLifecycle) {
+class ApplicationTimer @Inject()(clock: Clock,
+                                 appLifecycle: ApplicationLifecycle,
+                                 system: ActorSystem,
+                                 config: Configuration,
+                                 @Named("accessTokenActor") accessTokenActor: ActorRef) {
 
   // This code is called when the application starts.
   private val start: Instant = clock.instant
   Logger.info(s"ApplicationTimer demo: Starting application at ${start}.")
 
+  accessTokenActor ! NextToken(config.getConfig("wx").getString("appId"),
+    config.getConfig("wx").getString("appsecret"))
+
   // When the application starts, register a stop hook with the
-  // ApplicationLifecyle object. The code inside the stop hook wil
+  // ApplicationLifecyle object. The code inside the st, op hook wil
   // be run when the application stops.
   appLifecycle.addStopHook { () =>
     val stop: Instant = clock.instant
