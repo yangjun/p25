@@ -11,7 +11,9 @@ object WxToken {
 
   def get(appId: String): String = {
     tokens.get(appId) match {
-      case Some(s) => s
+      case Some(s) => {
+        s
+      }
       case None => ""
     }
   }

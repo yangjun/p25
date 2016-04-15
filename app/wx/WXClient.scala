@@ -11,6 +11,7 @@ import utils.Utils
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.NodeSeq
 
 /**
  *
@@ -39,7 +40,6 @@ case class GetAccessToken(appId: String, secret: String)
 object WXClient {
   val token = "wx"
   val logger = LoggerFactory.getLogger(classOf[WXClient])
-
   /**
    * 微信签名验证
    * @param timestamp
@@ -64,7 +64,7 @@ object WXClient {
     if (b) {
       logger.debug("验证成功...")
     } else {
-      logger.debug("验证失败...")
+      logger.error("验证失败...")
     }
     b
   }
@@ -78,6 +78,13 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
   val logger = LoggerFactory.getLogger(classOf[WXClient])
 
   def appId = config.getString("wx.appId")
+
+  // 下一个token
+  def token = {
+    val s = WxToken.get(appId)
+    logger.debug("access-token -> {}", s)
+    s
+  }
 
   def baseUrl(): String = {
     """https://api.weixin.qq.com/cgi-bin/"""
@@ -95,13 +102,12 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
 
   }
 
-
   def callbackIp() = {
     val url = baseUrl().concat("getcallbackip")
     val request: WSRequest = ws.url(url)
     val result = request.withHeaders("Accept" -> "application/json")
       .withRequestTimeout(5.seconds)
-      .withQueryString("access_token" -> WxToken.get(appId))
+      .withQueryString("access_token" -> token)
 
     val response: Future[WSResponse] = result.get()
     response map {
@@ -111,5 +117,115 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
       }
     }
   }
+
+  object Menu {
+    // 菜单 URL
+    private val menuUrl = baseUrl().concat("menu/")
+    // 创建菜单
+    def create(data: JsValue) = {
+      val url = menuUrl.concat("create")
+      val request = ws.url(url).withHeaders("Content-type" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString("access_token" -> token)
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.post(data)
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
+
+    // 创建菜单
+    def delete = {
+      val url = menuUrl.concat("delete")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString("access_token" -> token)
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.get()
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
+
+    // 创建菜单
+    def get = {
+      val url = menuUrl.concat("get")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString("access_token" -> token)
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.get()
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
+
+  }
+
+  // 消息
+  object Message {
+    // 菜单 URL
+    private val messageUrl = baseUrl().concat("message/")
+    // 客服消息
+    def custom(toUser: String, content: String) = {
+      val url = messageUrl.concat("custom/send")
+      val request = ws.url(url).withHeaders("Content-type" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString("access_token" -> token)
+      logger.debug("url -> {}", url)
+      val data = Json.obj(
+        "touser" -> toUser,
+        "msgtype" -> "text",
+        "text" -> Json.obj (
+          "content" -> content
+        )
+      )
+
+      val response: Future[WSResponse] = request.post(data)
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
+  }
+
+  // 用户
+  object User {
+    // 用户 URL
+    private val userUrl = baseUrl().concat("user/")
+
+    // 获取用户信息
+    def info(openId: String) = {
+      val url = userUrl.concat("info")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString(
+          "access_token" -> token,
+          "openid" -> openId,
+          "lang" -> "zh_CN"
+        )
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.get()
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
+
+  }
+
 
 }

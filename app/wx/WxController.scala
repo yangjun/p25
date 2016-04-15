@@ -58,7 +58,8 @@ class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(impli
         logger.debug("xml -> {}", jsonBody)
         Ok("")
       } else {
-        Ok(Json.obj("result" -> "非法请求"))
+        logger.error("非法请求")
+        Ok("")
       }
     }
   }
@@ -73,4 +74,51 @@ class WxController @Inject()(actorSystem: ActorSystem, wxClient: WXClient)(impli
     }
   }
 
+  /**
+   * 创建菜单
+   * @return
+   */
+  def createMenu = Action.async {
+    val data = Json.parse( """
+  {
+    "button": [
+      {
+        "type": "view",
+        "name": "主页",
+        "url": "http://192.168.1.100"
+      },
+      {
+        "type": "click",
+        "name": "点我",
+        "key":"EVENT_TEST"
+      }
+    ]
+  } """.stripMargin)
+
+    logger.debug("data -> {}", data)
+    wxClient.Menu.create(data) map { f =>
+      Ok(f)
+    }
+  }
+
+
+  def deleteMenu = Action.async {
+    wxClient.Menu.delete map { f =>
+      Ok(f)
+    }
+  }
+
+  def getMenu = Action.async {
+    wxClient.Menu.get map { f =>
+      Ok(f)
+    }
+  }
+
+  def customMessage = Action.async {
+    wxClient.Message.custom("oUO_Rs8PtsJaHJX_XASB9o4LGTbs", "来自开发者的测试消息") map {
+      f => {
+        Ok(f)
+      }
+    }
+  }
 }
