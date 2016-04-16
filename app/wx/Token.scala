@@ -23,3 +23,21 @@ object WxToken {
   }
 
 }
+
+// OAuth2 Token
+object WxOAuth2Token {
+  private var tokens = Map[String, OAuth2Token]()
+  def get(openid: String): OAuth2Token = {
+    tokens.get(openid) match {
+      case Some(s) => {
+        s
+      }
+      case None => OAuth2Token("", 0, "", "", "")
+    }
+  }
+
+  def +(openid: String, token: OAuth2Token): Unit = {
+    tokens = tokens + (openid -> token)
+  }
+
+}

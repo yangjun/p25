@@ -37,9 +37,13 @@ case class AccessToken(token: String, expires: Int) {
 
 case class GetAccessToken(appId: String, secret: String)
 
+case class OAuth2Token(token: String, expires: Int, refresh: String, openid: String, scope: String)
+
+
 object WXClient {
   val token = "wx"
   val logger = LoggerFactory.getLogger(classOf[WXClient])
+
   /**
    * 微信签名验证
    * @param timestamp
@@ -48,7 +52,7 @@ object WXClient {
    */
   def checkSignature(timestamp: String, nonce: String, signature: String): Boolean = {
     val list = List(token, timestamp, nonce)
-    logger.debug("{}" ,list)
+    logger.debug("{}", list)
     // 字典排序
     val sort = list.sortWith((s, t) => s.compareTo(t) < 0)
     // 拼接为一个字符串
@@ -86,8 +90,19 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
     s
   }
 
+  def oauth2Token(openid: String) = {
+    val s = WxOAuth2Token.get(openid)
+    logger.debug("oauth2-access-token -> {}", s)
+    s
+  }
+
   def baseUrl(): String = {
     """https://api.weixin.qq.com/cgi-bin/"""
+  }
+
+  // SNS
+  def snsUrl() = {
+    """https://api.weixin.qq.com/sns/"""
   }
 
   def accessToken(appid: String, secret: String) = {
@@ -121,6 +136,7 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
   object Menu {
     // 菜单 URL
     private val menuUrl = baseUrl().concat("menu/")
+
     // 创建菜单
     def create(data: JsValue) = {
       val url = menuUrl.concat("create")
@@ -175,6 +191,7 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
   object Message {
     // 菜单 URL
     private val messageUrl = baseUrl().concat("message/")
+
     // 客服消息
     def custom(toUser: String, content: String) = {
       val url = messageUrl.concat("custom/send")
@@ -185,7 +202,7 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
       val data = Json.obj(
         "touser" -> toUser,
         "msgtype" -> "text",
-        "text" -> Json.obj (
+        "text" -> Json.obj(
           "content" -> content
         )
       )
@@ -225,7 +242,89 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
       }
     }
 
+    def infoBySns(openId: String)  = {
+      val url = snsUrl().concat("userinfo")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString(
+          "access_token" -> oauth2Token(openId).token,
+          "openid" -> openId,
+          "lang" -> "zh_CN"
+        )
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.get()
+      response map {
+        f => {
+          logger.debug("{}", f.json)
+          f.json
+        }
+      }
+    }
   }
 
+  // OAuth2
+  object OAuth2 {
+    // 用户 URL
+    private val oauth2Url = snsUrl().concat("oauth2/")
+
+    // 回调时根据code获取token
+    def token(code: String, appid: String, secret: String) = {
+      val url = oauth2Url.concat("access_token")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString(
+          "appid" -> appid,
+          "secret" -> secret,
+          "code" -> code,
+          "grant_type" -> "authorization_code"
+        )
+      logger.debug("url -> {}", url)
+      val response: Future[WSResponse] = request.get()
+      response onFailure {
+        case ex: Exception => {
+          logger.error("获取oauth2 access-token 出错", ex)
+        }
+      }
+      response map {
+        f => {
+          implicit val reads = (
+            (__ \ "access_token").read[String] and
+              (__ \ "expires_in").read[Int] and
+              (__ \ "refresh_token").read[String] and
+              (__ \ "openid").read[String] and
+              (__ \ "scope").read[String]
+            )(OAuth2Token)
+
+          f.json.validate(reads)
+        }
+      }
+    }
+
+    def refresh(refresh: String, appid: String) = {
+      val url = oauth2Url.concat("refresh_token")
+      val request = ws.url(url).withHeaders("Accept" -> "application/json")
+        .withRequestTimeout(5.seconds)
+        .withQueryString(
+          "appid" -> appid,
+          "grant_type" -> "refresh_token",
+          "refresh_token" -> refresh
+        )
+      logger.debug("url -> {}", url)
+
+      val response: Future[WSResponse] = request.get()
+      response map {
+        f => {
+          implicit val reads = (
+            (__ \ "access_token").read[String] and
+              (__ \ "expires_in").read[Int] and
+              (__ \ "refresh_token").read[String] and
+              (__ \ "openid").read[String] and
+              (__ \ "scope").read[String]
+            )(OAuth2Token)
+          f.json.validate(reads)
+        }
+      }
+    }
+  }
 
 }

@@ -2,7 +2,7 @@ package wx
 
 import com.google.inject.AbstractModule
 import play.api.libs.concurrent.AkkaGuiceSupport
-import wx.actor.AccessTokenActor
+import wx.actor.{OAuth2TokenActor, AccessTokenActor}
 
 
 /**
@@ -12,5 +12,8 @@ class MyModule extends AbstractModule with AkkaGuiceSupport {
   override def configure() = {
     //
     bindActor[AccessTokenActor]("accessTokenActor")
+
+    bindActor[OAuth2TokenActor]("oauth2TokenActor")
+
   }
 }
