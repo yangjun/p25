@@ -7,15 +7,15 @@ GET     /                           controllers.HomeController.index
 # An example controller showing how to use dependency injection
 GET     /count                      controllers.CountController.count
 # An example controller showing how to write asynchronous code
-GET     /message                    controllers.AsyncController.message
+
+#GET     /message                    controllers.AsyncController.message
 
 #
-GET     /ws/:token                         controllers.WebSocketController.ws(token)
-GET     /ws1/:token                         controllers.WebSocketController.ws1(token)
+#GET     /ws/:token                         controllers.WebSocketController.ws(token)
+#GET     /ws1/:token                         controllers.WebSocketController.ws1(token)
 
-GET     /stream                             controllers.StreamController.m
-GET     /mongo                              controllers.DBController.findByName(name)
-
+#GET     /stream                             controllers.StreamController.m
+#GET     /mongo                              controllers.DBController.findByName(name)
 
 #
 GET     /wx/valid                      wx.WxController.valid(signature, timestamp, nonce, echostr)
@@ -36,6 +36,14 @@ GET       /wx/callback                   wx.WxController.callback(code: Option[S
 
 # jws
 GET       /wx/jwt                         wx.WxController.jwt
+
+# App System
+GET     /crm/v1/sdk/area                  sales.controllers.AreaController.query(name: Option[String])
+GET     /crm/v1/sdk/area/:id              sales.controllers.AreaController.read(id)
+POST     /crm/v1/sdk/area              sales.controllers.AreaController.create
+
+GET     /crm/v1/sdk/private              sales.controllers.AreaController.privateApi
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

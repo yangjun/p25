@@ -73,7 +73,6 @@ object WXClient {
     b
   }
 
-
 }
 
 @Singleton
