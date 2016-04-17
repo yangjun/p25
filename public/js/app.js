@@ -1,19 +1,10 @@
 'use strict';
 var app = angular.module('wxApp', ['ui.router', 'angular-jwt']);
 
-app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowProvider', 'jwtInterceptorProvider',
-    function ($stateProvider, $urlRouterProvider, $httpProvider, $windowProvider, jwtInterceptorProvider) {
+app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowProvider', 'jwtInterceptorProvider', 'ROUTER',
+    function ($stateProvider, $urlRouterProvider, $httpProvider, $windowProvider, jwtInterceptorProvider, ROUTER) {
+        ROUTER($stateProvider, $urlRouterProvider);
         var $window = $windowProvider.$get();
-
-        /**
-         * router
-         */
-        $stateProvider
-            .state('org', {
-                url: '/org',
-                templateUrl: '../html/org/org.html'
-            });
-        $urlRouterProvider.when('', '/org');
 
         /**
          * 配置 JWT 拦截器，为每一个 $http 请求添加请求头：Authorization: Bearer [JWT_TOKEN]。
@@ -48,6 +39,20 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowPro
         $httpProvider.interceptors.push('jwtInterceptor');
     }]);
 
-app.run(['$rootScope', '$state', function ($rootScope, $state) {
+app.run(['$rootScope', '$state', 'commonService', function ($rootScope, $state, commonService) {
     $rootScope.$state = $state;
+
+    /*动态设置页面标题*/
+    $rootScope.$on('$viewContentLoaded', function () {
+        var title = '';
+        switch ($rootScope.$state.current.name) {
+            case 'application':
+                title = '开发医院申请';
+                break;
+            case 'organization':
+                title = '组织机构管理';
+                break;
+        }
+        commonService.title(title);
+    });
 }]);
