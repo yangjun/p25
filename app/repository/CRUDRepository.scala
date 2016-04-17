@@ -19,19 +19,29 @@ trait CRUDRepository[E, ID] {
   def delete(id: ID)(implicit ec: ExecutionContext): Future[Either[String, ID]]
 
   def search(criteria: JsObject, limit: Int)(implicit ec: ExecutionContext): Future[Traversable[E]]
+
+  def search(criteria: Criteria, limit: Int)(implicit ec: ExecutionContext): Future[Traversable[E]] = {
+    this.search(criteria.toJson, limit)
+  }
+
 }
 
 trait Identity[E, ID] {
   def name: String
+
   def of(entity: E): Option[ID]
+
   def set(entity: E, id: ID): E
+
   def clear(entity: E): E
+
   def next: ID
 }
 
 import reactivemongo.api._
 
-abstract class MongoCRUDRepository[E: Format, ID: Format](implicit identity: Identity[E, ID]) extends CRUDRepository[E,ID] {
+abstract class MongoCRUDRepository[E: Format, ID: Format](implicit identity: Identity[E, ID]) extends CRUDRepository[E, ID] {
+
   import reactivemongo.play.json._
   import reactivemongo.play.json.collection.JSONCollection
 
@@ -73,5 +83,6 @@ abstract class MongoCRUDRepository[E: Format, ID: Format](implicit identity: Ide
     collection.flatMap(_.find(criteria).
       cursor[E](readPreference = ReadPreference.nearest).
       collect[List](limit))
+
 
 }
