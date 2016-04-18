@@ -16,7 +16,7 @@ case class LatLng(latitude: Double, longitude: Double) {
 }
 
 object LatLng {
-
+  // [12.00, 12.22]
   object LatLngWrites extends Writes[LatLng] {
     def writes(l: LatLng): JsArray = JsArray(Seq(JsNumber(l.latitude), JsNumber(l.longitude)))
   }
@@ -24,6 +24,7 @@ object LatLng {
   object LatLngReads extends Reads[LatLng] {
     def reads(json: JsValue) = json match {
       case JsArray(Seq(JsNumber(a), JsNumber(b))) => JsSuccess(LatLng(a.toDouble, b.toDouble))
+        // {12.11, 23.13}
       case json: JsObject => {
         val a = (json \ "0").as[Double]
         val b = (json \ "1").as[Double]
