@@ -1,3 +1,4 @@
+
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
@@ -38,9 +39,19 @@ GET       /wx/callback                   wx.WxController.callback(code: Option[S
 GET       /wx/jwt                         wx.WxController.jwt
 
 # App System
-GET     /crm/v1/sdk/area                  sales.controllers.AreaController.query(name: Option[String])
-GET     /crm/v1/sdk/area/:id              sales.controllers.AreaController.read(id)
-POST     /crm/v1/sdk/area              sales.controllers.AreaController.create
+
+# Area
+GET       /crm/v1/sdk/area                  sales.controllers.AreaController.query(name: Option[String])
+GET       /crm/v1/sdk/area/:id              sales.controllers.AreaController.read(id)
+POST      /crm/v1/sdk/area                  sales.controllers.AreaController.create
+DELETE    /crm/v1/sdk/area/:id              sales.controllers.AreaController.delete(id)
+
+# Hospital
+GET       /crm/v1/sdk/hospital              sales.controllers.HospitalController.query(name: Option[String])
+GET       /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.read(id)
+POST      /crm/v1/sdk/hospital              sales.controllers.HospitalController.create
+DELETE    /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.delete(id)
+
 
 GET     /crm/v1/sdk/private              sales.controllers.AreaController.privateApi
 

@@ -1,11 +1,10 @@
 package sales.repositories
 
-import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
 
 import play.api.libs.json.Json
 import play.modules.reactivemongo.ReactiveMongoApi
-import reactivemongo.api.DB
 import reactivemongo.play.json.collection.JSONCollection
 import repository.{MongoCRUDRepository, CRUDRepository}
 import sales.models.{NameQuery, Area}
@@ -32,5 +31,6 @@ trait AreaRepository extends CRUDRepository[Area, String] {
 @Singleton
 class AreaMongoRepository @Inject()(reactiveMongoApi: ReactiveMongoApi)
   extends MongoCRUDRepository[Area, String] with AreaRepository {
-  override def collection(implicit ec: ExecutionContext): Future[JSONCollection] = reactiveMongoApi.database.map(_.collection("areas"))
+  override def collection(implicit ec: ExecutionContext): Future[JSONCollection] =
+    reactiveMongoApi.database.map(_.collection("areas"))
 }

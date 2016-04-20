@@ -16,13 +16,14 @@ trait IdEntity {
   def id: Option[String]
 }
 
+
 // 区域
 case class Area(id: Option[String], code: String, name: String) extends IdEntity
 
 object Area {
   implicit val format = Json.format[Area]
   implicit object AreaIdentity extends Identity[Area, String] {
-    val name = "id"
+    val name = "uuid"
     def of(entity: Area): Option[String] = entity.id
     def set(entity: Area, id: String): Area = entity.copy(id = Option(id))
     def clear(entity: Area): Area = entity.copy(id = None)
@@ -33,13 +34,31 @@ object Area {
 
 // 经纬度
 case class LatLng(latitude: Double, longitude: Double)
+object LatLng {
+  implicit val format = Json.format[LatLng]
+}
 
 object ActiveStatus {
   val idle = "IDLE"
-
 }
+
 // 医院
-case class Hospital(id: String, name: String, area: String, loc: LatLng, address: String, status: String)
+case class Hospital(id: Option[String],
+                    name: String,
+                    area: Option[String],
+                    address: Option[String],
+                    loc: Option[LatLng],
+                    status: String = ActiveStatus.idle)
+object Hospital {
+  implicit val format = Json.format[Hospital]
+  implicit object hospitalIdentity extends Identity[Hospital, String] {
+    val name = "uuid"
+    def of(entity: Hospital): Option[String] = entity.id
+    def set(entity: Hospital, id: String): Hospital = entity.copy(id = Option(id))
+    def clear(entity: Hospital): Hospital = entity.copy(id = None)
+    def next: String = UUID.randomUUID() toString
+  }
+}
 
 case class UserProfile(name: String, nickname: Option[String], sex: Int, province: String, city: String, country: String)
 object UserProfile {

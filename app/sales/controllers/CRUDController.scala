@@ -16,6 +16,7 @@ import play.api.libs.json._
 class CRUDController [E: Format, ID](val repository: CRUDRepository[E, ID])
                                     (implicit identity: Identity[E, ID]) extends Controller {
 
+  // 默认每页大小
   val DEFAULT_LIMIT = Seq("50")
 
   def create = Action.async(parse.json) { implicit request =>
