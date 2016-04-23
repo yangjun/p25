@@ -14,9 +14,9 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 /**
- *
- * Created by 军 on 2016/4/11.
- */
+  *
+  * Created by 军 on 2016/4/11.
+  */
 
 
 case class WxError(errcode: String, errmsg: String)
@@ -25,12 +25,12 @@ case class AccessToken(token: String, expires: Int) {
   val accessTokenReads = (
     (__ \ "token").read[String] and
       (__ \ "expires").read[Int]
-    )(AccessToken)
+    ) (AccessToken)
 
   val accessTokenWrites = (
     (JsPath \ "token").write[String] and
       (JsPath \ "expires").write[Int]
-    )(unlift(AccessToken.unapply))
+    ) (unlift(AccessToken.unapply))
 
   implicit val accessTokenFormat = Format(accessTokenReads, accessTokenWrites)
 }
@@ -40,16 +40,31 @@ case class GetAccessToken(appId: String, secret: String)
 case class OAuth2Token(token: String, expires: Int, refresh: String, openid: String, scope: String)
 
 
+case class RegisterWxUser(openid: String,
+                          nickname: Option[String],
+                          sex: Option[Int],
+                          city: Option[String],
+                          province: Option[String],
+                          country: Option[String],
+                          headimgurl: Option[String],
+                          unionid: Option[String]
+                         )
+
+object RegisterWxUser {
+  implicit val format = Json.format[RegisterWxUser]
+}
+
 object WXClient {
   val token = "wx"
   val logger = LoggerFactory.getLogger(classOf[WXClient])
 
   /**
-   * 微信签名验证
-   * @param timestamp
-   * @param nonce
-   * @return
-   */
+    * 微信签名验证
+    *
+    * @param timestamp
+    * @param nonce
+    * @return
+    */
   def checkSignature(timestamp: String, nonce: String, signature: String): Boolean = {
     val list = List(token, timestamp, nonce)
     logger.debug("{}", list)
@@ -241,7 +256,8 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
       }
     }
 
-    def infoBySns(openId: String)  = {
+    // 通过社区API获取用户信息
+    def infoBySns(openId: String) = {
       val url = snsUrl().concat("userinfo")
       val request = ws.url(url).withHeaders("Accept" -> "application/json")
         .withRequestTimeout(5.seconds)
@@ -292,7 +308,7 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
               (__ \ "refresh_token").read[String] and
               (__ \ "openid").read[String] and
               (__ \ "scope").read[String]
-            )(OAuth2Token)
+            ) (OAuth2Token)
 
           f.json.validate(reads)
         }
@@ -319,7 +335,7 @@ class WXClient @Inject()(ws: WSClient, config: Configuration)(implicit exec: Exe
               (__ \ "refresh_token").read[String] and
               (__ \ "openid").read[String] and
               (__ \ "scope").read[String]
-            )(OAuth2Token)
+            ) (OAuth2Token)
           f.json.validate(reads)
         }
       }

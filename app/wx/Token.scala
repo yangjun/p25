@@ -40,4 +40,14 @@ object WxOAuth2Token {
     tokens = tokens + (openid -> token)
   }
 
+  def in(openid: String): Boolean = {
+    tokens.get(openid) match {
+      case Some(s) => {
+        true
+      }
+      case None => {
+        false
+      }
+    }
+  }
 }

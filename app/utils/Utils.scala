@@ -1,6 +1,7 @@
 package utils
 
 import java.security.MessageDigest
+import java.util.UUID
 
 import sun.misc.BASE64Encoder
 
@@ -20,4 +21,11 @@ object Utils {
     def valueOf(buf: Array[Byte]): String = buf.map("%02X" format _).mkString
   }
 
+  /**
+    * 下一个ID
+    * @return
+    */
+   def nextId(): String = {
+     UUID.randomUUID() toString
+   }
 }

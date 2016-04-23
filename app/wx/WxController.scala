@@ -1,33 +1,35 @@
 package wx
 
-import javax.inject.{Named, Inject, Singleton}
+import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem}
+import authentication.UserServiceImpl
 import org.slf4j.LoggerFactory
 import play.Configuration
 import play.api.libs.functional.syntax._
-
 import utils.Utils
 import wx.actor.OAuth2TokenActor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.xml.NodeSeq
-
 import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.libs.json._
-
 import pdi.jwt._
 
+
+import scala.concurrent.duration._
+
 /**
- * Created by 军 on 2016/4/11.
- */
+  * Created by 军 on 2016/4/11.
+  */
 
 @Singleton
 class WxController @Inject()(actorSystem: ActorSystem,
                              config: Configuration,
                              wxClient: WXClient,
-                             @Named("oauth2TokenActor") oauth2TokenActor: ActorRef)
+                             @Named("oauth2TokenActor") oauth2TokenActor: ActorRef,
+                             userService: UserServiceImpl)
                             (implicit exec: ExecutionContext) extends Controller {
 
   val logger = LoggerFactory.getLogger(classOf[WxController])
@@ -38,13 +40,14 @@ class WxController @Inject()(actorSystem: ActorSystem,
   val secret = config.getConfig("wx").getString("appsecret")
 
   /**
-   * WX验证服务器地址有效性
-   * @param signature  微信加密签名，signature结合了开发者填写的token参数和请求中的timestamp参数、nonce参数。
-   * @param timestamp  时间戳
-   * @param nonce   随机数
-   * @param echostr 随机字符串
-   * @return
-   */
+    * WX验证服务器地址有效性
+    *
+    * @param signature 微信加密签名，signature结合了开发者填写的token参数和请求中的timestamp参数、nonce参数。
+    * @param timestamp 时间戳
+    * @param nonce     随机数
+    * @param echostr   随机字符串
+    * @return
+    */
   def valid(signature: String, timestamp: String, nonce: String, echostr: String) = Action.async {
     Future {
       val b = WXClient.checkSignature(timestamp, nonce, signature)
@@ -58,12 +61,13 @@ class WxController @Inject()(actorSystem: ActorSystem,
   }
 
   /**
-   * 接收WX消息和事件
-   * @param signature
-   * @param timestamp
-   * @param nonce
-   * @return
-   */
+    * 接收WX消息和事件
+    *
+    * @param signature
+    * @param timestamp
+    * @param nonce
+    * @return
+    */
   def receiveEvent(signature: String, timestamp: String, nonce: String, echostr: String) = Action.async { request =>
     Future {
       val b = WXClient.checkSignature(timestamp, nonce, signature)
@@ -80,9 +84,10 @@ class WxController @Inject()(actorSystem: ActorSystem,
   }
 
   /**
-   * 测试微信接口
-   * @return
-   */
+    * 测试微信接口
+    *
+    * @return
+    */
   def ip = Action.async {
     wxClient.callbackIp map {
       f => Ok(f)
@@ -90,11 +95,13 @@ class WxController @Inject()(actorSystem: ActorSystem,
   }
 
   /**
-   * 创建菜单
-   * @return
-   */
+    * 创建菜单
+    *
+    * @return
+    */
   def createMenu = Action.async {
-    val data = Json.parse( """
+    val data = Json.parse(
+      """
   {
     "button": [
       {
@@ -146,40 +153,65 @@ class WxController @Inject()(actorSystem: ActorSystem,
     logger.debug("state -> {}", state)
     // 使用 code 换取 oauth2 access-token
     val response = wxClient.OAuth2.token(code1, appid, secret)
-    var session = JwtSession()
-    response map {
-      f => {
-        f match {
+    response flatMap {
+      f =>
+      f match {
           case s: JsSuccess[OAuth2Token] => {
-            val token = s.get
-            logger.debug("")
-            WxOAuth2Token +(token.openid, token)
-            oauth2TokenActor ! OAuth2TokenActor.NextToken(token.refresh, appid)
+            val token: OAuth2Token  = s.get
+//            if (!WxOAuth2Token.in(token.openid)) {
+              WxOAuth2Token +(token.openid, token)
+              oauth2TokenActor ! OAuth2TokenActor.NextToken(token.refresh, appid)
+//            }
             // 查询用户信息
             val userInfo = wxClient.User.infoBySns(token.openid)
-            userInfo map { u =>
+            userInfo.map { u =>
               logger.debug("用户信息 -> {}", u)
-              // 用户信息写入数据库
-              // TODO
-              val openId = u \ "openid"
-              session = session +("user", openId.as[String])
-              // 引导到业务系统首页
-            }
-          }
+              val wxUserResult = u.validate[RegisterWxUser]
+              wxUserResult match {
+                case JsSuccess(wxUser, _) => {
+                  logger.debug("wx用户信息 -> {}", wxUser)
+                  val result = Await.result(userService.registerWxUser(wxUser), 10 seconds)
+                  result match {
+                    case Right(userId) => {
+                      logger.debug("userId -> {}", userId)
+                      var session = JwtSession()
+                      session = session +("user", userId)
+                      val result = Redirect("/")
+                      // 响应头添加 JWT
+                      logger.debug("jwt -> {}", session)
+                      result.withJwtSession(session)
+                      result
+                    }
+                    case Left(x) =>
+                        emptySession
+                  }
+                } //  end JsSuccess
+                case JsError(err) => {
+                  emptySession
+                } // end JsError
+              }
+            } // end userInfo map
+          } //end JsSuccess
           case e: JsError => {
-            session = session +("user", "")
-            logger.error("回调出错了...")
-          }
-        }
-
-        val result = Redirect("/")
-        result
-        // 响应头添加 JWT
-        result.withJwtSession(session)
-      }
-    }
+            Future {
+              emptySession
+            }
+          } // end error
+        } //end match
+    } //end map
   }
 
+  private def emptySession: Result = {
+      var session = JwtSession()
+      session = session +("user", "")
+      logger.error("回调出错了...")
+      val result = Redirect("/")
+      // 响应头添加 JWT
+      logger.debug("jwt -> {}", session)
+      result.withJwtSession(session)
+      result
+
+  }
 
   // jwt 测试
   def jwt = Action.async { implicit request =>

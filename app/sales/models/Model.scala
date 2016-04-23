@@ -60,15 +60,6 @@ object Hospital {
   }
 }
 
-case class UserProfile(name: String, nickname: Option[String], sex: Int, province: String, city: String, country: String)
-object UserProfile {
-  implicit val format = Json.format[UserProfile]
-}
-// 用户
-case class User(id: String, openId: String, unionId: Option[String], profile: UserProfile)
-object User {
-  implicit val format = Json.format[User]
-}
 // 医生
 case class Doctor(id: String, userId: String, name: String, hospital: String)
 

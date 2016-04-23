@@ -1,7 +1,8 @@
 package sales.controllers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
+import authentication.Secured
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
@@ -13,6 +14,7 @@ import scala.concurrent.ExecutionContext
 /**
   * Created by 军 on 2016/4/18.
   */
+@Singleton
 class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                                    val hospitalRepository: HospitalMongoRepository)
                                   (implicit exec: ExecutionContext)

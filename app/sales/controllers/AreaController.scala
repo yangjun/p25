@@ -1,12 +1,14 @@
 package sales.controllers
 
-import javax.inject.{Singleton, Inject}
+import javax.inject.{Inject, Singleton}
 
+import authentication.Secured
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
-import play.modules.reactivemongo.{ReactiveMongoApi, ReactiveMongoComponents, MongoController}
+import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import sales.models.{Area, NameQuery}
 import sales.repositories.{AreaMongoRepository, AreaRepository}
+
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
