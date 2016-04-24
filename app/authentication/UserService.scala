@@ -11,8 +11,8 @@ import wx.RegisterWxUser
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-
 import authentication._
+import org.joda.time.DateTime
 
 /**
   * Created by yangjungis@126.com on 2016/4/23.
@@ -73,15 +73,17 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
             None,
             None,
             wxUser.nickname,
+            wxUser.nickname,
             wxUser.sex,
             wxUser.province,
             wxUser.city,
             wxUser.country,
-            wxUser.headimgurl
+            wxUser.headimgurl,
+            Some(DateTime.now())
           )
           // 开始注册
           val result = userCollection.flatMap(_.insert(user).map {
-            case le if le.ok == true => {
+            case le if le.ok => {
 
               val wx = WxUser(Utils.nextId(),
                 wxUser.openid,
@@ -130,4 +132,32 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
     cursor
   }
 
+  def editUser(userId: String, editUser: EditUser)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    val criteria = Json.obj("id" -> userId)
+    import reactivemongo.play.json._
+    val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
+    cursor.flatMap(c => {
+      c match {
+        case Some(u) => {
+          val u1 = u.copy(
+            displayName = editUser.displayName,
+            email = editUser.email,
+            mobile = editUser.mobile
+          )
+          logger.debug("user -> {}", u1)
+          userCollection.flatMap(_.update(criteria, u1)) map {
+            case le if le.ok => None
+            case le => Some(le.message)
+          }
+        }
+        case None => {
+          val m = s"未发现用户【$userId】"
+          logger.warn(m)
+          Future {
+            None
+          }
+        }
+      }
+    })
+  }
 }

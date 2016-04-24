@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 
 sealed trait Identity {
   val id: String
-  val created: DateTime
+  val created: Option[DateTime]
 }
 
 // 系统用户
@@ -17,14 +17,15 @@ case class User(id: String,
                 username: Option[String],
                 email: Option[String],
                 mobile: Option[String],
+                displayName: Option[String],
                 nickname: Option[String],
                 sex: Option[Int],
                 province: Option[String],
                 city: Option[String],
                 country: Option[String],
-                avatar: Option[String]
+                avatar: Option[String],
+                val created: Option[DateTime]
                ) extends Identity {
-  val created: DateTime = DateTime.now()
 }
 
 object User {
@@ -41,3 +42,13 @@ object WxUser {
   implicit val format = Json.format[WxUser]
 }
 
+
+case class EditUser(email: Option[String],
+                       mobile: Option[String],
+                       displayName: Option[String]) {
+  require(displayName.nonEmpty, "显示名不能为空")
+}
+
+object EditUser {
+  implicit val format = Json.format[EditUser]
+}

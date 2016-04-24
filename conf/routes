@@ -48,9 +48,11 @@ DELETE    /crm/v1/sdk/area/:id              sales.controllers.AreaController.del
 
 # Hospital
 GET       /crm/v1/sdk/hospital              sales.controllers.HospitalController.query(name: Option[String])
-GET       /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.read(id)
+#GET       /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.read(id)
 POST      /crm/v1/sdk/hospital              sales.controllers.HospitalController.create
-DELETE    /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.delete(id)
+PATCH     /crm/v1/sdk/hospital/:id              sales.controllers.HospitalController.edit(id)
+
+#DELETE    /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.delete(id)
 
 
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
@@ -58,6 +60,7 @@ GET       /crm/v1/sdk/private               sales.controllers.AreaController.pri
 # User
 GET       /crm/v1/sdk/auth/userProfile      authentication.AuthenticationController.userProfile
 GET       /crm/v1/sdk/auth/user             authentication.AuthenticationController.user(name)
+POST       /crm/v1/sdk/auth/user/:id        authentication.AuthenticationController.editUser(id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

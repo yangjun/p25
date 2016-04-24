@@ -57,7 +57,7 @@ abstract class MongoCRUDRepository[E: Format, ID: Format](implicit identity: Ide
         val doc = Json.toJson(identity.set(entity, id)).as[JsObject]
 
         collection.flatMap(_.insert(doc).map {
-          case le if le.ok == true => Right(id)
+          case le if le.ok  => Right(id)
           case le => Left(le.message)
         })
       }
