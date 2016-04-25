@@ -8,7 +8,7 @@ import play.api.libs.json.Json
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import sales.models.{CreateHospital, EditHospital, Hospital, NameQuery}
+import sales.models._
 import sales.repositories.{HospitalMongoRepository, HospitalRepository}
 import sales.services.HospitalService
 
@@ -56,4 +56,33 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
       p => Ok(Json.toJson(p))
     }
   }
+
+  def develop(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[DevelopHospital] {
+      entity =>
+        // 取当前登录用户（JWT)
+        val v = entity.copy(hospitalId = id)
+        hospitalService.develop(v).map {
+          case Right(id) =>
+            val data = Json.obj("id" -> id)
+            Ok(data)
+          case Left(err) => BadRequest(Json.toJson(err))
+        }
+    }
+  }
+
+  def resume(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[EditDevelopResume] {
+      entity =>
+        // 取当前登录用户（JWT)
+        val v = entity.copy(hospitalId = id)
+        hospitalService.resume(v).map {
+          case Right(id) =>
+            val data = Json.obj("id" -> id)
+            Ok(data)
+          case Left(err) => BadRequest(Json.toJson(err))
+        }
+    }
+  }
+
 }

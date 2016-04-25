@@ -2,18 +2,16 @@ package sales.services
 
 import javax.inject.{Inject, Singleton}
 
-import authentication.User
-import com.sun.org.apache.xpath.internal.functions.FuncTrue
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.core.errors.DatabaseException
+import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 import sales.models._
 import utils.Utils
-import reactivemongo.play.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,6 +26,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
   private def hospitalCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
     reactiveMongoApi.database.map(_.collection("hospitals"))
   }
+
   private def hospitalResumeHistoryCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
     reactiveMongoApi.database.map(_.collection("hospitalResumeHistories"))
   }
@@ -39,6 +38,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
 
   /**
     * 创建医院
+    *
     * @param createHospital
     * @param ec
     * @return
@@ -72,6 +72,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
 
   /**
     * 根据 id 查询医院
+    *
     * @param id
     * @return
     */
@@ -83,6 +84,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
 
   /**
     * 编辑医院基本信息
+    *
     * @param id
     * @param editHospital
     * @param ec
@@ -114,6 +116,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
 
   /**
     * 申请开发医院
+    *
     * @param developHospital
     * @return
     */
@@ -153,8 +156,47 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
     })
   }
 
+
+  def resume(editDevelopResume: EditDevelopResume): Future[Either[Error, String]] = {
+    val id = editDevelopResume.hospitalId
+    val cursor: Future[Option[Hospital]] = pk(id)
+    cursor.flatMap(f => {
+      f match {
+        case Some(o) => {
+          val r = o.resume(editDevelopResume)
+          r match {
+            case Some(resume) => {
+              val entity = o.copy(lastDevelopResume = Some(resume))
+              val criteria = Json.obj("id" -> id)
+              // 更新开发履历信息
+              hospital.flatMap(_.update(criteria, entity)) map {
+                case le if le.ok => {
+                  Right(id)
+                }
+                case le =>
+                  logger.error(le.message)
+                  Left(Error(le.code.getOrElse(0), le.message))
+              }
+            } // end Some
+            case None => {
+              Future {
+                Right(id)
+              }
+            }
+          }
+        } // end Some
+        case None => {
+          Future {
+            Right(id)
+          }
+        } // end None
+      }
+    }) // end flatMap
+  }
+
   /**
     * 分页查询
+    *
     * @param query
     * @param skip
     * @param limit
@@ -174,7 +216,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
   private def search(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[Hospital]] = {
     hospital.flatMap(_.find(criteria).
       options(QueryOpts(skipN = skip))
-      cursor[Hospital](readPreference = ReadPreference.nearest)
-      collect[List](limit))
+      cursor[Hospital] (readPreference = ReadPreference.nearest)
+      collect[List] (limit))
   }
 }
