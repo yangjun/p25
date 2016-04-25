@@ -1,0 +1,23 @@
+
+医院相关的API
+
+1. 新建医院
+POST /crm/v1/sdk/hospital
+请求内容参见 sales.models.CreateHospital
+
+2. 查询医院
+GET /crm/v1/sdk/hospital?name={name}&skip=0&limit=10
+返回内容参见 sales.models.Hospital
+
+3. 申请开发医院
+POST /crm/v1/sdk/hospital/:id/develop
+请求内容参见 sales.models.DevelopHospital
+
+4. 开发过程中填写开发履历
+POST /crm/v1/sdk/hospital/:id/resume
+请求内容参见 sales.models.EditDevelopResume
+
+5. 编辑医院基本信息
+PATCH /crm/v1/sdk/hospital/:id
+请求内容参见 sales.models.EditHospitals
+

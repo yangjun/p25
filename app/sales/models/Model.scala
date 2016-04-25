@@ -150,6 +150,19 @@ case class Hospital(
       } // end None
     }
   }
+
+  // 构造开发履历
+  def resume(editDevelopResume: EditDevelopResume): Option[DevelopResume] = {
+    lastDevelopResume match {
+      case Some(resume) => {
+        Some(resume.copy(hospitalDescription = editDevelopResume.hospitalDescription,
+          scheduleDescription = editDevelopResume.scheduleDescription))
+      }
+      case None => {
+        None
+      }
+    }
+  }
 }
 
 object Hospital {

@@ -50,9 +50,10 @@ DELETE    /crm/v1/sdk/area/:id              sales.controllers.AreaController.del
 GET       /crm/v1/sdk/hospital              sales.controllers.HospitalController.query(name: Option[String])
 #GET       /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.read(id)
 POST      /crm/v1/sdk/hospital              sales.controllers.HospitalController.create
-PATCH     /crm/v1/sdk/hospital/:id              sales.controllers.HospitalController.edit(id)
-
-#DELETE    /crm/v1/sdk/hospital/:id          sales.controllers.HospitalController.delete(id)
+PATCH     /crm/v1/sdk/hospital/:id                sales.controllers.HospitalController.edit(id)
+#DELETE    /crm/v1/sdk/hospital/:id               sales.controllers.HospitalController.delete(id)
+POST      /crm/v1/sdk/hospital/:id/develop        sales.controllers.HospitalController.develop(id)
+POST      /crm/v1/sdk/hospital/:id/resume        sales.controllers.HospitalController.resume(id)
 
 
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
