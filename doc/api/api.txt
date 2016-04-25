@@ -17,6 +17,7 @@ POST /crm/v1/sdk/hospital/:id/develop
 POST /crm/v1/sdk/hospital/:id/resume
 请求内容参见 sales.models.EditDevelopResume
 
+
 5. 编辑医院基本信息
 PATCH /crm/v1/sdk/hospital/:id
 请求内容参见 sales.models.EditHospitals
