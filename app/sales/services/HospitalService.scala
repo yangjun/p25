@@ -4,14 +4,14 @@ import javax.inject.{Inject, Singleton}
 
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.core.errors.DatabaseException
-import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 import sales.models._
 import utils.Utils
+import reactivemongo.play.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -31,10 +31,16 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
     reactiveMongoApi.database.map(_.collection("hospitalResumeHistories"))
   }
 
+  private def hospitalArchiveCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+    reactiveMongoApi.database.map(_.collection("hospitalArchives"))
+  }
+
   // 医院
   val hospital = hospitalCollection
   // 开发履历
   val resumeHistory = hospitalResumeHistoryCollection
+  // 归档
+  val archive = hospitalArchiveCollection
 
   /**
     * 创建医院
@@ -52,7 +58,8 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
       // 默认为空闲状态
       Some(ActiveStatus.Idle),
       None,
-      Some(DateTime.now())
+      Some(DateTime.now()),
+      archive = None
     )
     val insert = hospital.flatMap(_.insert(entity))
     insert.recover {
@@ -157,6 +164,12 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
   }
 
 
+  /**
+    * 编辑开发履历
+    *
+    * @param editDevelopResume
+    * @return
+    */
   def resume(editDevelopResume: EditDevelopResume): Future[Either[Error, String]] = {
     val id = editDevelopResume.hospitalId
     val cursor: Future[Option[Hospital]] = pk(id)
@@ -192,6 +205,69 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
         } // end None
       }
     }) // end flatMap
+  }
+
+  /**
+    * 开发成功，医院标记为合作伙伴
+    *
+    * @param becomePartner
+    * @return
+    */
+  def becomePartner(becomePartner: BecomePartner): Future[Option[String]] = {
+    val id = becomePartner.id
+    // 查询医院
+    val cursor: Future[Option[Hospital]] = pk(id)
+    cursor.flatMap(f => {
+      f match {
+        case Some(h) => {
+          h.status match {
+            case Some(status) => {
+              status match {
+                // 开发中...
+                case ActiveStatus.Developing => {
+                  val hospitalArchive = HospitalArchive(
+                    Utils.nextId(),
+                    id,
+                    becomePartner.principal,
+                    becomePartner.principalDoctor,
+                    "",
+                    "",
+                    Some(DateTime.now())
+                  )
+                  archive.flatMap(_.insert(hospitalArchive)) flatMap {
+                    case le if le.ok => {
+                      val criteria = Json.obj("id" -> id)
+                      val h1 = h.copy(status = Some(ActiveStatus.Partner))
+                      hospital.flatMap(_.update(criteria, h1)) map {
+                        case le if le.ok => {
+                          Some(hospitalArchive.id)
+                        }
+                        case le => {
+                          throw new RuntimeException("更新医院状态失败")
+                        }
+                      }
+                    }
+                    case le => {
+                      logger.error(le.message)
+                      throw new RuntimeException("添加归档失败")
+                    } // end le
+                  }
+                }
+                case _ => {
+                  throw new RuntimeException("开发中的医院才能归档")
+                }  // end 其他状态
+              } // end status match
+            } // end case Some(status)
+            case None => {
+              throw new RuntimeException("开发中的医院才能归档")
+            }
+          } // end match status
+        } // end case Some(h)
+        case None => {
+          throw new RuntimeException("未发现医院")
+        } // end None
+      } // match f
+    })
   }
 
   /**

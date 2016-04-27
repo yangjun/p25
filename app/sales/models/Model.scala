@@ -50,7 +50,6 @@ object Area {
 
 }
 
-
 // 经纬度
 case class LatLng(latitude: Double, longitude: Double)
 
@@ -113,7 +112,9 @@ case class Hospital(
                      // 最后一次开发过程
                      lastDevelopResume: Option[DevelopResume],
                      // 录入时间
-                     created: Option[DateTime]) {
+                     created: Option[DateTime],
+                     // 归档信息
+                     archive: Option[String]) {
 
 
   def dev(developHospital: DevelopHospital): (DevelopResume, Option[DevelopResumeHistory]) = {
@@ -260,23 +261,33 @@ case class Doctor(id: String, userId: String, name: String, hospital: String)
 
 // 事务所
 case class County(id: String, name: String, area: String)
+object County {
+  implicit val format = Json.format[County]
+}
 
 // 销售人员
 case class Salesman(id: String, userId: String, county: String)
+object Salesman {
+  implicit val format = Json.format[Salesman]
+}
 
 trait Job {
   def name: String
-
   def job: String
-
   def mobile: String
 }
 
 // 决定人
 case class Principal(name: String, job: String, mobile: String) extends Job
+object Principal {
+  implicit val format = Json.format[Principal]
+}
 
 // 用药人
 case class PrincipalDoctor(name: String, job: String, mobile: String) extends Job
+object PrincipalDoctor {
+  implicit val format = Json.format[PrincipalDoctor]
+}
 
 
 // 开票单位
@@ -293,13 +304,49 @@ case class FirstOrderOverview(mark: String, // 时间
                              )
 
 // 医院档案
-case class HospitalCase(id: String,
-                        hospital: String, // 所属医院
-                        principal: Principal, // 医院负责人
-                        principalDoctor: PrincipalDoctor, // 主要用药人
-                        county: County, // 开发事务所
-                        contacts: Salesman // 销售人员
-                       )
+case class HospitalArchive(
+                            // 标识
+                            id: String,
+                            // 医院标识
+                            hospital: String,
+                            principal: Principal, // 医院负责人
+                            principalDoctor: PrincipalDoctor, // 主要用药人
+                            county: String, // 开发事务所
+                            contacts: String, // 销售人员
+                            created: Option[DateTime] // 归档时间
+                          ) {
+
+}
+
+object HospitalArchive {
+  implicit val format = Json.format[HospitalArchive]
+}
+// 开发成功，成为合作伙伴
+case class BecomePartner(
+                          // 医院标识
+                          id: String,
+                          // 医院负责人
+                          principal: Principal,
+                          // 主要用药人
+                          principalDoctor: PrincipalDoctor
+                        ) {
+
+}
+
+object BecomePartner {
+  implicit val format = Json.format[BecomePartner]
+}
+// 编辑归档信息
+case class EditHospitalArchive(
+                                // 医院标识
+                                id: String,
+                                // 医院负责人
+                                principal: Principal,
+                                // 主要用药人
+                                principalDoctor: PrincipalDoctor
+                              ) {
+
+}
 
 
 // 订单
