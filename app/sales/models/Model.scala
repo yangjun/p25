@@ -3,6 +3,7 @@ package sales.models
 import java.util.UUID
 
 import org.joda.time.DateTime
+import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import repository.Identity
 import utils.Utils
@@ -115,14 +116,16 @@ case class Hospital(
                      created: Option[DateTime],
                      // 归档信息
                      archive: Option[String]) {
+  private lazy val logger = LoggerFactory.getLogger(classOf[Hospital])
 
 
   def dev(developHospital: DevelopHospital): (DevelopResume, Option[DevelopResumeHistory]) = {
+    logger.debug("status -> {}", status)
     status match {
       case Some(s) => {
         // 空闲状态允许开发
         val developResume = developHospital.resume
-        if (s.eq(ActiveStatus.Idle)) {
+        if (s.equals(ActiveStatus.Idle)) {
           lastDevelopResume match {
             // 已经开发过
             case Some(resume) => {
@@ -348,6 +351,9 @@ case class EditHospitalArchive(
 
 }
 
+object EditHospitalArchive {
+  implicit val format = Json.format[EditHospitalArchive]
+}
 
 // 订单
 case class Order()

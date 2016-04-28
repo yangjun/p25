@@ -5,11 +5,9 @@ import javax.inject.{Inject, Singleton}
 import authentication.Secured
 import controllers.JsonValidate
 import play.api.libs.json.Json
-import play.api.mvc.BodyParsers.parse
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import sales.models._
-import sales.repositories.{HospitalMongoRepository, HospitalRepository}
 import sales.services.HospitalService
 
 import scala.concurrent.ExecutionContext
@@ -24,7 +22,7 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                                   (implicit exec: ExecutionContext)
   extends Controller with MongoController with ReactiveMongoComponents with JsonValidate with Secured {
 
-  def create = Action.async(parse.json) {implicit req =>
+  def create = Action.async(parse.json) { implicit req =>
     validateAndThen[CreateHospital] {
       entity =>
         hospitalService.create(entity).map {
@@ -36,7 +34,7 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
-  def edit(id: String) = Action.async(parse.json) {implicit req =>
+  def edit(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[EditHospital] {
       entity =>
         hospitalService.edit(id, entity).map {
@@ -85,4 +83,35 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
+  def becomePartner(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[BecomePartner] {
+      param =>
+        val p = param.copy(id = id)
+        hospitalService.becomePartner(p) map (f => {
+          f match {
+            case Some(id) =>
+              val data = Json.obj("id" -> id)
+              Ok(data)
+            case None =>
+              BadRequest(Json.obj())
+          }
+        })
+    }
+  }
+
+  def editArchive(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[EditHospitalArchive] {
+      param =>
+        val p = param.copy(id = id)
+        hospitalService.editHospitalArchive(p) map (f => {
+          f match {
+            case Some(id) =>
+              val data = Json.obj("id" -> id)
+              Ok(data)
+            case None =>
+              BadRequest(Json.obj())
+          }
+        })
+    }
+  }
 }

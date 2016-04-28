@@ -8,10 +8,10 @@ import play.api.libs.json._
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.core.errors.DatabaseException
+import reactivemongo.play.json._
 import reactivemongo.play.json.collection.JSONCollection
 import sales.models._
 import utils.Utils
-import reactivemongo.play.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -237,7 +237,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
                   archive.flatMap(_.insert(hospitalArchive)) flatMap {
                     case le if le.ok => {
                       val criteria = Json.obj("id" -> id)
-                      val h1 = h.copy(status = Some(ActiveStatus.Partner))
+                      val h1 = h.copy(status = Some(ActiveStatus.Partner), archive = Some(hospitalArchive.id))
                       hospital.flatMap(_.update(criteria, h1)) map {
                         case le if le.ok => {
                           Some(hospitalArchive.id)
@@ -255,7 +255,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
                 }
                 case _ => {
                   throw new RuntimeException("开发中的医院才能归档")
-                }  // end 其他状态
+                } // end 其他状态
               } // end status match
             } // end case Some(status)
             case None => {
@@ -267,6 +267,55 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
           throw new RuntimeException("未发现医院")
         } // end None
       } // match f
+    })
+  }
+
+
+  /**
+    * 编辑归档信息
+    *
+    * @param editHospitalArchive
+    * @return
+    */
+  def editHospitalArchive(editHospitalArchive: EditHospitalArchive): Future[Option[String]] = {
+    val id = editHospitalArchive.id
+    // 查询医院
+    val cursor: Future[Option[Hospital]] = pk(id)
+    cursor.flatMap(f => {
+      f match {
+        case Some(h) => {
+          h.archive match {
+            case Some(archiveId) => {
+              val criteria = Json.obj("id" -> archiveId)
+              archive.flatMap(_.find(criteria).one[HospitalArchive]).flatMap(a => {
+                a match {
+                  case Some(hospitalArchive) => {
+                    val entity = hospitalArchive.copy(principal = editHospitalArchive.principal,
+                      principalDoctor = editHospitalArchive.principalDoctor)
+                    archive.flatMap(_.update(criteria, entity)) map {
+                      case le if le.ok => {
+                        Some(id)
+                      }
+                      case le => {
+                        throw new RuntimeException("更新归档失败")
+                      }
+                    }
+                  }
+                  case None => {
+                    throw new RuntimeException("未发现医院归档信息")
+                  }
+                }
+              })
+            }
+            case None => {
+              throw new RuntimeException("未发现归档")
+            }
+          }
+        }
+        case None => {
+          throw new RuntimeException("未发现医院")
+        }
+      }
     })
   }
 
