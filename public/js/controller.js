@@ -10,3 +10,10 @@ app.controller('ApplicationController', ['$scope', 'commonService',
             $scope.ok = result;
         });
     }]);
+
+/**
+ * 医院：新建医院
+ */
+app.controller('HospitalCreateCtrl', ['$scope',
+    function ($scope) {
+    }]);

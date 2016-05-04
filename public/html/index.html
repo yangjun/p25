@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <link rel="shortcut icon" href="../img/favicon.png" type="image/icon"/>
+    <link rel="shortcut icon" href=".../img/favicon.png" type="image/icon"/>
     <title>标题</title>
 
     <link href="../css/weui.min.css" rel="stylesheet"/>
@@ -16,26 +16,48 @@
     <script src="../js/component/jweixin-1.0.0.js"></script>
 
     <script src="../js/app.js"></script>
+    <script src="../js/controller.js"></script>
     <script src="../js/router.js"></script>
     <script src="../js/service.js"></script>
-    <script src="../js/controller.js"></script>
 </head>
 <body>
-<!--快速访问 FIXME-->
-<div class="weui_panel weui_panel_access">
-    <div class="weui_panel_bd spacing">
-        <a ui-sref="organization" class="weui_btn weui_btn_plain_primary">3.1. 系统组织机构管理</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.2. 基础信息维护</a>
-        <a ui-sref="application" ui-sref-opts="{reload:true}" class="weui_btn weui_btn_plain_primary">3.3. 开发医院申请</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.4. 医院基本信息登记</a>
-        <a ui-sref="problem" ui-sref-opts="{reload:true}" class="weui_btn weui_btn_plain_primary">3.5. 问题反馈</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.6. 医疗知识反馈</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.8. 处方管理</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.9. 订单管理</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.10. 出库管理</a>
-        <a ui-sref="application" class="weui_btn weui_btn_plain_primary">3.11. 回访管理</a>
+<div class="container" id="container">
+    <div class="tabbar">
+        <div class="weui_tab">
+            <div class="weui_tab_bd">
+                <ui-view></ui-view>
+            </div>
+            <div class="weui_tabbar">
+                <a class="weui_tabbar_item" ui-sref="hospital.create"
+                   ng-class="{'weui_bar_item_on':$state.includes('hospital')}">
+                    <div class="weui_tabbar_icon">
+                        <img src="../img/icon_nav_button.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">医院</p>
+                </a>
+                <a class="weui_tabbar_item" ui-sref="organization"
+                   ng-class="{'weui_bar_item_on':$state.includes('organization')}">
+                    <div class="weui_tabbar_icon">
+                        <img src="../img/icon_nav_msg.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">组织机构</p>
+                </a>
+                <a class="weui_tabbar_item" ui-sref="problem"
+                   ng-class="{'weui_bar_item_on':$state.includes('problem')}">
+                    <div class="weui_tabbar_icon">
+                        <img src="../img/icon_nav_article.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">问题反馈</p>
+                </a>
+                <a class="weui_tabbar_item">
+                    <div class="weui_tabbar_icon">
+                        <img src="../img/icon_nav_cell.png" alt="">
+                    </div>
+                    <p class="weui_tabbar_label">管理</p>
+                </a>
+            </div>
     </div>
 </div>
-<ui-view></ui-view>
+</div>
 </body>
 </html>
