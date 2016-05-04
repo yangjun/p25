@@ -9,6 +9,11 @@ app.constant('ROUTER',
                 url: '/organization',
                 templateUrl: '../html/org/org.html'
             })
+            /*问题反馈*/
+            .state('problem', {
+                url: '/problem',
+                templateUrl: '../html/feed/problem_feedback.html'
+            })
             /*开发医院申请*/
             .state('application', {
                 url: '/application',
@@ -17,3 +22,5 @@ app.constant('ROUTER',
             });
         $urlRouterProvider.when('', '/organization');
     });
+
+app.constant('CTX', "/crm/v1/sdk");
