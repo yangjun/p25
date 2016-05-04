@@ -4,6 +4,7 @@ import java.util.UUID
 
 import authentication.User
 import org.joda.time.DateTime
+import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import repository.Identity
 import utils.Utils
@@ -50,7 +51,6 @@ object Area {
   }
 
 }
-
 
 // 经纬度
 case class LatLng(latitude: Double, longitude: Double)
@@ -114,15 +114,19 @@ case class Hospital(
                      // 最后一次开发过程
                      lastDevelopResume: Option[DevelopResume],
                      // 录入时间
-                     created: Option[DateTime]) {
+                     created: Option[DateTime],
+                     // 归档信息
+                     archive: Option[String]) {
+  private lazy val logger = LoggerFactory.getLogger(classOf[Hospital])
 
 
   def dev(developHospital: DevelopHospital): (DevelopResume, Option[DevelopResumeHistory]) = {
+    logger.debug("status -> {}", status)
     status match {
       case Some(s) => {
         // 空闲状态允许开发
         val developResume = developHospital.resume
-        if (s.eq(ActiveStatus.Idle)) {
+        if (s.equals(ActiveStatus.Idle)) {
           lastDevelopResume match {
             // 已经开发过
             case Some(resume) => {
@@ -285,31 +289,34 @@ case class AddDoctor(
                       hospital: Option[String]
                     ) extends Message {
 
+
   /**
     * 构造用户信息
+    *
     * @return
     */
-  def user(): User ={
-  User(
-    Utils.nextId(),
-    Some(name),
-    email,
-    mobile,
-    Some(name),
-    Some(name),
-    // sex
-    None,
-    // province
-    None,
-    // city
-    None,
-    // country
-    None,
-    // avatar
-    None,
-    Some(DateTime.now())
-  )
+  def user(): User = {
+    User(
+      Utils.nextId(),
+      Some(name),
+      email,
+      mobile,
+      Some(name),
+      Some(name),
+      // sex
+      None,
+      // province
+      None,
+      // city
+      None,
+      // country
+      None,
+      // avatar
+      None,
+      Some(DateTime.now())
+    )
 
+  }
 }
 
 object AddDoctor {
@@ -319,8 +326,16 @@ object AddDoctor {
 // 事务所
 case class County(id: String, name: String, area: String)
 
+object County {
+  implicit val format = Json.format[County]
+}
+
 // 销售人员
 case class Salesman(id: String, userId: String, county: String)
+
+object Salesman {
+  implicit val format = Json.format[Salesman]
+}
 
 trait Job {
   def name: String
@@ -333,8 +348,16 @@ trait Job {
 // 决定人
 case class Principal(name: String, job: String, mobile: String) extends Job
 
+object Principal {
+  implicit val format = Json.format[Principal]
+}
+
 // 用药人
 case class PrincipalDoctor(name: String, job: String, mobile: String) extends Job
+
+object PrincipalDoctor {
+  implicit val format = Json.format[PrincipalDoctor]
+}
 
 
 // 开票单位
@@ -351,17 +374,58 @@ case class FirstOrderOverview(mark: String, // 时间
                              )
 
 // 医院档案
-case class HospitalCase(id: String,
-                        hospital: String, // 所属医院
-                        principal: Principal, // 医院负责人
-                        principalDoctor: PrincipalDoctor, // 主要用药人
-                        county: County, // 开发事务所
-                        contacts: Salesman // 销售人员
-                       )
+case class HospitalArchive(
+                            // 标识
+                            id: String,
+                            // 医院标识
+                            hospital: String,
+                            principal: Principal, // 医院负责人
+                            principalDoctor: PrincipalDoctor, // 主要用药人
+                            county: String, // 开发事务所
+                            contacts: String, // 销售人员
+                            created: Option[DateTime] // 归档时间
+                          ) {
+
+}
+
+object HospitalArchive {
+  implicit val format = Json.format[HospitalArchive]
+}
+
+// 开发成功，成为合作伙伴
+case class BecomePartner(
+                          // 医院标识
+                          id: String,
+                          // 医院负责人
+                          principal: Principal,
+                          // 主要用药人
+                          principalDoctor: PrincipalDoctor
+                        ) {
+
+}
+
+object BecomePartner {
+  implicit val format = Json.format[BecomePartner]
+}
+
+// 编辑归档信息
+case class EditHospitalArchive(
+                                // 医院标识
+                                id: String,
+                                // 医院负责人
+                                principal: Principal,
+                                // 主要用药人
+                                principalDoctor: PrincipalDoctor
+                              ) {
+
+}
+
+object EditHospitalArchive {
+  implicit val format = Json.format[EditHospitalArchive]
+}
 
 
-// 订单
-case class Order()
+
 
 
 

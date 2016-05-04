@@ -54,8 +54,13 @@ PATCH     /crm/v1/sdk/hospital/:id                sales.controllers.HospitalCont
 #DELETE    /crm/v1/sdk/hospital/:id               sales.controllers.HospitalController.delete(id)
 POST      /crm/v1/sdk/hospital/:id/develop        sales.controllers.HospitalController.develop(id)
 POST      /crm/v1/sdk/hospital/:id/resume         sales.controllers.HospitalController.resume(id)
+<<<<<<< HEAD
 GET       /crm/v1/sdk/hospital/redirect           sales.controllers.HospitalController.redirect
 
+=======
+POST      /crm/v1/sdk/hospital/:id/partner        sales.controllers.HospitalController.becomePartner(id)
+POST      /crm/v1/sdk/hospital/:id/archive        sales.controllers.HospitalController.editArchive(id)
+>>>>>>> 8ea2af4518c930b5b99f2e8a4bee21686a70803c
 
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
 

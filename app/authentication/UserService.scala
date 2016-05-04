@@ -13,6 +13,8 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import authentication._
 import org.joda.time.DateTime
+import scala.concurrent._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by yangjungis@126.com on 2016/4/23.

@@ -55,33 +55,54 @@ class DoctorService @Inject()(
     * @return
     */
   def create(addDoctor: AddDoctor)
-            (implicit ec: ExecutionContext): Future[Option[String]] = {
+            (implicit ec: ExecutionContext): Future[String] = {
     val id = Utils.nextId
     val hospitalId = addDoctor.hospital
     hospitalId match {
       case Some(hid) => {
-        pk(hid).map(h => {
+        // 查询医院
+        pk(hid).flatMap(h => {
           h match {
+            // 发现医院
             case Some(oneHospital) => {
               addDoctor.mobile match {
-                  // 查询是否已经注册用户
+                // 查询是否已经注册用户
                 case Some(mobile) => {
-                  userService.mobile(mobile) map (u => u match {
-                      // 已注册用户
+                  userService.mobile(mobile) flatMap (u => u match {
+                    // 已注册用户
                     case Some(user) => {
-                      user
+                      Future {
+                        user.id
+                      }
                     }
-                      // 未注册用户
+                    // 未注册用户
                     case None => {
-                      userService.addUser(addDoctor.user())
+                      userService.addUser(addDoctor.user()) map (user => {
+                        user match {
+                          case Some(u) => {
+                            u.id
+                          }
+                          case None => {
+                            throw new RuntimeException("新建用户失败")
+                          }
+                        }
+                      })
                     }
                   })
                 }
                 case None => {
-                  userService.
+                  userService.addUser(addDoctor.user()) map (user => {
+                    user match {
+                      case Some(u) => {
+                        u.id
+                      }
+                      case None => {
+                        throw new RuntimeException("新建用户失败")
+                      }
+                    }
+                  })
                 }
               }
-
             }
             case None => {
               throw new RuntimeException(s"未发现标识【$hospitalId】医院")

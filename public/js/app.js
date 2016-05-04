@@ -39,20 +39,6 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowPro
         $httpProvider.interceptors.push('jwtInterceptor');
     }]);
 
-app.run(['$rootScope', '$state', 'commonService', function ($rootScope, $state, commonService) {
+app.run(['$rootScope', '$state', function ($rootScope, $state) {
     $rootScope.$state = $state;
-
-    /*动态设置页面标题*/
-    $rootScope.$on('$viewContentLoaded', function () {
-        var title = '';
-        switch ($rootScope.$state.current.name) {
-            case 'application':
-                title = '开发医院申请';
-                break;
-            case 'organization':
-                title = '组织机构管理';
-                break;
-        }
-        commonService.title(title);
-    });
 }]);
