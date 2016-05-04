@@ -4,6 +4,7 @@ import javax.inject.{Inject, Singleton}
 
 import authentication.Secured
 import controllers.JsonValidate
+import pdi.jwt._
 import play.api.libs.json.Json
 import play.api.mvc.BodyParsers.parse
 import play.api.mvc.{Action, Controller}
@@ -74,6 +75,7 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   def resume(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[EditDevelopResume] {
       entity =>
+        // TODO
         // 取当前登录用户（JWT)
         val v = entity.copy(hospitalId = id)
         hospitalService.resume(v).map {
@@ -83,6 +85,15 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
           case Left(err) => BadRequest(Json.toJson(err))
         }
     }
+  }
+
+  // 测试重定向
+  def redirect = Action {implicit req =>
+    var session = JwtSession()
+    session = session +("user", "yangjun")
+    session = session.withSignature("secret")
+    val result = Redirect("/count", 302)
+    result.withJwtSession(session)
   }
 
 }

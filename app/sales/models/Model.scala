@@ -2,6 +2,7 @@ package sales.models
 
 import java.util.UUID
 
+import authentication.User
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import repository.Identity
@@ -256,7 +257,64 @@ object EditDevelopResume {
 
 
 // 医生
-case class Doctor(id: String, userId: String, name: String, hospital: String)
+case class Doctor(id: String,
+                  // 用户标识
+                  userId: Option[String],
+                  // 名称
+                  name: String,
+                  // 职位
+                  job: Option[String],
+                  // 医院标识
+                  hospital: String)
+
+object Doctor {
+  implicit val format = Json.format[Doctor]
+}
+
+// 为医院添加医生
+case class AddDoctor(
+                      // 医生姓名
+                      name: String,
+                      // 电子邮件
+                      email: Option[String],
+                      // 手机号码
+                      mobile: Option[String],
+                      // 所在医院职位
+                      job: Option[String],
+                      // 所在医院
+                      hospital: Option[String]
+                    ) extends Message {
+
+  /**
+    * 构造用户信息
+    * @return
+    */
+  def user(): User ={
+  User(
+    Utils.nextId(),
+    Some(name),
+    email,
+    mobile,
+    Some(name),
+    Some(name),
+    // sex
+    None,
+    // province
+    None,
+    // city
+    None,
+    // country
+    None,
+    // avatar
+    None,
+    Some(DateTime.now())
+  )
+
+}
+
+object AddDoctor {
+  implicit val format = Json.format[Doctor]
+}
 
 // 事务所
 case class County(id: String, name: String, area: String)

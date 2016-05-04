@@ -156,7 +156,6 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
     })
   }
 
-
   def resume(editDevelopResume: EditDevelopResume): Future[Either[Error, String]] = {
     val id = editDevelopResume.hospitalId
     val cursor: Future[Option[Hospital]] = pk(id)
@@ -219,4 +218,5 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
       cursor[Hospital] (readPreference = ReadPreference.nearest)
       collect[List] (limit))
   }
+
 }

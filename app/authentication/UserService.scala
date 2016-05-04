@@ -132,6 +132,14 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
     cursor
   }
 
+  def mobile(mobile: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
+    // 根据移动号码名查询
+    val criteria = Json.obj("mobile" -> mobile)
+    import reactivemongo.play.json._
+    val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
+    cursor
+  }
+
   def editUser(userId: String, editUser: EditUser)(implicit ec: ExecutionContext): Future[Option[String]] = {
     val criteria = Json.obj("id" -> userId)
     import reactivemongo.play.json._
@@ -160,4 +168,21 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
       }
     })
   }
+
+  /**
+    * 添加用户
+    * @param user
+    * @return
+    */
+  def addUser(user: User): Future[Option[User]] = {
+    userCollection.flatMap(_.insert(user) map {
+      case le if le.ok => {
+        Some(user)
+      }
+      case le => {
+        throw new RuntimeException(le.message)
+      }
+    })
+  }
+
 }
