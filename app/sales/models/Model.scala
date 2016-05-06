@@ -259,7 +259,6 @@ object EditDevelopResume {
   implicit val format = Json.format[EditDevelopResume]
 }
 
-
 // 医生
 case class Doctor(id: String,
                   // 用户标识
@@ -320,7 +319,7 @@ case class AddDoctor(
 }
 
 object AddDoctor {
-  implicit val format = Json.format[Doctor]
+  implicit val format = Json.format[AddDoctor]
 }
 
 // 事务所
@@ -423,10 +422,6 @@ case class EditHospitalArchive(
 object EditHospitalArchive {
   implicit val format = Json.format[EditHospitalArchive]
 }
-
-
-
-
 
 
 

@@ -59,6 +59,10 @@ GET       /crm/v1/sdk/hospital/redirect           sales.controllers.HospitalCont
 POST      /crm/v1/sdk/hospital/:id/partner        sales.controllers.HospitalController.becomePartner(id)
 POST      /crm/v1/sdk/hospital/:id/archive        sales.controllers.HospitalController.editArchive(id)
 
+# Doctor
+POST      /crm/v1/sdk/hospital/:id/doctor         sales.controllers.HospitalController.addDoctor(id)
+GET       /crm/v1/sdk/hospital/:id/doctor         sales.controllers.HospitalController.queryDoctor(id: String, name: Option[String])
+
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
 
 # User

@@ -9,9 +9,9 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import sales.models._
-import sales.services.HospitalService
+import sales.services.{DoctorService, HospitalService}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Left, Right}
 
 /**
@@ -19,7 +19,8 @@ import scala.util.{Left, Right}
   */
 @Singleton
 class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
-                                   val hospitalService: HospitalService)
+                                   val hospitalService: HospitalService,
+                                   val doctorService: DoctorService)
                                   (implicit exec: ExecutionContext)
   extends Controller with MongoController with ReactiveMongoComponents with JsonValidate with Secured {
 
@@ -86,7 +87,7 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   }
 
   // 测试重定向
-  def redirect = Action {implicit req =>
+  def redirect = Action { implicit req =>
     var session = JwtSession()
     session = session +("user", "yangjun")
     session = session.withSignature("secret")
@@ -95,6 +96,12 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   }
 
 
+  /**
+    * 成为合作伙伴
+    *
+    * @param id
+    * @return
+    */
   def becomePartner(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[BecomePartner] {
       param =>
@@ -111,6 +118,12 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
+  /**
+    * 编辑归档信息
+    *
+    * @param id
+    * @return
+    */
   def editArchive(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[EditHospitalArchive] {
       param =>
@@ -127,4 +140,33 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
+  /**
+    * 添加医生
+    *
+    * @param id 医院id
+    * @return
+    */
+  def addDoctor(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[AddDoctor] {
+      param =>
+        val p = param.copy(hospital = Some(id))
+        doctorService.create(p) map (f => {
+          f match {
+            case Some(id) =>
+              val data = Json.obj("id" -> id)
+              Ok(data)
+            case None =>
+              BadRequest(Json.obj())
+          }
+        })
+    }
+  }
+
+  def queryDoctor(id: String, name: Option[String]) = Action.async { implicit req =>
+    val skip = req.queryString.get("skip").getOrElse(DEFAULT_SKIP).head.toInt
+    val limit = req.queryString.get("limit").getOrElse(DEFAULT_LIMIT).head.toInt
+    doctorService.search(id, name, skip, limit) map {
+      p => Ok(Json.toJson(p))
+    }
+  }
 }

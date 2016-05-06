@@ -4,11 +4,13 @@ import javax.inject.{Inject, Singleton}
 
 import authentication.{UserService, UserServiceImpl}
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
+import reactivemongo.api.{QueryOpts, ReadPreference}
 import reactivemongo.play.json.collection.JSONCollection
 import sales.models._
 import utils.Utils
+import reactivemongo.play.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,7 +59,7 @@ class DoctorService @Inject()(
     * @return
     */
   def create(addDoctor: AddDoctor)
-            (implicit ec: ExecutionContext): Future[String] = {
+            (implicit ec: ExecutionContext): Future[Option[String]] = {
     val id = Utils.nextId
     val hospitalId = addDoctor.hospital
     val userId = hospitalId match {
@@ -116,6 +118,7 @@ class DoctorService @Inject()(
         throw new RuntimeException("需要指定医院标识")
       }
     }
+
     // 创建
     userId flatMap (u => {
       val doctor = Doctor(id,
@@ -125,7 +128,7 @@ class DoctorService @Inject()(
         hospital = addDoctor.hospital.getOrElse("")
       )
       doctorCollection.flatMap(_.insert(doctor)) map {
-        case le if le.ok => id
+        case le if le.ok => Some(id)
         case le =>
           logger.error(le.message)
           throw new RuntimeException("新建失败")
@@ -133,6 +136,24 @@ class DoctorService @Inject()(
     })
   }
 
+
+  /**
+    * 根据医院和医生名称查询医院医生
+    * @param id
+    * @param name
+    * @param ec
+    */
+  def search(id: String, name: Option[String], skip: Int, limit: Int)(implicit ec: ExecutionContext): Future[Traversable[Doctor]] = {
+   val criteria =  name match {
+      case Some(name) => {
+        Json.obj("name" -> name, "hospital" -> id)
+      }
+      case None => {
+        Json.obj("hospital" -> id)
+      }
+    }
+    search(criteria, skip, limit)
+  }
 
   /**
     * 根据 id 查询医院
@@ -145,4 +166,12 @@ class DoctorService @Inject()(
     import reactivemongo.play.json._
     hospital.flatMap(_.find(criteria).one[Hospital])
   }
+
+  private def search(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[Doctor]] = {
+    doctor.flatMap(_.find(criteria).
+      options(QueryOpts(skipN = skip))
+      cursor[Doctor] (readPreference = ReadPreference.nearest)
+      collect[List] (limit))
+  }
+
 }
