@@ -1,0 +1,46 @@
+<!--医院：申请开发-->
+<form name="form" ng-submit="createHospital()">
+    <div class="content">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">医院名称</div>
+                            <div class="item-input">
+                                <input type="text" disabled ng-model="hospital.name">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">开发天数</div>
+                            <div class="item-input">
+                                <input type="number" ng-model="hospital.area">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="item-content">
+                        <div class="item-inner">
+                            <div class="item-title label">销售人员</div>
+                            <div class="item-input">
+                                <input type="text" placeholder="选填" ng-model="hospital.area">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="content-block">
+            <div class="row">
+                <a class="col-50 button button-big button-fill button-danger" ui-sref="hospital.info({id:hospital.id})"
+                   ui-sref-opts="{reload:true}">取消</a>
+                <button class="col-50 button button-big button-fill button-success" type="submit">申请</button>
+            </div>
+        </div>
+    </div>
+</form>

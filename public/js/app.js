@@ -41,4 +41,15 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowPro
 
 app.run(['$rootScope', '$state', function ($rootScope, $state) {
     $rootScope.$state = $state;
+
+    /*页面相关设置*/
+    $rootScope.config = {
+        title: {
+            hastitle: false, /*是否显示标题*/
+            title: '', /*标题内容*/
+            hasback: false, /*是否显示返回按钮*/
+            backurl: ''/*返回按钮地址*/
+        }
+    };
+
 }]);

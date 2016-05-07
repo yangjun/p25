@@ -1,4 +1,4 @@
-<!--医院：新建医院-->
+<!--医院：编辑医院-->
 <form name="form" ng-submit="createHospital()">
     <div class="content">
         <div class="list-block">
@@ -45,13 +45,13 @@
                     </div>
                 </li>
             </ul>
-    </div>
+        </div>
         <div class="content-block">
             <div class="row">
-                <a class="col-50 button button-big button-fill button-danger" ui-sref="hospital.home"
+                <a class="col-50 button button-big button-fill button-danger" ui-sref="hospital.info({id:hospital.id})"
                    ui-sref-opts="{reload:true}">取消</a>
-                <button class="col-50 button button-big button-fill button-success" type="submit">提交</button>
+                <button class="col-50 button button-big button-fill button-success" type="submit">保存</button>
+            </div>
         </div>
     </div>
-</div>
 </form>

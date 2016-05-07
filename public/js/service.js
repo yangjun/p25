@@ -83,8 +83,9 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param skip
              * @param limit
              */
-            hospital: function (name, skip, limit) {
-                return restClient.get(CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
+            listHospital: function (name, skip, limit) {
+                //return restClient.get(CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CTX + '/hospital?skip=' + skip + '&limit=' + limit);
             },
             /**
              * 申请开发医院
@@ -106,8 +107,8 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * 编辑医院基本信息
              * @param id
              */
-            editHospital: function (id) {
-                return restClient.patch(CTX + '/hospital/' + id);
+            editHospital: function (id, obj) {
+                return restClient.patch(CTX + '/hospital/' + id, obj);
             }
         }
     }]);
