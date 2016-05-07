@@ -3,6 +3,8 @@ package utils
 import java.security.MessageDigest
 import java.util.UUID
 
+import org.joda.time.DateTime
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, DateTimeFormatterBuilder}
 import sun.misc.BASE64Encoder
 
 /**
@@ -28,4 +30,28 @@ object Utils {
    def nextId(): String = {
      UUID.randomUUID() toString
    }
+
+
+  /**
+    * 格式化当前日期
+    * @param pattern
+    * @return
+    */
+   def fmt(pattern: String): String = {
+     val now = DateTime.now()
+     val fmt = DateTimeFormat.forPattern(pattern)
+     fmt.print(now)
+   }
+
+  /**
+    * 转换当前日期到 yyyy.MM
+    * <pre>
+    *   2106.05
+    * </pre>
+    * @return
+    */
+  def orderFmt(): String = {
+    fmt("yyyy.MM")
+  }
+
 }

@@ -9,7 +9,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import sales.models._
-import sales.services.{DoctorService, HospitalService}
+import sales.services.{DoctorService, HospitalService, OrderService}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Left, Right}
@@ -20,6 +20,7 @@ import scala.util.{Left, Right}
 @Singleton
 class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                                    val hospitalService: HospitalService,
+                                   val orderService: OrderService,
                                    val doctorService: DoctorService)
                                   (implicit exec: ExecutionContext)
   extends Controller with MongoController with ReactiveMongoComponents with JsonValidate with Secured {
@@ -160,6 +161,19 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
           }
         })
     }
+  }
+
+  def deleteDoctor(id: String) = Action.async { implicit req =>
+    doctorService.delete(id) map (f => {
+      f match {
+        case Some(id) => {
+          val data = Json.obj("id" -> id)
+          Ok(data)
+        }
+        case None =>
+          BadRequest(Json.obj())
+      }
+    })
   }
 
   def queryDoctor(id: String, name: Option[String]) = Action.async { implicit req =>

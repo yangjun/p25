@@ -15,6 +15,7 @@ import reactivemongo.play.json._
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
+  * 医生相关的操作
   * Created by yangjungis@126.com on 2016/4/30.
   */
 @Singleton
@@ -121,13 +122,13 @@ class DoctorService @Inject()(
 
     // 创建
     userId flatMap (u => {
-      val doctor = Doctor(id,
+      val doctor1 = Doctor(id,
         Some(u),
         addDoctor.name,
         addDoctor.job,
         hospital = addDoctor.hospital.getOrElse("")
       )
-      doctorCollection.flatMap(_.insert(doctor)) map {
+      doctor.flatMap(_.insert(doctor1)) map {
         case le if le.ok => Some(id)
         case le =>
           logger.error(le.message)
@@ -138,6 +139,23 @@ class DoctorService @Inject()(
 
 
   /**
+    * 删除医生
+    * @param id 医生标识
+    * @param ec
+    * @return
+    */
+  def delete(id: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    val criteria = Json.obj("id" -> id)
+    import reactivemongo.play.json._
+    doctor.flatMap(_.remove(criteria)) map {
+      case le if le.ok => Some(id)
+      case le => {
+        logger.error(le.message)
+        throw new RuntimeException(s"删除医生【$id】失败")
+      }
+    }
+  }
+  /**
     * 根据医院和医生名称查询医院医生
     * @param id
     * @param name
@@ -146,7 +164,8 @@ class DoctorService @Inject()(
   def search(id: String, name: Option[String], skip: Int, limit: Int)(implicit ec: ExecutionContext): Future[Traversable[Doctor]] = {
    val criteria =  name match {
       case Some(name) => {
-        Json.obj("name" -> name, "hospital" -> id)
+        val r = Json.obj("$regex" -> name, "$options" -> "$mi")
+        Json.obj("name" -> r, "hospital" -> id)
       }
       case None => {
         Json.obj("hospital" -> id)
@@ -171,7 +190,7 @@ class DoctorService @Inject()(
     doctor.flatMap(_.find(criteria).
       options(QueryOpts(skipN = skip))
       cursor[Doctor] (readPreference = ReadPreference.nearest)
-      collect[List] (limit))
+      collect[List](limit))
   }
 
 }

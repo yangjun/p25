@@ -423,5 +423,116 @@ object EditHospitalArchive {
   implicit val format = Json.format[EditHospitalArchive]
 }
 
+// 订单
+case class Order(
+                  // 标识
+                  id: String,
+                  // 订单编号（自动生成序号）
+                  no: String,
+                  // 申请人
+                  proposer: String,
+                  // 创建日期
+                  created: Option[DateTime],
+                  // 状态
+                  status: String = OrderStatus.Idle,
+                  // 医院
+                  hospitalId: String,
+                  // 备注
+                  notes: Option[String],
+                  // 订单项
+                  items: Set[OrderItem]
+                ) {
 
+}
+
+object Order {
+  implicit val format = Json.format[Order]
+}
+
+object OrderStatus {
+  // 提交订单后的初始状态
+  val Idle = "idle"
+  // 处理中
+  val Handling = "handling"
+  // 发货中
+  val Shipping = "shipping"
+  // 等待确认
+  val Confirmation = "confirmation"
+  // 取消
+  val Cancel = "cancel"
+  // 完成
+  val achieve = "achieve"
+}
+
+// 订单项
+case class OrderItem(
+                      // 序号
+                      no: Int,
+                      // 药品名称
+                      goodsName: String,
+                      // 规格型号
+                      specification: String,
+                      // 单位
+                      unit: String,
+                      // 数量
+                      quantity: Int,
+                      // 备注
+                      notes: Option[String]
+                    ) {
+
+}
+
+object OrderItem {
+  implicit val format = Json.format[OrderItem]
+}
+
+case class OrderAudit(id: String,
+                      orderId: String,
+                      who: String,
+                      created: Option[DateTime],
+                      notes: Option[String]
+                     )
+
+object OrderAudit {
+  implicit val format = Json.format[OrderAudit]
+}
+
+/**
+  * 记录订单相关参与人（订单+参与人唯一）
+  * @param id
+  * @param orderId
+  * @param who
+  */
+case class OrderRef(id: String,
+                    orderId: String,
+                    who: String)
+object OrderRef {
+  implicit val format = Json.format[OrderRef]
+}
+case class NextOrderNo(
+                        // 前缀
+                        prefix: String,
+                        // 序号
+                        serial: Int = 1
+                      )
+
+object NextOrderNo {
+  implicit val format = Json.format[NextOrderNo]
+}
+
+case class CreateOrder(
+                        // 医院
+                        hospitalId: Option[String],
+                        // 订单项
+                        items: Set[OrderItem],
+                        // 申请人
+                        proposer: Option[String],
+                        // 备注
+                        notes: Option[String]
+                      ) {
+
+}
+object CreateOrder {
+  implicit val format = Json.format[CreateOrder]
+}
 
