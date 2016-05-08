@@ -58,6 +58,25 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
+  /**
+    * 查询单个医院信息
+    * @param id
+    * @return
+    */
+  def read(id: String) = Action.async { implicit req =>
+    hospitalService.pk(id) map {
+      p =>
+        p match {
+          case Some(p) =>
+            Ok (Json.toJson (p) )
+          case None => {
+            val err = Json.obj("error" -> "为发现")
+            BadRequest(Json.toJson(err))
+          }
+        }
+    }
+  }
+
   def develop(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[DevelopHospital] {
       entity =>

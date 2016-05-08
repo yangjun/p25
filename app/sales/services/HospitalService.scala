@@ -83,7 +83,7 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
     * @param id
     * @return
     */
-  private def pk(id: String): Future[Option[Hospital]] = {
+  def pk(id: String): Future[Option[Hospital]] = {
     val criteria = Json.obj("id" -> id)
     import reactivemongo.play.json._
     hospital.flatMap(_.find(criteria).one[Hospital])
