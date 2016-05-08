@@ -70,7 +70,7 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
           case Some(p) =>
             Ok (Json.toJson (p) )
           case None => {
-            val err = Json.obj("error" -> "为发现")
+            val err = Json.obj("error" -> "未发现")
             BadRequest(Json.toJson(err))
           }
         }

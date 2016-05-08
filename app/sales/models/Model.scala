@@ -499,6 +499,7 @@ object OrderAudit {
 
 /**
   * 记录订单相关参与人（订单+参与人唯一）
+  *
   * @param id
   * @param orderId
   * @param who
@@ -506,9 +507,11 @@ object OrderAudit {
 case class OrderRef(id: String,
                     orderId: String,
                     who: String)
+
 object OrderRef {
   implicit val format = Json.format[OrderRef]
 }
+
 case class NextOrderNo(
                         // 前缀
                         prefix: String,
@@ -532,7 +535,21 @@ case class CreateOrder(
                       ) {
 
 }
+
 object CreateOrder {
   implicit val format = Json.format[CreateOrder]
 }
 
+/**
+  * 拒绝订单
+  *
+  * @param reason
+  */
+case class RejectOrder(
+                        // 拒绝原因
+                        reason: String
+                      )
+
+object RejectOrder {
+  implicit val format = Json.format[RejectOrder]
+}

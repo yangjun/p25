@@ -79,4 +79,94 @@ class OrderController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
       }
     }
   }
+
+  def read(id: String) = Action.async { implicit req =>
+    orderService.pk(id) map {
+      p =>
+        p match {
+          case Some(p) =>
+            Ok (Json.toJson (p) )
+          case None => {
+            val err = Json.obj("error" -> "未发现")
+            BadRequest(Json.toJson(err))
+          }
+        }
+    }
+  }
+
+  /**
+    * 取消订单
+    *
+    * @param id
+    * @return
+    */
+  def cancel(id: String) = Action.async { implicit req =>
+    orderService.cancel(id) map {
+      p => {
+        val data = Json.obj("id" -> p)
+        Ok(Json.toJson(data))
+      }
+    }
+  }
+
+  /**
+    * 审核通过
+    *
+    * @param id
+    * @return
+    */
+  def permit(id: String) = Action.async { implicit req =>
+    orderService.permit(id) map {
+      p => {
+        val data = Json.obj("id" -> p)
+        Ok(Json.toJson(data))
+      }
+    }
+  }
+
+  /**
+    *
+    * @param id
+    * @return
+    */
+  def reject(id: String) = Action.async(parse.json) { implicit req =>
+    validateAndThen[RejectOrder] {
+      param =>
+        orderService.reject(id, param.reason) map {
+          p => {
+            val data = Json.obj("id" -> p)
+            Ok(Json.toJson(data))
+          }
+        }
+    }
+  }
+
+  /**
+    * 出库
+    * @param id
+    * @return
+    */
+  def goods(id: String) = Action.async { implicit req =>
+    orderService.goods(id) map {
+      p => {
+        val data = Json.obj("id" -> p)
+        Ok(Json.toJson(data))
+      }
+    }
+  }
+
+  /**
+    * 收货后订单确认
+    * @param id
+    * @return
+    */
+  def confirm(id: String) = Action.async { implicit req =>
+    orderService.confirm(id) map {
+      p => {
+        val data = Json.obj("id" -> p)
+        Ok(Json.toJson(data))
+      }
+    }
+  }
+
 }

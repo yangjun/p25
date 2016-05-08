@@ -67,8 +67,15 @@ DELETE    /crm/v1/sdk/doctor/:id                  sales.controllers.HospitalCont
 
 #Order
 POST      /crm/v1/sdk/hospital/:id/order          sales.controllers.OrderController.createOrder(id)
-GET      /crm/v1/sdk/hospital/:id/order           sales.controllers.OrderController.queryByHospital(id)
-GET      /crm/v1/sdk/order                        sales.controllers.OrderController.query(no: Option[String], status: Option[String])
+GET       /crm/v1/sdk/hospital/:id/order          sales.controllers.OrderController.queryByHospital(id)
+GET       /crm/v1/sdk/order                       sales.controllers.OrderController.query(no: Option[String], status: Option[String])
+GET       /crm/v1/sdk/order/:id                   sales.controllers.OrderController.read(id)
+DELETE    /crm/v1/sdk/order/:id                   sales.controllers.OrderController.cancel(id)
+POST      /crm/v1/sdk/order/:id/permit            sales.controllers.OrderController.permit(id)
+POST      /crm/v1/sdk/order/:id/reject            sales.controllers.OrderController.reject(id)
+POST      /crm/v1/sdk/order/:id/goods             sales.controllers.OrderController.goods(id)
+POST      /crm/v1/sdk/order/:id/confirm           sales.controllers.OrderController.confirm(id)
+
 
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
 

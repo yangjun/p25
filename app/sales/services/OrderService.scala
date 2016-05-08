@@ -111,7 +111,7 @@ class OrderService @Inject()(
           val status = order.status
           if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
             val criteria = Json.obj("id" -> id)
-            val update = Json.obj("status" -> OrderStatus.Cancel)
+            val update = order.copy(status = OrderStatus.Cancel)
             orderCollection.flatMap(_.update(criteria, update)) flatMap {
               case le if le.ok =>
                 createOrderAudit(id, "", "取消订单")
@@ -141,7 +141,7 @@ class OrderService @Inject()(
           val status = item.status
           if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
             val criteria = Json.obj("id" -> id)
-            val update = Json.obj("status" -> OrderStatus.Handling)
+            val update = item.copy(status = OrderStatus.Handling)
             orderCollection.flatMap(_.update(criteria, update)) flatMap {
               case le if le.ok =>
                 createOrderAudit(id, "", "审核通过")
@@ -172,7 +172,7 @@ class OrderService @Inject()(
           val status = item.status
           if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
             val criteria = Json.obj("id" -> id)
-            val update = Json.obj("status" -> OrderStatus.Idle)
+            val update = item.copy(status = OrderStatus.Idle)
             orderCollection.flatMap(_.update(criteria, update)) flatMap {
               case le if le.ok =>
                 createOrderAudit(id, "", s"订单被拒绝,原因【$reason】")
@@ -202,7 +202,7 @@ class OrderService @Inject()(
           val status = item.status
           if (OrderStatus.Handling.equals(status)) {
             val criteria = Json.obj("id" -> id)
-            val update = Json.obj("status" -> OrderStatus.Shipping)
+            val update = item.copy(status = OrderStatus.Shipping)
             orderCollection.flatMap(_.update(criteria, update)) flatMap {
               case le if le.ok =>
                 createOrderAudit(id, "", "准备出库")
@@ -233,7 +233,7 @@ class OrderService @Inject()(
           if (OrderStatus.Shipping.equals(status)) {
             val criteria = Json.obj("id" -> id)
             // 更新状态为归档模式
-            val update = Json.obj("status" -> OrderStatus.achieve)
+            val update = item.copy(status = OrderStatus.achieve)
             orderCollection.flatMap(_.update(criteria, update)) flatMap {
               case le if le.ok =>
                 createOrderAudit(id, "", "已收货，订单完成。")
@@ -370,7 +370,7 @@ class OrderService @Inject()(
     }
   }
 
-  private def pk(id: String): Future[Option[Order]] = {
+  def pk(id: String): Future[Option[Order]] = {
     val criteria = Json.obj("id" -> id)
     import reactivemongo.play.json._
     order.flatMap(_.find(criteria).one[Order])
