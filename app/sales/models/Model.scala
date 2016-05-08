@@ -13,6 +13,7 @@ import utils.Utils
   * Created by yangjungis@126.com on 2016/4/17.
   */
 
+
 // 名称查询
 case class NameQuery(name: Option[String])
 
@@ -433,16 +434,88 @@ case class Order(
                   proposer: String,
                   // 创建日期
                   created: Option[DateTime],
+                  // 最后一次更新日期
+                  updated: Option[DateTime],
                   // 状态
-                  status: String = OrderStatus.Idle,
+                  status: String = OrderStatus.idle,
                   // 医院
                   hospitalId: String,
                   // 备注
                   notes: Option[String],
                   // 订单项
-                  items: Set[OrderItem]
+                  items: Set[OrderItem],
+                  // 出库单
+                  stockOrderId: Option[String] = None
                 ) {
 
+  /**
+    * 提交操作状态变化
+    *
+    * @return
+    */
+  def permit(): Order = {
+    val nextStatus = status match {
+      case OrderStatus.idle =>
+        OrderStatus.firstReview
+      case OrderStatus.firstReview =>
+        OrderStatus.review
+      case OrderStatus.review =>
+        OrderStatus.stock
+      case OrderStatus.stock =>
+        OrderStatus.goodsReceipt
+      case OrderStatus.goodsReceipt =>
+        OrderStatus.achieve
+      case OrderStatus.achieve =>
+        OrderStatus.achieve
+    }
+    copy(status = nextStatus, updated = Some(DateTime.now()))
+  }
+
+  /**
+    * 拒绝操作状态变化
+    *
+    * @return
+    */
+  def reject(): Order = {
+    val nextStatus = status match {
+      case OrderStatus.idle =>
+        OrderStatus.idle
+      case OrderStatus.firstReview =>
+        OrderStatus.idle
+      case OrderStatus.review =>
+        OrderStatus.firstReview
+      case OrderStatus.stock =>
+        OrderStatus.review
+      case OrderStatus.goodsReceipt =>
+        OrderStatus.goodsReceipt
+      case OrderStatus.achieve =>
+        OrderStatus.achieve
+    }
+    copy(status = nextStatus, updated = Some(DateTime.now()))
+  }
+
+  /**
+    * 取消操作状态变化
+    *
+    * @return
+    */
+  def cancel(): Order = {
+    val nextStatus = status match {
+      case OrderStatus.idle =>
+        OrderStatus.cancel
+      case OrderStatus.firstReview =>
+        OrderStatus.cancel
+      case OrderStatus.review =>
+        OrderStatus.cancel
+      case OrderStatus.stock =>
+        OrderStatus.cancel
+      case OrderStatus.goodsReceipt =>
+        OrderStatus.goodsReceipt
+      case OrderStatus.achieve =>
+        OrderStatus.achieve
+    }
+    copy(status = nextStatus, updated = Some(DateTime.now()))
+  }
 }
 
 object Order {
@@ -450,19 +523,23 @@ object Order {
 }
 
 object OrderStatus {
-  // 提交订单后的初始状态
-  val Idle = "idle"
-  // 处理中
-  val Handling = "handling"
-  // 发货中
-  val Shipping = "shipping"
-  // 等待确认
-  val Confirmation = "confirmation"
-  // 取消
-  val Cancel = "cancel"
-  // 完成
+  // 新建订单后的状态，申请阶段
+  val idle = "idle"
+  // 初审阶段
+  val firstReview = "firstReview"
+  // 审核阶段
+  val review = "review"
+  // 出库阶段
+  val stock = "stock"
+  // 收货阶段
+  val goodsReceipt = "goodsReceipt"
+  // 完成，正常归档
   val achieve = "achieve"
+  // 取消，异常归档
+  val cancel = "cancel"
+
 }
+
 
 // 订单项
 case class OrderItem(
@@ -484,6 +561,143 @@ case class OrderItem(
 
 object OrderItem {
   implicit val format = Json.format[OrderItem]
+}
+
+/**
+  * 一个订单对应一个出库单
+  *
+  * @param id
+  * @param orderId
+  * @param notes
+  */
+case class StockOrder(
+                       // 标识
+                       id: String,
+                       // 订单标识
+                       orderId: String,
+                       // 库管
+                       storekeeper: String,
+                       // 创建日期
+                       created: Option[DateTime],
+                       // 最后一次更新日期
+                       updated: Option[DateTime],
+                       // 备注
+                       notes: Option[String]
+                     )
+
+object StockOrder {
+  implicit val format = Json.format[StockOrder]
+}
+
+/**
+  * 出库物品清单
+  */
+case class GoodsItem(
+                      id: String,
+                      // 出库单标识
+                      stockOrderId: String,
+                      // 电子监管码（一物一码）
+                      code: String,
+                      // 批号
+                      batchNo: Option[String],
+                      // 销售代码
+                      salesCode: Option[String],
+                      // 有效期
+                      effective: Option[String]
+                    )
+
+object GoodsItem {
+  implicit val format = Json.format[GoodsItem]
+}
+
+/**
+  * 创建出库单
+  */
+case class CreateStockOrder(notes: Option[String],
+                            items: Set[GoodsItem]
+                           ) {
+  /**
+    * 构造出库单
+    *
+    * @param orderId     订单标识
+    * @param storekeeper 库管
+    * @return
+    */
+  def stockOrder(orderId: String, storekeeper: String): StockOrder = {
+    val now = DateTime.now()
+    StockOrder(id = Utils.nextId(),
+      orderId = orderId,
+      storekeeper = storekeeper,
+      created = Some(now),
+      updated = Some(now),
+      notes = notes
+    )
+  }
+}
+
+object CreateStockOrder {
+  implicit val format = Json.format[CreateStockOrder]
+}
+
+case class CreateGoodsItem(
+                            // 电子监管码（一物一码）
+                            code: String,
+                            // 批号
+                            batchNo: Option[String],
+                            // 销售代码
+                            salesCode: Option[String],
+                            // 有效期
+                            effective: Option[String]
+                          ) {
+  /**
+    * 构建一个出库物品清单
+    * @param stockOrderId
+    * @return
+    */
+  def goodsItem(stockOrderId: String):GoodsItem = {
+    GoodsItem(id = Utils.nextId(),
+      stockOrderId = stockOrderId,
+      code = code,
+      batchNo = batchNo,
+      salesCode = salesCode,
+      effective = effective
+    )
+  }
+}
+
+object CreateGoodsItem {
+  implicit val format = Json.format[CreateGoodsItem]
+}
+
+/**
+  * 为出库单添加商品清单
+  *
+  * @param items
+  */
+case class AddGoodsItem(items: Set[CreateGoodsItem]) {
+  def goodsItems(stockOrderId: String): Set[GoodsItem] = {
+    items map {
+      item => {
+        item.goodsItem(stockOrderId)
+      }
+    }
+  }
+}
+
+object AddGoodsItem {
+  implicit val format = Json.format[AddGoodsItem]
+}
+
+/**
+  * 删除商品清单
+  *
+  * @param items
+  */
+case class RemoveGoodsItem(items: Set[String]) {
+}
+
+object RemoveGoodsItem {
+  implicit val format = Json.format[RemoveGoodsItem]
 }
 
 case class OrderAudit(id: String,
@@ -541,6 +755,21 @@ object CreateOrder {
 }
 
 /**
+  * 接受订单
+  *
+  * @param reason
+  */
+case class PermitOrder(
+                        reason: String
+                      ) {
+
+}
+
+object PermitOrder {
+  implicit val format = Json.format[PermitOrder]
+}
+
+/**
   * 拒绝订单
   *
   * @param reason
@@ -553,3 +782,18 @@ case class RejectOrder(
 object RejectOrder {
   implicit val format = Json.format[RejectOrder]
 }
+
+
+/**
+  * 取消订单
+  *
+  * @param reason
+  */
+case class CancelOrder(
+                        reason: String
+                      )
+
+object CancelOrder {
+  implicit val format = Json.format[CancelOrder]
+}
+

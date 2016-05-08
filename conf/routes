@@ -73,9 +73,14 @@ GET       /crm/v1/sdk/order/:id                   sales.controllers.OrderControl
 DELETE    /crm/v1/sdk/order/:id                   sales.controllers.OrderController.cancel(id)
 POST      /crm/v1/sdk/order/:id/permit            sales.controllers.OrderController.permit(id)
 POST      /crm/v1/sdk/order/:id/reject            sales.controllers.OrderController.reject(id)
-POST      /crm/v1/sdk/order/:id/goods             sales.controllers.OrderController.goods(id)
 POST      /crm/v1/sdk/order/:id/confirm           sales.controllers.OrderController.confirm(id)
+GET       /crm/v1/sdk/order/:id/goods             sales.controllers.OrderController.queryStockItemByOrder(id)
 
+# Stock
+POST      /crm/v1/sdk/order/:id/stock             sales.controllers.OrderController.createStockOrder(id)
+POST      /crm/v1/sdk/stock/:id                   sales.controllers.OrderController.addStockItem(id)
+DELETE    /crm/v1/sdk/stock/:id                   sales.controllers.OrderController.removeStockItem(id)
+GET       /crm/v1/sdk/stock/:id                   sales.controllers.OrderController.queryStockItemByStock(id)
 
 GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
 

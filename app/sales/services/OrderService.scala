@@ -2,7 +2,7 @@ package sales.services
 
 import javax.inject.{Inject, Singleton}
 
-import authentication.UserServiceImpl
+import authentication.{User, UserServiceImpl}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
 import play.api.libs.json.{JsObject, JsString, Json}
@@ -43,6 +43,14 @@ class OrderService @Inject()(
     reactiveMongoApi.database.map(_.collection("orderRef"))
   }
 
+  private def stockOrderCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+    reactiveMongoApi.database.map(_.collection("stockOrder"))
+  }
+
+  private def goodsItemCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+    reactiveMongoApi.database.map(_.collection("goodsItem"))
+  }
+
   val order = orderCollection
 
   /**
@@ -50,9 +58,24 @@ class OrderService @Inject()(
     */
   val nextOrderNo = orderNoCollection
 
+  /**
+    * 订单审批历史
+    */
   val orderAudit = orderAuditCollection
 
+  /**
+    * 订单干系人
+    */
   val orderRef = orderRefCollection
+  /**
+    * 出库单
+    */
+  val stockOrder = stockOrderCollection
+
+  /**
+    * 出库清单
+    */
+  val goodsItem = goodsItemCollection
 
   /**
     * 创建订单
@@ -71,13 +94,16 @@ class OrderService @Inject()(
     }
     val id = Utils.nextId()
     nextNo() flatMap { no =>
+      val now = DateTime.now()
       val newOrder = Order(id = id,
         no = no,
-        proposer = "",
-        created = Some(DateTime.now()),
-        status = OrderStatus.Idle,
+        proposer = createOrder.proposer.getOrElse(""),
+        created = Some(now),
+        updated = Some(now),
+        status = OrderStatus.idle,
         hospitalId = createOrder.hospitalId.getOrElse(""),
         notes = createOrder.notes,
+        stockOrderId = None,
         items = createOrder.items)
       order.flatMap(_.insert(newOrder)) map {
         case le if le.ok => Some(id)
@@ -104,22 +130,18 @@ class OrderService @Inject()(
     * @param ec
     * @return
     */
-  def cancel(id: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
-    pk(id) flatMap { order =>
-      order match {
-        case Some(order) =>
-          val status = order.status
-          if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
-            val criteria = Json.obj("id" -> id)
-            val update = order.copy(status = OrderStatus.Cancel)
-            orderCollection.flatMap(_.update(criteria, update)) flatMap {
-              case le if le.ok =>
-                createOrderAudit(id, "", "取消订单")
-              case le =>
-                throw new RuntimeException("取消订单失败")
-            }
-          } else {
-            throw new RuntimeException("订单不能被取消")
+  def cancel(id: String, cancelOrder: CancelOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    pk(id) flatMap { item =>
+      item match {
+        case Some(item) =>
+          val reason = cancelOrder.reason
+          val update = item.cancel()
+          val criteria = Json.obj("id" -> id)
+          orderCollection.flatMap(_.update(criteria, update)) flatMap {
+            case le if le.ok =>
+              createOrderAudit(id, User.mockUser, s"取消订单,原因【$reason】")
+            case le =>
+              throw new RuntimeException("取消订单失败")
           }
         case None =>
           throw new RuntimeException("订单不存在")
@@ -130,26 +152,27 @@ class OrderService @Inject()(
   /**
     * 审核通过
     *
-    * @param id
+    * @param id 订单ID
     * @param ec
     * @return
     */
-  def permit(id: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def permit(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    logger.debug("permitOrder -> {}", permitOrder)
     pk(id) flatMap { item =>
       item match {
         case Some(item) =>
-          val status = item.status
-          if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
-            val criteria = Json.obj("id" -> id)
-            val update = item.copy(status = OrderStatus.Handling)
-            orderCollection.flatMap(_.update(criteria, update)) flatMap {
-              case le if le.ok =>
-                createOrderAudit(id, "", "审核通过")
-              case le =>
-                throw new RuntimeException("审核通过订单失败")
-            }
-          } else {
-            throw new RuntimeException("订单不能被审核通过")
+          logger.debug("order -> {}", item)
+          val reason = permitOrder.reason
+          val update = item.permit()
+          val criteria = Json.obj("id" -> id)
+          order.flatMap(_.update(criteria, update)) flatMap {
+            case le if le.ok =>
+              logger.debug("order -> {}", item)
+              val notes = s"审核通过，原因【$reason】"
+              logger.debug("notes -> {}", notes)
+              createOrderAudit(id, User.mockUser, reason)
+            case le =>
+              throw new RuntimeException("审核通过订单失败")
           }
         case None =>
           throw new RuntimeException("订单不存在")
@@ -161,26 +184,22 @@ class OrderService @Inject()(
     * 拒绝订单
     *
     * @param id
-    * @param reason
+    * @param rejectOrder
     * @param ec
     * @return
     */
-  def reject(id: String, reason: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def reject(id: String, rejectOrder: RejectOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
     pk(id) flatMap { item =>
       item match {
         case Some(item) =>
-          val status = item.status
-          if (OrderStatus.Idle.equals(status) || OrderStatus.Handling.equals(status)) {
-            val criteria = Json.obj("id" -> id)
-            val update = item.copy(status = OrderStatus.Idle)
-            orderCollection.flatMap(_.update(criteria, update)) flatMap {
-              case le if le.ok =>
-                createOrderAudit(id, "", s"订单被拒绝,原因【$reason】")
-              case le =>
-                throw new RuntimeException("审核拒绝订单失败")
-            }
-          } else {
-            throw new RuntimeException("订单不能被审核拒绝")
+          val reason = rejectOrder.reason
+          val update = item.reject()
+          val criteria = Json.obj("id" -> id)
+          orderCollection.flatMap(_.update(criteria, update)) flatMap {
+            case le if le.ok =>
+              createOrderAudit(id, "", s"订单被拒绝,原因【$reason】")
+            case le =>
+              throw new RuntimeException("审核拒绝订单失败")
           }
         case None =>
           throw new RuntimeException("订单不存在")
@@ -189,33 +208,142 @@ class OrderService @Inject()(
   }
 
   /**
-    * 出库
+    * 创建出库单
     *
     * @param id
     * @param ec
-    * @return
+    * @return 出库单标识
     */
-  def goods(id: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def createStockOrder(id: String, createStockOrder: CreateStockOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
     pk(id) flatMap { item =>
       item match {
         case Some(item) =>
-          val status = item.status
-          if (OrderStatus.Handling.equals(status)) {
-            val criteria = Json.obj("id" -> id)
-            val update = item.copy(status = OrderStatus.Shipping)
-            orderCollection.flatMap(_.update(criteria, update)) flatMap {
-              case le if le.ok =>
-                createOrderAudit(id, "", "准备出库")
-              case le =>
-                throw new RuntimeException("订单出库失败")
-            }
-          } else {
-            throw new RuntimeException("订单不能出库")
+          // 是否已经生成出库单
+          val optStockOrderId = item.stockOrderId
+          optStockOrderId match {
+              // 已经生成
+            case Some(stockOrderId) =>
+              Future {
+                Some(stockOrderId)
+              }
+            case None =>
+              // 创建出库单
+              val newStockOrder = createStockOrder.stockOrder(id, User.mockUser)
+              stockOrder.flatMap(_.insert(newStockOrder)) flatMap {
+                case le if le.ok =>
+                  // 更新订单出库单标识
+                  val newOrder = item.copy(stockOrderId = Some(newStockOrder.id))
+                  val criteria = Json.obj("id" -> item.id)
+                  order.flatMap(_.update(criteria, newOrder)) map {
+                    case le if le.ok =>
+                      Some(newStockOrder.id)
+                    case le =>
+                      throw new RuntimeException("更新订单出库信息错误")
+                  }
+                case le =>
+                  throw new RuntimeException("创建出库单错误")
+              }
           }
         case None =>
           throw new RuntimeException("订单不存在")
       }
     }
+  }
+
+  /**
+    *
+    * @param id 出库单标识
+    * @param addGoodsItem
+    * @param ec
+    * @return
+    */
+  def addStockItem(id: String, addGoodsItem: AddGoodsItem)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    stockOrderById(id) map { item =>
+      item match {
+        case Some(item) =>
+          // 出库单存在
+          // 构造出库清单
+          val items = addGoodsItem.goodsItems(item.id)
+          items map {
+            item =>
+              goodsItem.flatMap(_.insert(item)) map {
+                case le if le.ok  =>
+                  Some(item.id)
+                case le =>
+                  throw new RuntimeException("创建出库清单出错")
+              }
+          }
+          Some(id)
+        case None =>
+          throw new RuntimeException("出库单不存在")
+      }
+    }
+  }
+
+  /**
+    * 删除出库清单
+    * @param id 出库单标识
+    * @param ec
+    * @return
+    */
+  def removeStockItem(id: String, removeGoodsItem: RemoveGoodsItem)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    val f = stockOrderById(id) flatMap { item =>
+      val stockOrderId = id
+      item match {
+        case Some(item) =>
+          // 出库单存在
+          // 查询订单，检查订单状态
+          pk(item.orderId) map {
+            order =>
+              order match {
+                case Some(order) =>
+                  order.status match {
+                    case OrderStatus.stock =>
+                      //  订单在出库阶段可以删除出库清单
+                      removeGoodsItem.items map {
+                        id => {
+                          // 查询出库清单
+                          val criteria = Json.obj("id" -> id)
+                          goodsItem.flatMap(_.find(criteria).one[GoodsItem]) map {
+                            item => {
+                              item match {
+                                case Some(item) =>
+                                  // 检查给定标识的出库清单是否与出库单一致
+                                item.stockOrderId match {
+                                    case u if u.equals(stockOrderId) =>
+                                      goodsItem.flatMap(_.remove(criteria)) map {
+                                        case le if le.ok =>
+                                          Some(id)
+                                        case le =>
+                                          throw new RuntimeException("删除出库清单出错")
+                                      }
+                                    case _ =>
+                                      throw new RuntimeException("不是当前库存订单")
+                                  } // end match item.stockOrderId
+                                case None =>
+                                  throw new RuntimeException("订单清单不存在")
+                              } // end match item
+                            }
+                          }
+                        }
+                      }
+                    case _ =>
+                      throw new RuntimeException("仅在出库阶段可以删除出库清单")
+
+                  } // end match order.status
+                case None =>
+                  throw new RuntimeException("未发现出库单对应的订单")
+              } // end match order
+
+          }
+        case None =>
+          throw new RuntimeException("出库单不存在")
+      } // end match item
+    }
+
+    // 返回结果
+    f map( p => Some(id) )
+
   }
 
   /**
@@ -225,28 +353,8 @@ class OrderService @Inject()(
     * @param ec
     * @return
     */
-  def confirm(id: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
-    pk(id) flatMap { item =>
-      item match {
-        case Some(item) =>
-          val status = item.status
-          if (OrderStatus.Shipping.equals(status)) {
-            val criteria = Json.obj("id" -> id)
-            // 更新状态为归档模式
-            val update = item.copy(status = OrderStatus.achieve)
-            orderCollection.flatMap(_.update(criteria, update)) flatMap {
-              case le if le.ok =>
-                createOrderAudit(id, "", "已收货，订单完成。")
-              case le =>
-                throw new RuntimeException("收货确认失败")
-            }
-          } else {
-            throw new RuntimeException("订单不能收货确认")
-          }
-        case None =>
-          throw new RuntimeException("订单不存在")
-      }
-    }
+  def confirm(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    permit(id, permitOrder)
   }
 
   /**
@@ -307,15 +415,59 @@ class OrderService @Inject()(
     * @return
     */
   def queryByHospital(hospitalId: String, skip: Int, limit: Int): Future[Traversable[Order]] = {
-    val criteria = Json.obj()
-    criteria.+("hospitalId", JsString(hospitalId))
+    var criteria = Json.obj()
+    criteria = criteria.+("hospitalId", JsString(hospitalId))
     search(criteria, skip, limit)
+  }
+
+  /**
+    * 根据出库单查询出库清单
+    * @param id 出库单标识
+    * @param skip
+    * @param limit
+    * @return
+    */
+  def queryStockItemByStock(id: String, skip: Int, limit: Int): Future[Traversable[GoodsItem]] = {
+    val criteria = Json.obj("stockOrderId" -> id)
+    searchGoodsItem(criteria = criteria, skip = skip, limit = limit)
+  }
+
+
+  /**
+    * 根据订单查询出库清单
+    * @param id 订单标识
+    * @param skip
+    * @param limit
+    * @return
+    */
+  def queryStockItemByOrder(id: String, skip: Int, limit: Int): Future[Traversable[GoodsItem]] = {
+    pk(id) flatMap {
+      order => order match {
+        case Some(order) =>
+          logger.debug("stockOrderId -> {}", order.stockOrderId)
+          order.stockOrderId match {
+            case Some(stockOrderId) =>
+              queryStockItemByStock(stockOrderId, skip, limit)
+            case None =>
+              throw new RuntimeException("还未生成出库单")
+          }
+        case None =>
+          throw new RuntimeException(" 订单不存在")
+      }
+    }
   }
 
   private def search(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[Order]] = {
     order.flatMap(_.find(criteria).
       options(QueryOpts(skipN = skip))
       cursor[Order] (readPreference = ReadPreference.nearest)
+      collect[List] (limit))
+  }
+
+  private def searchGoodsItem(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[GoodsItem]] = {
+    goodsItem.flatMap(_.find(criteria).
+      options(QueryOpts(skipN = skip))
+      cursor[GoodsItem] (readPreference = ReadPreference.nearest)
       collect[List] (limit))
   }
 
@@ -375,6 +527,12 @@ class OrderService @Inject()(
     import reactivemongo.play.json._
     order.flatMap(_.find(criteria).one[Order])
   }
+
+   def stockOrderById(id: String): Future[Option[StockOrder]] = {
+     val criteria = Json.obj("id" -> id)
+     import reactivemongo.play.json._
+     stockOrder.flatMap(_.find(criteria).one[StockOrder])
+   }
 
   /**
     * 下一个订单号（年+月+流水号（8））
