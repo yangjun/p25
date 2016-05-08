@@ -17,21 +17,28 @@
 <div class="page-group">
     <div class="page page-current">
         <header class="bar bar-nav" ng-if="config.title.hastitle">
-            <a class="button button-link button-nav pull-left back" ng-if="config.title.hasback"
-               ng-href="{{config.title.backurl}}">
-                <span class="icon icon-left"></span>返回
+            <a class="button pull-left" ng-if="config.title.hasback" ng-href="{{config.title.backurl}}">
+                返回
             </a>
+            <button class="button pull-right" ng-if="config.title.hasmenu" ng-click="menu()">
+                菜单
+            </button>
             <h1 class="title">{{config.title.title}}</h1>
         </header>
         <nav class="bar bar-tab">
-            <a class="tab-item" ui-sref="home" ui-sref-opts="{reload:true}" ui-sref-active="active">
+            <a class="tab-item" ui-sref="home" ui-sref-active="active">
                 <span class="icon icon-home"></span>
                 <span class="tab-label">首页</span>
             </a>
-            <a class="tab-item" ui-sref="hospital.home" ui-sref-opts="{reload:true}"
+            <a class="tab-item" ui-sref="hospital.list"
                ng-class="{'active':$state.includes('hospital')}">
                 <span class="icon icon-friends"></span>
                 <span class="tab-label">医院</span>
+            </a>
+            <a class="tab-item" ui-sref="hospital.list"
+               ng-class="{'active':$state.includes('order')}">
+                <span class="icon icon-cart"></span>
+                <span class="tab-label">订单</span>
             </a>
         </nav>
         <div class="content">
@@ -50,6 +57,7 @@
 <!--angular 相关-->
 <script src="../js/app.js"></script>
 <script src="../js/router.js"></script>
+<script src="../js/filter.js"></script>
 <script src="../js/service.js"></script>
 <!--angular controller-->
 <script src="../js/controller/home.js"></script>

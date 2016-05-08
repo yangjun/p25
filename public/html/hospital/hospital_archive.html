@@ -1,33 +1,35 @@
-<!--医院：申请开发-->
+<!--医院：编辑归档信息-->
 <div ng-show="!loading">
-    <form name="form" ng-submit="developHospital(form)">
+    <form name="form" ng-submit="resumeHospital(form)">
         <div class="content">
             <div class="list-block">
                 <ul>
                     <li>
                         <div class="item-content">
                             <div class="item-inner">
-                                <label class="item-title">申请医院</label>
+                                <label class="item-title">开发医院</label>
                                 <div class="item-after">{{hospital.name}}</div>
                             </div>
                         </div>
                     </li>
-                    <li>
+                    <li class="align-top">
                         <div class="item-content">
                             <div class="item-inner">
-                                <label class="item-title label" for="day">开发天数</label>
+                                <label class="item-title label" for="hospitalDescription">对接情况</label>
                                 <div class="item-input">
-                                    <input type="number" name="day" id="day" required ng-model="hospital.day">
+                                    <textarea name="hospitalDescription" id="hospitalDescription" required
+                                              ng-model="hospital.hospitalDescription"></textarea>
                                 </div>
                             </div>
                         </div>
                     </li>
-                    <li>
+                    <li class="align-top">
                         <div class="item-content">
                             <div class="item-inner">
-                                <label class="item-title label" for="salesman">销售人员</label>
+                                <label class="item-title label" for="scheduleDescription">开发进度</label>
                                 <div class="item-input">
-                                    <input type="text" name="salesman" id="salesman" ng-model="hospital.salesman">
+                                    <textarea name="scheduleDescription" id="scheduleDescription"
+                                              ng-model="hospital.scheduleDescription"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -38,7 +40,7 @@
                 <div class="row">
                     <a class="col-50 button button-big button-fill button-danger"
                        ui-sref="hospital.info({id:hospital.hospitalId})">取消</a>
-                    <button class="col-50 button button-big button-fill button-success" type="submit">申请</button>
+                    <button class="col-50 button button-big button-fill button-success" type="submit">保存</button>
                 </div>
             </div>
         </div>

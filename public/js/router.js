@@ -29,12 +29,6 @@ app.constant('ROUTER',
                 url: '/hospital',
                 template: '<div ui-view></div>'
             })
-            /*医院首页*/
-            .state('hospital.home', {
-                url: '/home',
-                templateUrl: '../html/hospital/hospital_home.html',
-                controller: 'HospitalHomeCtrl'
-            })
             /*所有医院*/
             .state('hospital.list', {
                 url: '/list',
@@ -53,17 +47,46 @@ app.constant('ROUTER',
                 templateUrl: '../html/hospital/hospital_create.html',
                 controller: 'HospitalCreateCtrl'
             })
+            /*编辑医院*/
+            .state('hospital.edit', {
+                url: '/:id/edit',
+                templateUrl: '../html/hospital/hospital_edit.html',
+                controller: 'HospitalEditCtrl'
+            })
             /*申请开发*/
             .state('hospital.develop', {
                 url: '/:id/develop',
                 templateUrl: '../html/hospital/hospital_develop.html',
                 controller: 'HospitalDevelopCtrl'
             })
-            /*编辑医院*/
-            .state('hospital.edit', {
-                url: '/:id/edit',
-                templateUrl: '../html/hospital/hospital_edit.html',
-                controller: 'HospitalEditCtrl'
+            /*记录开发进度*/
+            .state('hospital.resume', {
+                url: '/:id/resume',
+                templateUrl: '../html/hospital/hospital_resume.html',
+                controller: 'HospitalResumeCtrl'
+            })
+            /*编辑归档信息*/
+            .state('hospital.archive', {
+                url: '/:id/archive',
+                templateUrl: '../html/hospital/hospital_archive.html',
+                controller: 'HospitalArchiveCtrl'
+            })
+            /*医生*/
+            .state('hospital.doctor', {
+                url: '/:id/doctor',
+                template: '<div ui-view></div>'
+            })
+            /*医生：所有医生*/
+            .state('hospital.doctor.list', {
+                url: '/list',
+                templateUrl: '../html/hospital/hospital_doctor_list.html',
+                controller: 'HospitalDoctorListCtrl'
+            })
+            /*医生：添加医生*/
+            .state('hospital.doctor.create', {
+                url: '/create',
+                templateUrl: '../html/hospital/hospital_doctor_create.html',
+                controller: 'HospitalDoctorCreateCtrl'
             });
         $urlRouterProvider.when('', '/home');
     });

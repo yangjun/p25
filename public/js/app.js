@@ -48,7 +48,15 @@ app.run(['$rootScope', '$state', function ($rootScope, $state) {
             hastitle: false, /*是否显示标题*/
             title: '', /*标题内容*/
             hasback: false, /*是否显示返回按钮*/
-            backurl: ''/*返回按钮地址*/
+            backurl: '', /*返回按钮地址*/
+            hasmenu: false, /*是否显示菜单*/
+            menufunc: undefined/*菜单回掉方法*/
+        }
+    };
+
+    $rootScope.menu = function () {
+        if ($rootScope.config.title.hasmenu && $rootScope.config.title.menufunc && (typeof $rootScope.config.title.menufunc === 'function')) {
+            $rootScope.config.title.menufunc();
         }
     };
 
