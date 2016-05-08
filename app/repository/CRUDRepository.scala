@@ -74,7 +74,8 @@ abstract class MongoCRUDRepository[E: Format, ID: Format](implicit identity: Ide
     })
   }
 
-  def delete(id: ID)(implicit ec: ExecutionContext): Future[Either[String, ID]] = collection.flatMap(_.remove(Json.obj(identity.name -> id)) map {
+  def delete(id: ID)(implicit ec: ExecutionContext): Future[Either[String, ID]] =
+    collection.flatMap(_.remove(Json.obj(identity.name -> id)) map {
     case le if le.ok == true => Right(id)
     case le => Left(le.message)
   })

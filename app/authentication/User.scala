@@ -30,6 +30,7 @@ case class User(id: String,
 
 object User {
   implicit val format = Json.format[User]
+  val mockUser = "root"
 }
 
 // 通过WX注册的用户
