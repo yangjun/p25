@@ -163,7 +163,9 @@ class OrderService @Inject()(
         case Some(item) =>
           logger.debug("order -> {}", item)
           val reason = permitOrder.reason
+          logger.debug("reason -> {}", reason)
           val update = item.permit()
+          logger.debug("update -> {}", item)
           val criteria = Json.obj("id" -> id)
           order.flatMap(_.update(criteria, update)) flatMap {
             case le if le.ok =>
@@ -221,7 +223,7 @@ class OrderService @Inject()(
           // 是否已经生成出库单
           val optStockOrderId = item.stockOrderId
           optStockOrderId match {
-              // 已经生成
+            // 已经生成
             case Some(stockOrderId) =>
               Future {
                 Some(stockOrderId)
@@ -267,7 +269,7 @@ class OrderService @Inject()(
           items map {
             item =>
               goodsItem.flatMap(_.insert(item)) map {
-                case le if le.ok  =>
+                case le if le.ok =>
                   Some(item.id)
                 case le =>
                   throw new RuntimeException("创建出库清单出错")
@@ -282,6 +284,7 @@ class OrderService @Inject()(
 
   /**
     * 删除出库清单
+    *
     * @param id 出库单标识
     * @param ec
     * @return
@@ -309,7 +312,7 @@ class OrderService @Inject()(
                               item match {
                                 case Some(item) =>
                                   // 检查给定标识的出库清单是否与出库单一致
-                                item.stockOrderId match {
+                                  item.stockOrderId match {
                                     case u if u.equals(stockOrderId) =>
                                       goodsItem.flatMap(_.remove(criteria)) map {
                                         case le if le.ok =>
@@ -342,7 +345,7 @@ class OrderService @Inject()(
     }
 
     // 返回结果
-    f map( p => Some(id) )
+    f map (p => Some(id))
 
   }
 
@@ -422,6 +425,7 @@ class OrderService @Inject()(
 
   /**
     * 根据出库单查询出库清单
+    *
     * @param id 出库单标识
     * @param skip
     * @param limit
@@ -435,6 +439,7 @@ class OrderService @Inject()(
 
   /**
     * 根据订单查询出库清单
+    *
     * @param id 订单标识
     * @param skip
     * @param limit
@@ -528,11 +533,11 @@ class OrderService @Inject()(
     order.flatMap(_.find(criteria).one[Order])
   }
 
-   def stockOrderById(id: String): Future[Option[StockOrder]] = {
-     val criteria = Json.obj("id" -> id)
-     import reactivemongo.play.json._
-     stockOrder.flatMap(_.find(criteria).one[StockOrder])
-   }
+  def stockOrderById(id: String): Future[Option[StockOrder]] = {
+    val criteria = Json.obj("id" -> id)
+    import reactivemongo.play.json._
+    stockOrder.flatMap(_.find(criteria).one[StockOrder])
+  }
 
   /**
     * 下一个订单号（年+月+流水号（8））

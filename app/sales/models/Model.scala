@@ -447,6 +447,7 @@ case class Order(
                   // 出库单
                   stockOrderId: Option[String] = None
                 ) {
+  private lazy val logger = LoggerFactory.getLogger(classOf[Order])
 
   /**
     * 提交操作状态变化
@@ -454,8 +455,9 @@ case class Order(
     * @return
     */
   def permit(): Order = {
+    logger.debug("status -> {}", status)
     val nextStatus = status match {
-      case OrderStatus.idle =>
+      case s if s.equals(OrderStatus.idle) =>
         OrderStatus.firstReview
       case OrderStatus.firstReview =>
         OrderStatus.review
@@ -467,6 +469,8 @@ case class Order(
         OrderStatus.achieve
       case OrderStatus.achieve =>
         OrderStatus.achieve
+      case _ =>
+        status
     }
     copy(status = nextStatus, updated = Some(DateTime.now()))
   }
