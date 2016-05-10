@@ -87,7 +87,39 @@ app.constant('ROUTER',
                 url: '/create',
                 templateUrl: '../html/hospital/hospital_doctor_create.html',
                 controller: 'HospitalDoctorCreateCtrl'
+            })
+            /*订单*/
+            .state('hospital.order', {
+                url: '/:id/order',
+                template: '<div ui-view></div>'
+            })
+            /*订单：所有订单*/
+            .state('hospital.order.list', {
+                url: '/list',
+                templateUrl: '../html/hospital/hospital_order_list.html',
+                controller: 'HospitalOrderListCtrl'
+            })
+            /*订单：添加订单*/
+            .state('hospital.order.create', {
+                url: '/create',
+                templateUrl: '../html/hospital/hospital_order_create.html',
+                controller: 'HospitalOrderCreateCtrl'
             });
+
+        /*------------------------------订单------------------------------*/
+        $stateProvider
+            .state('order', {
+                url: '/order',
+                template: '<div ui-view></div>'
+            })
+            /*所有订单*/
+            .state('order.list', {
+                url: '/list',
+                templateUrl: '../html/order/order_list.html',
+                controller: 'OrderListCtrl'
+            });
+
+
         $urlRouterProvider.when('', '/home');
     });
 

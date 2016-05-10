@@ -72,7 +72,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
         return {
             /**
              * 新建医院
-             * @param obj 医院基本信息
+             * @param obj 医院信息
              */
             createHospital: function (obj) {
                 return restClient.post(CTX + '/hospital', obj);
@@ -144,6 +144,90 @@ app.factory('hospitalService', ['restClient', 'CTX',
              */
             removeDoctor: function (id) {
                 return restClient.delete(CTX + '/doctor/' + id);
+            },
+            /**
+             * 查询订单列表：根据医院ID
+             * @param id
+             * @param name
+             * @param skip
+             * @param limit
+             */
+            listHospitalOrder: function (id, name, skip, limit) {
+                return restClient.get(CTX + '/hospital/' + id + '/order?skip=' + skip + '&limit=' + limit);
             }
         }
     }]);
+
+/*订单*/
+app.factory('orderService', ['restClient', 'CTX',
+    function (restClient, CTX) {
+        return {
+            /**
+             * 查询订单列表
+             * @param no
+             * @param status
+             * @param skip
+             * @param limit
+             */
+            listOrder: function (no, status, skip, limit) {
+                //return restClient.get(CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CTX + '/order?skip=' + skip + '&limit=' + limit);
+            },
+            /**
+             * 创建订单
+             * @param id
+             * @param obj
+             */
+            createOrder: function (id, obj) {
+                return restClient.post(CTX + '/hospital/' + id + '/order', obj);
+            },
+            /**
+             * 查询订单信息
+             * @param id
+             */
+            queryOrder: function (id) {
+                return restClient.get(CTX + '/order/' + id);
+            },
+            /**
+             * 取消订单
+             * @param id
+             */
+            cancelOrder: function (id) {
+                return restClient.delete(CTX + '/order/' + id);
+            },
+            /**
+             * 接受订单
+             * @param id
+             * @param obj
+             */
+            permitOrder: function (id, obj) {
+                return restClient.post(CTX + '/order/' + id + '/permit', obj);
+            },
+            /**
+             * 拒绝订单
+             * @param id
+             * @param obj
+             */
+            rejectOrder: function (id, obj) {
+                return restClient.post(CTX + '/order/' + id + '/reject', obj);
+            },
+            /**
+             * 确认订单
+             * @param id
+             * @param obj
+             */
+            confirmOrder: function (id, obj) {
+                return restClient.post(CTX + '/order/' + id + '/confirm', obj);
+            },
+            /**
+             * 根据订单查询出库清单
+             * @param id
+             * @param skip
+             * @param limit
+             */
+            queryStockItemByOrder: function (id, skip, limit) {
+                return restClient.get(CTX + '/order/' + id + '/goods?skip=' + skip + '&limit=' + limit);
+            }
+        }
+    }]);
+
