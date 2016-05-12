@@ -41,7 +41,9 @@ trait UserService {
 }
 
 @Singleton
-class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends UserService {
+class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi,
+                                sessionService: SessionService
+                               ) extends UserService {
   val logger = LoggerFactory.getLogger(classOf[UserService])
 
   private def userCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
@@ -81,12 +83,12 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
             wxUser.city,
             wxUser.country,
             wxUser.headimgurl,
-            Some(DateTime.now())
+            Some(DateTime.now()),
+            roles = Some(Set(Role.guest))
           )
           // 开始注册
           val result = userCollection.flatMap(_.insert(user).map {
             case le if le.ok => {
-
               val wx = WxUser(Utils.nextId(),
                 wxUser.openid,
                 userId
@@ -118,12 +120,21 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
   }
 
 
-  override def userProfile(userId: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
+  override def userProfile(token: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
     // 根据id查询
-    val criteria = Json.obj("id" -> userId)
-    import reactivemongo.play.json._
-    val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
-    cursor
+    sessionService.queryByToken(token) flatMap  (f => {
+      f match {
+        case Some(session) =>
+          val criteria = Json.obj("id" -> session.userId)
+          import reactivemongo.play.json._
+          val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
+          cursor
+        case None =>
+          Future {
+            None
+          }
+      }
+    })
   }
 
   def user(username: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
@@ -173,6 +184,7 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
 
   /**
     * 添加用户
+    *
     * @param user
     * @return
     */
@@ -183,6 +195,74 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi) extends User
       }
       case le => {
         throw new RuntimeException(le.message)
+      }
+    })
+  }
+
+  /**
+    * 给用户分配角色
+    *
+    * @param userId
+    * @param role
+    */
+  def allocationRole(userId: String, role: String): Future[Option[Set[String]]] = {
+    val criteria = Json.obj("id" -> userId)
+    import reactivemongo.play.json._
+    val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
+    cursor flatMap (user => {
+      user match {
+        case Some(user) =>
+          val roles = user.roles match {
+            case Some(roles) =>
+              Some(roles.+(role))
+            case None =>
+              Some(Set(role))
+          }
+          val updateUser = user.copy(roles = roles)
+          userCollection().flatMap(_.update(criteria, updateUser)) map {
+            case le if le.ok =>
+              roles
+            case le =>
+              None
+          }
+        case None =>
+          Future {
+            None
+          }
+      }
+    })
+  }
+
+  /**
+    * 取消用户某个角色
+    * @param userId
+    * @param role
+    * @return
+    */
+  def removeRole(userId: String, role: String): Future[Option[Set[String]]] = {
+    val criteria = Json.obj("id" -> userId)
+    import reactivemongo.play.json._
+    val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
+    cursor flatMap (user => {
+      user match {
+        case Some(user) =>
+          val roles = user.roles match {
+            case Some(roles) =>
+              Some(roles.-(role))
+            case None =>
+              None
+          }
+          val updateUser = user.copy(roles = roles)
+          userCollection().flatMap(_.update(criteria, updateUser)) map {
+            case le if le.ok =>
+              roles
+            case le =>
+              None
+          }
+        case None =>
+          Future {
+            None
+          }
       }
     })
   }

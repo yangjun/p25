@@ -20,7 +20,7 @@ class AuthenticationController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   extends Controller with ReactiveMongoComponents with Secured with JsonValidate {
 
   def userProfile = Authenticated.async { implicit req =>
-    userService.userProfile(req.userId).map(f => {
+    userService.userProfile(req.token).map(f => {
       f match {
         case Some(u) => {
           import authentication.User.format

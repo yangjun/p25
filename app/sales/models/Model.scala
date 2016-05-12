@@ -2,10 +2,11 @@ package sales.models
 
 import java.util.UUID
 
-import authentication.User
+import authentication.{Role, User}
 import org.joda.time.DateTime
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
+import play.api.libs.iteratee.Enumerator
+import play.api.libs.json.{Json, Writes}
 import repository.Identity
 import utils.Utils
 
@@ -313,9 +314,9 @@ case class AddDoctor(
       None,
       // avatar
       None,
-      Some(DateTime.now())
+      Some(DateTime.now()),
+      roles = Some(Set(Role.doctor))
     )
-
   }
 }
 
@@ -655,10 +656,11 @@ case class CreateGoodsItem(
                           ) {
   /**
     * 构建一个出库物品清单
+    *
     * @param stockOrderId
     * @return
     */
-  def goodsItem(stockOrderId: String):GoodsItem = {
+  def goodsItem(stockOrderId: String): GoodsItem = {
     GoodsItem(id = Utils.nextId(),
       stockOrderId = stockOrderId,
       code = code,
@@ -800,4 +802,105 @@ case class CancelOrder(
 object CancelOrder {
   implicit val format = Json.format[CancelOrder]
 }
+
+
+//================工作流相关=========================
+
+object TaskStatus {
+  // 初始状态，上一个发起人可以取回
+  val idle: String = "idle"
+  // 接收任务开始处理
+  val processing: String = "processing"
+  // 已经完成，可能是
+  val completed: String = "completed"
+}
+
+object Action {
+  // 接受
+  val permit: String = "permit"
+  // 拒绝
+  val reject: String = "Reject"
+
+}
+
+/**
+  * 代办任务
+  */
+case class Task(
+                 // 标识
+                 id: String,
+                 // 人员
+                 who: String,
+                 // 工单（订单ID）
+                 no: String,
+                 // 参见 TaskStatus
+                 status: String = TaskStatus.idle,
+                 // 动作
+                 action: String,
+                 // 创建时间
+                 created: Option[DateTime],
+                 // 开始时间
+                 statred: Option[DateTime],
+                 // 完成时间
+                 completed: Option[DateTime]
+               )
+
+
+object Task {
+  implicit val format = Json.format[Task]
+}
+
+case class Payload(
+                    clazz: String,
+                    value: String
+                  ) {
+  /**
+    *
+    * @tparam T
+    * @return
+    */
+//  def deserialization[T]: T = {
+//    import play.api.libs.json.Json
+//    Json.parse(value).as[T]
+//  }
+}
+
+object Payload {
+  implicit val format = Json.format[Payload]
+
+  /**
+    * 序列化对象
+    *
+    * @param t
+    * @tparam T
+    * @return
+    */
+//  def serialize[T](t: T): Payload = {
+//    import play.api.libs.json.Json
+//    Payload(t.getClass.getName, Json.toJson(t).toString())
+//  }
+}
+
+/**
+  * 工单历史信息
+  */
+case class History(
+                    // 标识
+                    id: String,
+                    // 工单（订单ID）
+                    no: String,
+                    // 任务ID
+                    taskId: String,
+                    // 工单内容（序列化）
+                    payload: Payload,
+                    created: Option[DateTime] = Some(DateTime.now())
+                  ) {
+//  def order: Order = payload.deserialization[Order]
+}
+
+
+object History {
+  implicit val format = Json.format[History]
+}
+
 

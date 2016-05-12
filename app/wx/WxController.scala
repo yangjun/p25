@@ -3,7 +3,7 @@ package wx
 import javax.inject.{Inject, Named, Singleton}
 
 import akka.actor.{ActorRef, ActorSystem}
-import authentication.UserServiceImpl
+import authentication.{SessionService, UserServiceImpl}
 import org.slf4j.LoggerFactory
 import play.Configuration
 import play.api.libs.functional.syntax._
@@ -15,8 +15,7 @@ import scala.xml.NodeSeq
 import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.libs.json._
-import pdi.jwt._
-
+import pdi.jwt.{JwtSession, _}
 
 import scala.concurrent.duration._
 
@@ -29,6 +28,7 @@ class WxController @Inject()(actorSystem: ActorSystem,
                              config: Configuration,
                              wxClient: WXClient,
                              @Named("oauth2TokenActor") oauth2TokenActor: ActorRef,
+                             sessionService: SessionService,
                              userService: UserServiceImpl)
                             (implicit exec: ExecutionContext) extends Controller {
 
@@ -173,13 +173,22 @@ class WxController @Inject()(actorSystem: ActorSystem,
                   val result = Await.result(userService.registerWxUser(wxUser), 10 seconds)
                   result match {
                     case Right(userId) => {
+                      var jwtSession = JwtSession()
                       logger.debug("userId -> {}", userId)
-                      var session = JwtSession()
-                      session = session +("user", userId)
+                      sessionService.create(userId = userId) map {session => {
+                        session match {
+                          case Some(session) =>
+                            jwtSession = jwtSession +("token", session.token)
+                            jwtSession = jwtSession +("refreshToken", session.refreshToken)
+                            jwtSession = jwtSession +("expiration", session.ttl)
+                          case None =>
+                        }
+                      }}
+
                       val result = Redirect("/")
                       // 响应头添加 JWT
-                      logger.debug("jwt -> {}", session)
-                      result.withJwtSession(session)
+                      logger.debug("jwt -> {}", jwtSession)
+                      result.withJwtSession(jwtSession)
                       result
                     }
                     case Left(x) =>

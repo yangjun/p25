@@ -330,7 +330,10 @@ class HospitalService @Inject()(reactiveMongoApi: ReactiveMongoApi)
   def search(query: NameQuery, skip: Int, limit: Int): Future[Traversable[Hospital]] = {
     query.name match {
       case Some(name) => {
-        search(Json.obj("name" -> name), skip, limit)
+        val r = Json.obj("$regex" -> name, "$options" -> "$mi")
+        val criteria = Json.obj("base.name" -> r)
+        logger.debug("criteria -> {}", criteria)
+        search(criteria, skip, limit)
       }
       case None => {
         search(Json.obj(), skip, limit)
