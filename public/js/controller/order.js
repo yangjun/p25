@@ -187,13 +187,16 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 });
                             }
 
-                            var stockButtons = [
-                                {
+                            var stockButtons = [];
+
+                            if ($scope.stockOrderId) {
+                                stockButtons.push({
                                     text: '查看出库清单',
                                     onClick: function () {
+                                        $scope.$state.go('order.goods', {oid: $scope.$state.params.oid});
                                     }
-                                }
-                            ];
+                                });
+                            }
 
                             var cancelButton = [
                                 {
@@ -331,6 +334,55 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
         };
 
         $scope.load();
+
+    }]);
+
+/**
+ * 订单：出库清单
+ */
+app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
+    function ($rootScope, $scope, orderService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '出库清单',
+                hasback: true,
+                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+            }
+        };
+
+        $scope.hasmore = false;
+        $scope.filter = {
+            no: '',
+            status: '',
+            skip: 0,
+            limit: 10
+        };
+
+        $scope.load = function (skip) {
+            $.showIndicator($scope);
+            $scope.filter.skip = skip;
+            orderService.queryStockItemByOrder($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+                $scope.stocks = result.data;
+                $scope.hasmore = result.data && result.data.length > 0;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        /*加载更多*/
+        $scope.loadMore = function () {
+            $.showIndicator($scope);
+            $scope.filter.skip += $scope.filter.limit;
+            orderService.queryStockItemByOrder($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+                $scope.stocks = $scope.stocks.concat(result.data);
+                $scope.hasmore = result.data && result.data.length > 0;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        $scope.load(0);
 
     }]);
 

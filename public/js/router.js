@@ -147,6 +147,12 @@ app.constant('ROUTER',
                 url: '/:oid/confirm',
                 templateUrl: '../html/order/order_confirm.html',
                 controller: 'OrderConfirmCtrl'
+            })
+            /*订单：出库清单*/
+            .state('order.goods', {
+                url: '/:oid/goods',
+                templateUrl: '../html/order/order_goods.html',
+                controller: 'OrderGoodsCtrl'
             });
 
 
