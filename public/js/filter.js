@@ -15,3 +15,25 @@ app.filter('hospitalStatus', function () {
     }
 });
 
+/*订单状态*/
+app.filter('orderStatus', function () {
+    return function (decision) {
+        switch (decision) {
+            case 'idle':
+                return '申请阶段';
+            case 'firstReview':
+                return '初审阶段';
+            case 'review':
+                return '审核阶段';
+            case 'stock':
+                return '出库阶段';
+            case 'goodsReceipt':
+                return '收货阶段';
+            case 'achieve':
+                return '已完成';
+            case 'cancel':
+                return '已取消';
+        }
+    }
+});
+

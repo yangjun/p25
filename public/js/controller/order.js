@@ -131,19 +131,61 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
  */
 app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospitalService',
     function ($rootScope, $scope, orderService, hospitalService) {
-        $rootScope.config = {
-            title: {
-                hastitle: true,
-                title: '订单信息',
-                hasback: true,
-                backurl: '#/order/list'
-            }
-        };
-
         $scope.load = function () {
             $.showIndicator($scope);
             orderService.queryOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
+                $rootScope.config = {
+                    title: {
+                        hastitle: true,
+                        title: '订单信息',
+                        hasback: true,
+                        backurl: '#/order/list',
+                        hasmenu: true,
+                        menufunc: function () {
+                            var actionButtons = [];
+
+                            if ($scope.order.status === 'idle') {
+                                actionButtons.push({
+                                    text: '接受订单',
+                                    onClick: function () {
+                                        $scope.$state.go('order.permit', {oid: $scope.$state.params.oid});
+                                    }
+                                });
+                            }
+
+                            actionButtons.push({
+                                text: '拒绝订单',
+                                onClick: function () {
+                                }
+                            });
+
+                            actionButtons.push({
+                                text: '确认订单',
+                                onClick: function () {
+                                }
+                            });
+
+                            var stockButtons = [
+                                {
+                                    text: '查看出库清单',
+                                    onClick: function () {
+                                    }
+                                }
+                            ];
+
+                            var cancelButton = [
+                                {
+                                    text: '取消',
+                                    color: 'danger'
+                                }
+                            ];
+
+                            $.actions([actionButtons, stockButtons, cancelButton]);
+                        }
+                    }
+                };
+
                 hospitalService.queryHospital($scope.order.hospitalId).then(function (result) {
                     $scope.order.hospital = result.data;
                 }).finally(function () {
@@ -152,4 +194,42 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
             });
         };
         $scope.load();
+    }]);
+
+/**
+ * 订单：接受订单
+ */
+app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
+    function ($rootScope, $scope, orderService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '接受订单',
+                hasback: true,
+                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+            }
+        };
+
+        $scope.permitOrderReason = {reason: ''};
+
+        $scope.load = function () {
+            $.showIndicator($scope);
+            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+                $scope.order = result.data;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        /*接受订单*/
+        $scope.permitOrder = function () {
+            $.showIndicator($scope);
+            orderService.permitOrder($scope.$state.params.oid, $scope.permitOrderReason).then(function (result) {
+                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+        $scope.load();
+
     }]);

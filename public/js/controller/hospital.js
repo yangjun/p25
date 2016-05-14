@@ -722,6 +722,7 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
                 $.hideIndicator($scope);
             });
         };
+        
         $scope.load();
 
     }]);

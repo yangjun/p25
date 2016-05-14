@@ -129,6 +129,12 @@ app.constant('ROUTER',
                 url: '/:oid/info',
                 templateUrl: '../html/order/order_info.html',
                 controller: 'OrderInfoCtrl'
+            })
+            /*接受订单*/
+            .state('order.permit', {
+                url: '/:oid/permit',
+                templateUrl: '../html/order/order_permit.html',
+                controller: 'OrderPermitCtrl'
             });
 
 
