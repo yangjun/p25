@@ -141,6 +141,12 @@ app.constant('ROUTER',
                 url: '/:oid/reject',
                 templateUrl: '../html/order/order_reject.html',
                 controller: 'OrderRejectCtrl'
+            })
+            /*确认订单*/
+            .state('order.confirm', {
+                url: '/:oid/confirm',
+                templateUrl: '../html/order/order_confirm.html',
+                controller: 'OrderConfirmCtrl'
             });
 
 

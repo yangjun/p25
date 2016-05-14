@@ -182,6 +182,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 actionButtons.push({
                                     text: '确认订单',
                                     onClick: function () {
+                                        $scope.$state.go('order.confirm', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -250,7 +251,7 @@ app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
                 $.hideIndicator($scope);
             });
         };
-        
+
         $scope.load();
 
     }]);
@@ -293,3 +294,43 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.load();
 
     }]);
+
+/**
+ * 订单：确认订单
+ */
+app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
+    function ($rootScope, $scope, orderService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '确认订单',
+                hasback: true,
+                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+            }
+        };
+
+        $scope.confirmOrderReason = {reason: ''};
+
+        $scope.load = function () {
+            $.showIndicator($scope);
+            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+                $scope.order = result.data;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        /*确认订单*/
+        $scope.confirmOrder = function () {
+            $.showIndicator($scope);
+            orderService.confirmOrder($scope.$state.params.oid, $scope.confirmOrderReason).then(function (result) {
+                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        $scope.load();
+
+    }]);
+
