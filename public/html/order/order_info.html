@@ -1,0 +1,95 @@
+<!--订单：订单信息-->
+<div ng-show="!loading">
+    <form name="form" ng-submit="createOrder(form)">
+        <div class="content">
+            <div class="content-block-title">医院</div>
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title"></div>
+                                <div class="item-after">{{order.hospital.base.name}}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">申请人</div>
+                                <div class="item-after">{{order.proposer}}</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title">备注</div>
+                                <div class="item-after">{{order.notes}}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div ng-repeat="item in order.items">
+                <div class="content-block-title">订单项</div>
+                <div class="list-block">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">序号</div>
+                                    <div class="item-after">{{item.no}}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">药品名称</div>
+                                    <div class="item-after">{{item.goodsName}}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">规格型号</div>
+                                    <div class="item-after">{{item.specification}}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">单位</div>
+                                    <div class="item-after">{{item.unit}}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">数量</div>
+                                    <div class="item-after">{{item.quantity}}</div>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title">备注</div>
+                                    <div class="item-after">{{item.notes}}</div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -691,8 +691,8 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
 /**
  * 医院：订单：删除订单
  */
-app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'hospitalService', 'orderService',
-    function ($rootScope, $scope, hospitalService, orderService) {
+app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService',
+    function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
                 hastitle: true,

@@ -125,3 +125,31 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.load(0);
 
     }]);
+
+/**
+ * 订单：订单信息
+ */
+app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospitalService',
+    function ($rootScope, $scope, orderService, hospitalService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '订单信息',
+                hasback: true,
+                backurl: '#/order/list'
+            }
+        };
+
+        $scope.load = function () {
+            $.showIndicator($scope);
+            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+                $scope.order = result.data;
+                hospitalService.queryHospital($scope.order.hospitalId).then(function (result) {
+                    $scope.order.hospital = result.data;
+                }).finally(function () {
+                    $.hideIndicator($scope);
+                });
+            });
+        };
+        $scope.load();
+    }]);

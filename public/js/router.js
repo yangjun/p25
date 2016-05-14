@@ -123,6 +123,12 @@ app.constant('ROUTER',
                 url: '/list',
                 templateUrl: '../html/order/order_list.html',
                 controller: 'OrderListCtrl'
+            })
+            /*订单信息*/
+            .state('order.info', {
+                url: '/:oid/info',
+                templateUrl: '../html/order/order_info.html',
+                controller: 'OrderInfoCtrl'
             });
 
 
