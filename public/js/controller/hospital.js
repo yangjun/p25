@@ -519,8 +519,8 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
 /**
  * 医院：订单：所有订单
  */
-app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalService', 'orderService',
+    function ($rootScope, $scope, hospitalService, orderService) {
         $rootScope.config = {
             title: {
                 hastitle: true,
@@ -585,20 +585,13 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
         };
 
         /*点击订单时，弹出菜单*/
-        $scope.popupMenu = function (doctor) {
+        $scope.popupMenu = function (order) {
             var actionButtons = [
                 {
                     text: '删除',
                     onClick: function () {
-                        $.confirm('确认删除 ？',
-                            function () {
-                                hospitalService.removeDoctor(doctor.id).then(function (result) {
-                                    $scope.load(0);
-                                });
-                            },
-                            function () {
-                            }
-                        );
+                        /*点击‘删除’菜单，跳转‘删除订单’页面*/
+                        $scope.$state.go('hospital.order.remove', {id: $scope.$state.params.id, oid: order.id});
                     }
                 }
             ];
@@ -684,9 +677,51 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                     return;
                 }
             }
+            if (!$scope.order.items || $scope.order.items.length <= 0) {
+                $.toast('订单项不能为空');
+                return;
+            }
             orderService.createOrder($scope.$state.params.id, $scope.order).then(function (result) {
                 $scope.$state.go('hospital.order.list', {id: $scope.$state.params.id});
             });
         };
+
+    }]);
+
+/**
+ * 医院：订单：删除订单
+ */
+app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'hospitalService', 'orderService',
+    function ($rootScope, $scope, hospitalService, orderService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '删除订单',
+                hasback: true,
+                backurl: '#/hospital/' + $scope.$state.params.id + '/order/list'
+            }
+        };
+
+        $scope.cancelOrderReason = {reason: ''};
+
+        $scope.load = function () {
+            $.showIndicator($scope);
+            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+                $scope.order = result.data;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        /*删除订单*/
+        $scope.cancelOrder = function () {
+            $.showIndicator($scope);
+            orderService.cancelOrder($scope.order.id, $scope.cancelOrderReason).then(function (result) {
+                $scope.$state.go('hospital.order.list', {id: $scope.$state.params.id});
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+        $scope.load();
 
     }]);

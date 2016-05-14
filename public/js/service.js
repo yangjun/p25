@@ -164,8 +164,8 @@ app.factory('orderService', ['restClient', 'CTX',
         return {
             /**
              * 查询订单列表
-             * @param no
-             * @param status
+             * @param no 订单编号
+             * @param status 订单状态
              * @param skip
              * @param limit
              */
@@ -175,7 +175,7 @@ app.factory('orderService', ['restClient', 'CTX',
             },
             /**
              * 创建订单
-             * @param id
+             * @param id 医院ID
              * @param obj
              */
             createOrder: function (id, obj) {
@@ -183,21 +183,22 @@ app.factory('orderService', ['restClient', 'CTX',
             },
             /**
              * 查询订单信息
-             * @param id
+             * @param id 订单ID
              */
             queryOrder: function (id) {
                 return restClient.get(CTX + '/order/' + id);
             },
             /**
              * 取消订单
-             * @param id
+             * @param id 订单ID
+             * @param obj
              */
-            cancelOrder: function (id) {
-                return restClient.delete(CTX + '/order/' + id);
+            cancelOrder: function (id, obj) {
+                return restClient.delete(CTX + '/order/' + id, obj);
             },
             /**
              * 接受订单
-             * @param id
+             * @param id 订单ID
              * @param obj
              */
             permitOrder: function (id, obj) {
@@ -205,7 +206,7 @@ app.factory('orderService', ['restClient', 'CTX',
             },
             /**
              * 拒绝订单
-             * @param id
+             * @param id 订单ID
              * @param obj
              */
             rejectOrder: function (id, obj) {
@@ -213,7 +214,7 @@ app.factory('orderService', ['restClient', 'CTX',
             },
             /**
              * 确认订单
-             * @param id
+             * @param id 订单ID
              * @param obj
              */
             confirmOrder: function (id, obj) {
@@ -221,7 +222,7 @@ app.factory('orderService', ['restClient', 'CTX',
             },
             /**
              * 根据订单查询出库清单
-             * @param id
+             * @param id 订单ID
              * @param skip
              * @param limit
              */

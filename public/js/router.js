@@ -104,6 +104,12 @@ app.constant('ROUTER',
                 url: '/create',
                 templateUrl: '../html/hospital/hospital_order_create.html',
                 controller: 'HospitalOrderCreateCtrl'
+            })
+            /*订单：删除订单*/
+            .state('hospital.order.remove', {
+                url: '/:oid/remove',
+                templateUrl: '../html/hospital/hospital_order_remove.html',
+                controller: 'HospitalOrderRemoveCtrl'
             });
 
         /*------------------------------订单------------------------------*/
