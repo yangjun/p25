@@ -135,6 +135,12 @@ app.constant('ROUTER',
                 url: '/:oid/permit',
                 templateUrl: '../html/order/order_permit.html',
                 controller: 'OrderPermitCtrl'
+            })
+            /*拒绝订单*/
+            .state('order.reject', {
+                url: '/:oid/reject',
+                templateUrl: '../html/order/order_reject.html',
+                controller: 'OrderRejectCtrl'
             });
 
 

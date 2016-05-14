@@ -145,7 +145,12 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                         menufunc: function () {
                             var actionButtons = [];
 
-                            if ($scope.order.status === 'idle') {
+                            if ($scope.order.status === 'idle'
+                                || $scope.order.status === 'firstReview'
+                                || $scope.order.status === 'review'
+                                || $scope.order.status === 'stock'
+                                || $scope.order.status === 'goodsReceipt'
+                                || $scope.order.status === 'achieve') {
                                 actionButtons.push({
                                     text: '接受订单',
                                     onClick: function () {
@@ -154,17 +159,32 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 });
                             }
 
-                            actionButtons.push({
-                                text: '拒绝订单',
-                                onClick: function () {
-                                }
-                            });
+                            if ($scope.order.status === 'idle'
+                                || $scope.order.status === 'firstReview'
+                                || $scope.order.status === 'review'
+                                || $scope.order.status === 'stock'
+                                || $scope.order.status === 'goodsReceipt'
+                                || $scope.order.status === 'achieve') {
+                                actionButtons.push({
+                                    text: '拒绝订单',
+                                    onClick: function () {
+                                        $scope.$state.go('order.reject', {oid: $scope.$state.params.oid});
+                                    }
+                                });
+                            }
 
-                            actionButtons.push({
-                                text: '确认订单',
-                                onClick: function () {
-                                }
-                            });
+                            if ($scope.order.status === 'idle'
+                                || $scope.order.status === 'firstReview'
+                                || $scope.order.status === 'review'
+                                || $scope.order.status === 'stock'
+                                || $scope.order.status === 'goodsReceipt'
+                                || $scope.order.status === 'achieve') {
+                                actionButtons.push({
+                                    text: '确认订单',
+                                    onClick: function () {
+                                    }
+                                });
+                            }
 
                             var stockButtons = [
                                 {
@@ -230,6 +250,46 @@ app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
                 $.hideIndicator($scope);
             });
         };
+        
+        $scope.load();
+
+    }]);
+
+/**
+ * 订单：拒绝订单
+ */
+app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
+    function ($rootScope, $scope, orderService) {
+        $rootScope.config = {
+            title: {
+                hastitle: true,
+                title: '拒绝订单',
+                hasback: true,
+                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+            }
+        };
+
+        $scope.rejectOrderReason = {reason: ''};
+
+        $scope.load = function () {
+            $.showIndicator($scope);
+            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+                $scope.order = result.data;
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        /*拒绝订单*/
+        $scope.rejectOrder = function () {
+            $.showIndicator($scope);
+            orderService.rejectOrder($scope.$state.params.oid, $scope.rejectOrderReason).then(function (result) {
+                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
         $scope.load();
 
     }]);
