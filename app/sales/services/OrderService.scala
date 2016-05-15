@@ -94,11 +94,12 @@ class OrderService @Inject()(
       throw new RuntimeException("订单清单为空")
     }
     val id = Utils.nextId()
+    val proposer = createOrder.proposer.getOrElse("")
     nextNo() flatMap { no =>
       val now = DateTime.now()
       val newOrder = Order(id = id,
         no = no,
-        proposer = createOrder.proposer.getOrElse(""),
+        proposer = proposer,
         created = Some(now),
         updated = Some(now),
         status = OrderStatus.idle,
@@ -116,7 +117,7 @@ class OrderService @Inject()(
       id match {
         case Some(id) =>
           // 创建一条审计日志
-          createOrderAudit(id, "", "新建订单")
+          createOrderAudit(id, proposer, "新建订单")
       }
     }
   }

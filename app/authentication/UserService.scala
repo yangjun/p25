@@ -3,7 +3,7 @@ package authentication
 import javax.inject.{Inject, Singleton}
 
 import org.slf4j.LoggerFactory
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json.collection.JSONCollection
 import utils.Utils
@@ -11,9 +11,11 @@ import wx.RegisterWxUser
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import authentication._
+
 import org.joda.time.DateTime
-import scala.concurrent._
+import reactivemongo.api.{QueryOpts, ReadPreference}
+
+import reactivemongo.play.json._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -155,6 +157,15 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi,
     cursor
   }
 
+  def findByRole(roles: Option[Set[String]], skip: Int, limit: Int)(implicit ec: ExecutionContext): Future[Traversable[User]] = {
+    // 根据角色查询用户
+    val r = Json.obj("$elemMatch" -> Json.obj("$in" -> roles))
+    val criteria = Json.obj("roles" -> r)
+    import reactivemongo.play.json._
+    val cursor = search(criteria = criteria, skip = skip, limit = limit)
+    cursor
+  }
+
   def editUser(userId: String, editUser: EditUser)(implicit ec: ExecutionContext): Future[Option[String]] = {
     val criteria = Json.obj("id" -> userId)
     import reactivemongo.play.json._
@@ -182,6 +193,14 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi,
         }
       }
     })
+  }
+
+
+  private def search(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[User]] = {
+    userCollection.flatMap(_.find(criteria).
+      options(QueryOpts(skipN = skip))
+      cursor[User] (readPreference = ReadPreference.nearest)
+      collect[List] (limit))
   }
 
   /**

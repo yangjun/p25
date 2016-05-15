@@ -25,6 +25,7 @@ class TaskService @Inject()(
                            (implicit ec: ExecutionContext) {
   val task = taskCollection
 
+  val stage = stageCollection
 
   /**
     * 接受一个任务， 把任务从idle -> processing
@@ -189,12 +190,56 @@ class TaskService @Inject()(
     task.flatMap(_.find(criteria).one[Task])
   }
 
+  /**
+    * 查询任务参与者
+    * 更加任务-->订单-->订单下一个阶段-->找相应的角色-->查询用户
+    *
+    * @param id
+    * @return
+    */
+  def stakeholders(id: String, skip: Int, limit: Int): Future[Traversable[Stakeholder]] = {
+    read(id) flatMap (task => {
+      task match {
+        case Some(task) =>
+          orderService.pk(task.no) flatMap (order => {
+            order match {
+              case Some(order) =>
+                val nextStatus = order.permit().status
+                val criteria = Json.obj(
+                  "workflow" -> Stage.workflow,
+                  "stage" -> nextStatus)
+                stage.flatMap(_.find(criteria).one[Stage]) flatMap (stage => {
+                  stage match {
+                    case Some(stage) =>
+                      val stakeholders = stage.stakeholders
+                      userService.findByRole(Some(stakeholders), skip, limit) map (users => {
+                        users map (user => Stakeholder(user))
+                      })
+                    case None =>
+                      throw new RuntimeException(s"未发现【$nextStatus】阶段配置");
+                  } // end stage1 match
+                })
+              case None =>
+                val no = task.no
+                throw new RuntimeException(s"未发现标识【$no】订单");
+            } // end order match
+          })
+        case None =>
+          throw new RuntimeException(s"未发现标识【$id】任务");
+      } // end task match
+    })
+  }
+
   private def search(criteria: JsObject, skip: Int, limit: Int): Future[Traversable[Task]] = {
     logger.debug("criteria -> {}", criteria)
     task.flatMap(_.find(criteria).
       options(QueryOpts(skipN = skip))
       cursor[Task] (readPreference = ReadPreference.nearest)
       collect[List] (limit))
+  }
+
+  private def stageCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+    reactiveMongoApi.database.map(_.collection("stage"))
   }
 
   private def taskCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {

@@ -7,7 +7,6 @@ import play.api.mvc._
 
 import scala.concurrent.Future
 import pdi.jwt._
-import play.mvc.Security.AuthenticatedAction
 
 
 class AuthenticatedRequest[A](val token: String, request: Request[A]) extends WrappedRequest[A](request) {
@@ -20,7 +19,6 @@ trait Secured {
 
 
 object AuthenticatedAction extends ActionBuilder[AuthenticatedRequest] {
-  lazy val logger = LoggerFactory.getLogger(classOf[AuthenticatedAction])
   def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) =
     request.jwtSession.getAs[String]("token") match {
       case Some(token) =>

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import sales.models.{EditDevelopResume, PermitOrder, RejectOrder}
+import sales.models.{EditDevelopResume, PermitOrder, RejectOrder, Stakeholder}
 import sales.services.{DoctorService, HospitalService, OrderService, TaskService}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -120,11 +120,30 @@ class TaskController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                   })
               case None =>
                 Future {
-                  Ok(Json.obj())
+                  BadRequest(Json.obj("error" -> "非法用户"))
                 }
             })
       }
     }
+  }
+
+  def stakeholders(id: String) = Authenticated.async { implicit req =>
+    val skip = req.queryString.get("skip").getOrElse(DEFAULT_SKIP).head.toInt
+    val limit = req.queryString.get("limit").getOrElse(DEFAULT_LIMIT).head.toInt
+    val token = req.token
+    sessionService.who(token) flatMap (
+      who =>
+        who match {
+          case Some(who) =>
+            taskService.stakeholders(id, skip, limit) map (
+              stakeholders => {
+                Ok(Json.toJson(stakeholders))
+              })
+          case None =>
+            Future {
+              BadRequest(Json.obj("error" -> "非法用户"))
+            }
+        })
   }
 
 }

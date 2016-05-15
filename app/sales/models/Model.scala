@@ -186,9 +186,7 @@ object Hospital {
 
     def next: String = UUID.randomUUID() toString
   }
-
 }
-
 
 // 医院开发过程
 case class DevelopResumeHistory(id: Option[String],
@@ -425,6 +423,28 @@ object EditHospitalArchive {
   implicit val format = Json.format[EditHospitalArchive]
 }
 
+// 订单项
+case class OrderItem(
+                      // 序号
+                      no: Int,
+                      // 药品名称
+                      goodsName: String,
+                      // 规格型号
+                      specification: String,
+                      // 单位
+                      unit: String,
+                      // 数量
+                      quantity: Int,
+                      // 备注
+                      notes: Option[String]
+                    ) {
+
+}
+
+object OrderItem {
+  implicit val format = Json.format[OrderItem]
+}
+
 // 订单
 case class Order(
                   // 标识
@@ -510,15 +530,15 @@ case class Order(
     val nextStatus = status match {
       case s if s.equals(OrderStatus.idle) =>
         OrderStatus.cancel
-      case  s if s.equals(OrderStatus.firstReview) =>
+      case s if s.equals(OrderStatus.firstReview) =>
         OrderStatus.cancel
-      case  s if s.equals(OrderStatus.review) =>
+      case s if s.equals(OrderStatus.review) =>
         OrderStatus.cancel
-      case  s if s.equals(OrderStatus.stock) =>
+      case s if s.equals(OrderStatus.stock) =>
         OrderStatus.cancel
-      case  s if s.equals(OrderStatus.goodsReceipt) =>
+      case s if s.equals(OrderStatus.goodsReceipt) =>
         OrderStatus.goodsReceipt
-      case  s if s.equals(OrderStatus.achieve) =>
+      case s if s.equals(OrderStatus.achieve) =>
         OrderStatus.achieve
       case _ =>
         status
@@ -571,28 +591,6 @@ object OrderStatus {
 
 }
 
-
-// 订单项
-case class OrderItem(
-                      // 序号
-                      no: Int,
-                      // 药品名称
-                      goodsName: String,
-                      // 规格型号
-                      specification: String,
-                      // 单位
-                      unit: String,
-                      // 数量
-                      quantity: Int,
-                      // 备注
-                      notes: Option[String]
-                    ) {
-
-}
-
-object OrderItem {
-  implicit val format = Json.format[OrderItem]
-}
 
 /**
   * 一个订单对应一个出库单
@@ -845,12 +843,12 @@ object CancelOrder {
   * @param reason 留言
   */
 case class CommitOrder(
-                      // 提交给谁
+                        // 提交给谁
                         who: String,
-                      // 谁发起的提交
-                       sender: String,
-                      // 留言
-                       reason: Option[String]) {
+                        // 谁发起的提交
+                        sender: String,
+                        // 留言
+                        reason: Option[String]) {
 
 }
 
@@ -859,10 +857,10 @@ object CommitOrder {
 }
 
 case class CommitNewOrder(
-                        // 提交给谁
-                        who: String,
-                        // 留言
-                        reason: Option[String]) {
+                           // 提交给谁
+                           who: String,
+                           // 留言
+                           reason: Option[String]) {
   def commitOrder(sender: String): CommitOrder = {
     CommitOrder(who = who, sender = sender, reason = reason)
   }
@@ -871,107 +869,3 @@ case class CommitNewOrder(
 object CommitNewOrder {
   implicit val format = Json.format[CommitNewOrder]
 }
-
-//================工作流相关=========================
-
-object TaskStatus {
-  // 【待办】，初始状态，上一个发起人可以取回
-  val idle: String = "idle"
-  // 【正在处理】接收任务开始处理
-  val processing: String = "processing"
-  // 【已完成】，可能是接受或者拒绝，参见  action
-  val completed: String = "completed"
-}
-
-object Action {
-  // 接受
-  val permit: String = "permit"
-  // 拒绝
-  val reject: String = "reject"
-
-}
-
-/**
-  * 代办任务
-  */
-case class Task(
-                 // 标识
-                 id: String,
-                 // 人员
-                 who: String,
-                 // 工单（订单ID）
-                // 谁发来的任务
-                 sender: String,
-                 no: String,
-                 // 参见 TaskStatus
-                 status: String = TaskStatus.idle,
-                 notes: Option[String],
-                 // 动作
-                 action: Option[String],
-                 // 创建时间
-                 created: Option[DateTime],
-                 // 开始时间
-                 started: Option[DateTime],
-                 // 完成时间
-                 completed: Option[DateTime]
-               )
-
-
-object Task {
-  implicit val format = Json.format[Task]
-}
-
-case class Payload(
-                    clazz: String,
-                    value: String
-                  ) {
-  /**
-    *
-    * @tparam T
-    * @return
-    */
-  //  def deserialization[T]: T = {
-  //    import play.api.libs.json.Json
-  //    Json.parse(value).as[T]
-  //  }
-}
-
-object Payload {
-  implicit val format = Json.format[Payload]
-
-  /**
-    * 序列化对象
-    *
-    * @param t
-    * @tparam T
-    * @return
-    */
-  //  def serialize[T](t: T): Payload = {
-  //    import play.api.libs.json.Json
-  //    Payload(t.getClass.getName, Json.toJson(t).toString())
-  //  }
-}
-
-/**
-  * 工单历史信息
-  */
-case class History(
-                    // 标识
-                    id: String,
-                    // 工单（订单ID）
-                    no: String,
-                    // 任务ID
-                    taskId: String,
-                    // 工单内容（序列化）
-                    payload: Payload,
-                    created: Option[DateTime] = Some(DateTime.now())
-                  ) {
-  //  def order: Order = payload.deserialization[Order]
-}
-
-
-object History {
-  implicit val format = Json.format[History]
-}
-
-

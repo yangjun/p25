@@ -9,6 +9,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoComponents}
 import sales.services.{OrderService, TaskService}
+import sales.models._
 
 import scala.concurrent.{ExecutionContext, Future}
 

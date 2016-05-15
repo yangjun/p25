@@ -91,6 +91,7 @@ GET       /crm/v1/sdk/task/:id                    sales.controllers.TaskControll
 POST      /crm/v1/sdk/task/:id/accept             sales.controllers.TaskController.accept(id)
 POST      /crm/v1/sdk/task/:id/permit             sales.controllers.TaskController.permit(id)
 POST      /crm/v1/sdk/task/:id/reject             sales.controllers.TaskController.reject(id)
+GET        /crm/v1/sdk/task/:id/stakeholders      sales.controllers.TaskController.stakeholders(id)
 
 # My
 GET       /crm/v1/sdk/my/order                    sales.controllers.MyController.order(no: Option[String], status: Option[String])
