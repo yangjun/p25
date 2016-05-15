@@ -109,9 +109,9 @@ class HospitalController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   // 测试重定向
   def redirect = Action { implicit req =>
     var session = JwtSession()
-    session = session +("user", "yangjun")
+    session = session +("token", "yangjun")
     session = session.withSignature("secret")
-    val result = Redirect("/count", 302)
+    val result = Redirect("/", 302)
     result.withJwtSession(session)
   }
 

@@ -47,6 +47,12 @@ object WxUser {
 }
 
 
+/**
+  * 编辑用户信息
+  * @param email
+  * @param mobile
+  * @param displayName
+  */
 case class EditUser(email: Option[String],
                        mobile: Option[String],
                        displayName: Option[String]) {
@@ -73,6 +79,8 @@ object Role {
   val doctor = "doctor"
   // 还未登录用户，匿名用户
   val anonymous ="anonymous"
+  // 库管，负责出库，对审核通过的订单进行出库
+  val stock = "stock"
 }
 
 
@@ -85,7 +93,7 @@ case class Session(
                   userId: String,
                   // 登录后生成的Token
                   token: String,
-                  // 用于交互下一个Token
+                  // 用于交换下一个Token
                   refreshToken: String,
                   // 创建日期
                   val created: DateTime = DateTime.now(),
@@ -116,3 +124,6 @@ object Session {
     )
   }
 }
+
+//============== 组织结构 =========================================================
+

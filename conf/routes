@@ -38,6 +38,9 @@ GET       /wx/callback                   wx.WxController.callback(code: Option[S
 # jws
 GET       /wx/jwt                         wx.WxController.jwt
 
+# TEST redirect
+GET       /crm/v1/sdk/hospital/redirect           sales.controllers.HospitalController.redirect
+
 # App System
 
 # Area
@@ -57,8 +60,6 @@ POST      /crm/v1/sdk/hospital/:id/resume         sales.controllers.HospitalCont
 POST      /crm/v1/sdk/hospital/:id/partner        sales.controllers.HospitalController.becomePartner(id)
 POST      /crm/v1/sdk/hospital/:id/archive        sales.controllers.HospitalController.editArchive(id)
 
-# TEST redirect
-GET       /crm/v1/sdk/hospital/redirect           sales.controllers.HospitalController.redirect
 
 # Doctor
 POST      /crm/v1/sdk/hospital/:id/doctor         sales.controllers.HospitalController.addDoctor(id)
@@ -70,9 +71,11 @@ POST      /crm/v1/sdk/hospital/:id/order          sales.controllers.OrderControl
 GET       /crm/v1/sdk/hospital/:id/order          sales.controllers.OrderController.queryByHospital(id)
 GET       /crm/v1/sdk/order                       sales.controllers.OrderController.query(no: Option[String], status: Option[String])
 GET       /crm/v1/sdk/order/:id                   sales.controllers.OrderController.read(id)
+
+POST       /crm/v1/sdk/order/:id/commit           sales.controllers.OrderController.commit(id)
 DELETE    /crm/v1/sdk/order/:id                   sales.controllers.OrderController.cancel(id)
-POST      /crm/v1/sdk/order/:id/permit            sales.controllers.OrderController.permit(id)
-POST      /crm/v1/sdk/order/:id/reject            sales.controllers.OrderController.reject(id)
+#POST      /crm/v1/sdk/order/:id/permit            sales.controllers.OrderController.permit(id)
+#POST      /crm/v1/sdk/order/:id/reject            sales.controllers.OrderController.reject(id)
 POST      /crm/v1/sdk/order/:id/confirm           sales.controllers.OrderController.confirm(id)
 GET       /crm/v1/sdk/order/:id/goods             sales.controllers.OrderController.queryStockItemByOrder(id)
 
@@ -82,12 +85,23 @@ POST      /crm/v1/sdk/stock/:id                   sales.controllers.OrderControl
 DELETE    /crm/v1/sdk/stock/:id                   sales.controllers.OrderController.removeStockItem(id)
 GET       /crm/v1/sdk/stock/:id                   sales.controllers.OrderController.queryStockItemByStock(id)
 
-GET       /crm/v1/sdk/private               sales.controllers.AreaController.privateApi
+# Task
+GET       /crm/v1/sdk/task                        sales.controllers.TaskController.query(status: Option[String], action: Option[String])
+GET       /crm/v1/sdk/task/:id                    sales.controllers.TaskController.read(id)
+POST      /crm/v1/sdk/task/:id/accept             sales.controllers.TaskController.accept(id)
+POST      /crm/v1/sdk/task/:id/permit             sales.controllers.TaskController.permit(id)
+POST      /crm/v1/sdk/task/:id/reject             sales.controllers.TaskController.reject(id)
+
+# My
+GET       /crm/v1/sdk/my/order                    sales.controllers.MyController.order(no: Option[String], status: Option[String])
+GET       /crm/v1/sdk/my/task                     sales.controllers.MyController.task(status: Option[String], action: Option[String])
+
+GET       /crm/v1/sdk/private                     sales.controllers.AreaController.privateApi
 
 # User
-GET       /crm/v1/sdk/auth/userProfile      authentication.AuthenticationController.userProfile
-GET       /crm/v1/sdk/auth/user             authentication.AuthenticationController.user(name)
-POST       /crm/v1/sdk/auth/user/:id        authentication.AuthenticationController.editUser(id)
+GET       /crm/v1/sdk/auth/userProfile            authentication.AuthenticationController.userProfile
+GET       /crm/v1/sdk/auth/user                   authentication.AuthenticationController.user(name)
+POST      /crm/v1/sdk/auth/user/:id               authentication.AuthenticationController.editUser(id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

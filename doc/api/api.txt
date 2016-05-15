@@ -22,3 +22,54 @@ POST /crm/v1/sdk/hospital/:id/resume
 PATCH /crm/v1/sdk/hospital/:id
 请求内容参见 sales.models.EditHospitals
 
+
+//   如何通过微信登录后获取用户信息
+1. 在WX浏览器调用如下的地址，或直接用AJAX调用
+get https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd1a9eba03a82e959&redirect_uri=http://luotaoyeah.iok.la/wx/callback&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect
+2. 微信会调用应用的提供的回调地址
+ /wx/callback
+3. 获取用户成功，返回到主页
+并在请求头中包含
+Authorization:"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIbWFjU0hBMjU2In0.eyJ1c2VyIjoieWFuZ2p1biJ9.LCXhNo_UzsTmGhyt2bMADbS4PfvXv-mw5Hp2EoIryWI"
+Authorization 内容使用 jwt 格式封装
+
+4. 以后的请求都要在头上添加上面获取的Authorization头
+调用如下地址获取当前登录用户信息 get /crm/v1/sdk/auth/userProfile
+如果调用失败，返回401
+
+
+流程相关的接口
+
+// 查询当前用户任务状态
+待办
+GET /crm/v1/sdk/task?status=idle
+
+处理中
+GET /crm/v1/sdk/task?status=processing
+
+已经完成
+GET /crm/v1/sdk/task?status=completed
+
+接受任务
+POST /crm/v1/sdk/task/:id/accept
+审核通过
+POST /crm/v1/sdk/task/:id/permit
+拒绝
+POST /crm/v1/sdk/task/:id/reject
+
+
+录入完申请单后，
+提交进入审批流程
+POST       /crm/v1/sdk/order/:id/commit
+
+查询自己提交的订单
+
+
+调试: 用户ID
+ee30d15d-aa9c-46c3-90c4-6b715d89afbb
+
+JWT:
+Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIbWFjU0hBMjU2In0.eyJ0b2tlbiI6InlhbmdqdW4ifQ.bA52NGMsJ993T1T9IGYcMSDmzebsHB3sVAozSBBreyw
+
+
+

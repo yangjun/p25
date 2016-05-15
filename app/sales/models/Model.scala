@@ -460,15 +460,15 @@ case class Order(
     val nextStatus = status match {
       case s if s.equals(OrderStatus.idle) =>
         OrderStatus.firstReview
-      case OrderStatus.firstReview =>
+      case s if s.equals(OrderStatus.firstReview) =>
         OrderStatus.review
-      case OrderStatus.review =>
+      case s if s.equals(OrderStatus.review) =>
         OrderStatus.stock
-      case OrderStatus.stock =>
+      case s if s.equals(OrderStatus.stock) =>
         OrderStatus.goodsReceipt
-      case OrderStatus.goodsReceipt =>
+      case s if s.equals(OrderStatus.goodsReceipt) =>
         OrderStatus.achieve
-      case OrderStatus.achieve =>
+      case s if s.equals(OrderStatus.achieve) =>
         OrderStatus.achieve
       case _ =>
         status
@@ -483,18 +483,20 @@ case class Order(
     */
   def reject(): Order = {
     val nextStatus = status match {
-      case OrderStatus.idle =>
+      case s if s.equals(OrderStatus.idle) =>
         OrderStatus.idle
-      case OrderStatus.firstReview =>
+      case s if s.equals(OrderStatus.firstReview) =>
         OrderStatus.idle
-      case OrderStatus.review =>
+      case s if s.equals(OrderStatus.review) =>
         OrderStatus.firstReview
-      case OrderStatus.stock =>
+      case s if s.equals(OrderStatus.stock) =>
         OrderStatus.review
-      case OrderStatus.goodsReceipt =>
+      case s if s.equals(OrderStatus.goodsReceipt) =>
         OrderStatus.goodsReceipt
-      case OrderStatus.achieve =>
+      case s if s.equals(OrderStatus.achieve) =>
         OrderStatus.achieve
+      case _ =>
+        status
     }
     copy(status = nextStatus, updated = Some(DateTime.now()))
   }
@@ -506,20 +508,44 @@ case class Order(
     */
   def cancel(): Order = {
     val nextStatus = status match {
-      case OrderStatus.idle =>
+      case s if s.equals(OrderStatus.idle) =>
         OrderStatus.cancel
-      case OrderStatus.firstReview =>
+      case  s if s.equals(OrderStatus.firstReview) =>
         OrderStatus.cancel
-      case OrderStatus.review =>
+      case  s if s.equals(OrderStatus.review) =>
         OrderStatus.cancel
-      case OrderStatus.stock =>
+      case  s if s.equals(OrderStatus.stock) =>
         OrderStatus.cancel
-      case OrderStatus.goodsReceipt =>
+      case  s if s.equals(OrderStatus.goodsReceipt) =>
         OrderStatus.goodsReceipt
-      case OrderStatus.achieve =>
+      case  s if s.equals(OrderStatus.achieve) =>
         OrderStatus.achieve
+      case _ =>
+        status
     }
     copy(status = nextStatus, updated = Some(DateTime.now()))
+  }
+
+  /**
+    * 根据订单生成待办任务
+    *
+    * @param commitOrder
+    * @return
+    */
+  def task(commitOrder: CommitOrder): Task = {
+    Task(
+      id = Utils.nextId(),
+      who = commitOrder.who,
+      sender = commitOrder.sender,
+      //  订单标识
+      no = id,
+      status = TaskStatus.idle,
+      notes = commitOrder.reason,
+      action = None,
+      created = Some(DateTime.now()),
+      started = None,
+      completed = None
+    )
   }
 }
 
@@ -766,9 +792,13 @@ object CreateOrder {
   * @param reason
   */
 case class PermitOrder(
+                        who: String,
                         reason: String
                       ) {
 
+  def commitOrder(sender: String): CommitOrder = {
+    CommitOrder(who = who, sender = sender, reason = Some(reason))
+  }
 }
 
 object PermitOrder {
@@ -783,7 +813,12 @@ object PermitOrder {
 case class RejectOrder(
                         // 拒绝原因
                         reason: String
-                      )
+                      ) {
+  def commitOrder(who: String, sender: String): CommitOrder = {
+    CommitOrder(who = who, sender = sender, reason = Some(reason))
+  }
+
+}
 
 object RejectOrder {
   implicit val format = Json.format[RejectOrder]
@@ -803,15 +838,48 @@ object CancelOrder {
   implicit val format = Json.format[CancelOrder]
 }
 
+/**
+  * 提交订单，开始审核流程
+  *
+  * @param who    初审人员
+  * @param reason 留言
+  */
+case class CommitOrder(
+                      // 提交给谁
+                        who: String,
+                      // 谁发起的提交
+                       sender: String,
+                      // 留言
+                       reason: Option[String]) {
+
+}
+
+object CommitOrder {
+  implicit val format = Json.format[CommitOrder]
+}
+
+case class CommitNewOrder(
+                        // 提交给谁
+                        who: String,
+                        // 留言
+                        reason: Option[String]) {
+  def commitOrder(sender: String): CommitOrder = {
+    CommitOrder(who = who, sender = sender, reason = reason)
+  }
+}
+
+object CommitNewOrder {
+  implicit val format = Json.format[CommitNewOrder]
+}
 
 //================工作流相关=========================
 
 object TaskStatus {
-  // 初始状态，上一个发起人可以取回
+  // 【待办】，初始状态，上一个发起人可以取回
   val idle: String = "idle"
-  // 接收任务开始处理
+  // 【正在处理】接收任务开始处理
   val processing: String = "processing"
-  // 已经完成，可能是
+  // 【已完成】，可能是接受或者拒绝，参见  action
   val completed: String = "completed"
 }
 
@@ -819,7 +887,7 @@ object Action {
   // 接受
   val permit: String = "permit"
   // 拒绝
-  val reject: String = "Reject"
+  val reject: String = "reject"
 
 }
 
@@ -832,15 +900,18 @@ case class Task(
                  // 人员
                  who: String,
                  // 工单（订单ID）
+                // 谁发来的任务
+                 sender: String,
                  no: String,
                  // 参见 TaskStatus
                  status: String = TaskStatus.idle,
+                 notes: Option[String],
                  // 动作
-                 action: String,
+                 action: Option[String],
                  // 创建时间
                  created: Option[DateTime],
                  // 开始时间
-                 statred: Option[DateTime],
+                 started: Option[DateTime],
                  // 完成时间
                  completed: Option[DateTime]
                )
@@ -859,10 +930,10 @@ case class Payload(
     * @tparam T
     * @return
     */
-//  def deserialization[T]: T = {
-//    import play.api.libs.json.Json
-//    Json.parse(value).as[T]
-//  }
+  //  def deserialization[T]: T = {
+  //    import play.api.libs.json.Json
+  //    Json.parse(value).as[T]
+  //  }
 }
 
 object Payload {
@@ -875,10 +946,10 @@ object Payload {
     * @tparam T
     * @return
     */
-//  def serialize[T](t: T): Payload = {
-//    import play.api.libs.json.Json
-//    Payload(t.getClass.getName, Json.toJson(t).toString())
-//  }
+  //  def serialize[T](t: T): Payload = {
+  //    import play.api.libs.json.Json
+  //    Payload(t.getClass.getName, Json.toJson(t).toString())
+  //  }
 }
 
 /**
@@ -895,7 +966,7 @@ case class History(
                     payload: Payload,
                     created: Option[DateTime] = Some(DateTime.now())
                   ) {
-//  def order: Order = payload.deserialization[Order]
+  //  def order: Order = payload.deserialization[Order]
 }
 
 

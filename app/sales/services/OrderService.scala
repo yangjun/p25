@@ -23,6 +23,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class OrderService @Inject()(
                               userService: UserServiceImpl,
+                              taskItemService: TaskItemService,
                               reactiveMongoApi: ReactiveMongoApi)
                             (implicit ec: ExecutionContext) {
   private lazy val logger = LoggerFactory.getLogger(classOf[OrderService])
@@ -121,6 +122,51 @@ class OrderService @Inject()(
   }
 
   /**
+    * 订单创建者提交订单审核，开始审核流程
+    *
+    * @param id 订单标识
+    * @param commitOrder
+    * @param ec
+    * @return
+    */
+  def commit(id: String, who: String, commitOrder: CommitNewOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    pk(id) flatMap { item =>
+      item match {
+        case Some(item) =>
+          item.status match {
+            case s if s.equals(OrderStatus.idle) =>
+              val reason = commitOrder.reason
+              val update = item.permit()
+              logger.debug("order -> {}", update)
+              val criteria = Json.obj("id" -> id)
+              val sender = item.proposer
+              val updateCommitOrder = commitOrder.commitOrder(sender)
+              order.flatMap(_.update(criteria, update)) flatMap {
+                case le if le.ok =>
+                  // 生成待办任务
+                  taskItemService.create(update.task(updateCommitOrder))
+                  val notes  = reason match {
+                    case Some(reason) =>
+                      s"附言【$reason】"
+                    case None =>
+                      ""
+                  }
+                  createOrderAudit(id, who, s"提交订单,请求初审，$notes")
+                case le =>
+                  throw new RuntimeException("提交订单失败")
+              }
+            case _ => {
+              throw new RuntimeException("订单不能被提交")
+            }
+          } // end item.status match
+        case None =>
+          throw new RuntimeException("订单不存在")
+      } // end item match
+    }
+  }
+
+
+  /**
     * 取消订单
     * <pre>
     *
@@ -156,7 +202,7 @@ class OrderService @Inject()(
     * @param ec
     * @return
     */
-  def permit(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def permit(id: String, sender: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
     logger.debug("permitOrder -> {}", permitOrder)
     pk(id) flatMap { item =>
       item match {
@@ -170,9 +216,10 @@ class OrderService @Inject()(
           order.flatMap(_.update(criteria, update)) flatMap {
             case le if le.ok =>
               logger.debug("order -> {}", item)
-              val notes = s"审核通过，原因【$reason】"
+              val notes = s"审核通过，附言【$reason】"
               logger.debug("notes -> {}", notes)
-              createOrderAudit(id, User.mockUser, reason)
+              taskItemService.create(update.task(permitOrder.commitOrder(sender)))
+              createOrderAudit(id, sender, notes)
             case le =>
               throw new RuntimeException("审核通过订单失败")
           }
@@ -190,16 +237,26 @@ class OrderService @Inject()(
     * @param ec
     * @return
     */
-  def reject(id: String, rejectOrder: RejectOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def reject(id: String, who: String, sender: String, rejectOrder: RejectOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
     pk(id) flatMap { item =>
       item match {
         case Some(item) =>
           val reason = rejectOrder.reason
           val update = item.reject()
           val criteria = Json.obj("id" -> id)
-          orderCollection.flatMap(_.update(criteria, update)) flatMap {
+          order.flatMap(_.update(criteria, update)) flatMap {
             case le if le.ok =>
-              createOrderAudit(id, "", s"订单被拒绝,原因【$reason】")
+              val notes = s"拒绝通过，原因【$reason】"
+              logger.debug("notes -> {}", notes)
+              // 已经回退给订单申请者
+              update.status match {
+                case s if s.equals(OrderStatus.idle) =>
+
+                case _ =>
+                  // 创建待办任务
+                  taskItemService.create(update.task(rejectOrder.commitOrder(who, sender)))
+              }
+              createOrderAudit(id, who, notes)
             case le =>
               throw new RuntimeException("审核拒绝订单失败")
           }
@@ -357,7 +414,7 @@ class OrderService @Inject()(
     * @return
     */
   def confirm(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
-    permit(id, permitOrder)
+    permit(id, User.mockUser, permitOrder)
   }
 
   /**
@@ -409,7 +466,41 @@ class OrderService @Inject()(
     search(criteria, skip, limit)
   }
 
-  /**
+  def query1(who: Option[String], no: Option[String], status: Option[String], skip: Int, limit: Int): Future[Traversable[Order]] = {
+    var criteria = Json.obj()
+    who match {
+      case Some(who) =>
+        criteria = criteria.+("proposer", JsString(who))
+      case None =>
+    }
+    no match {
+      case Some(no) =>
+        criteria = criteria.+(
+          "no", Json.obj(
+            "$regex" -> no,
+            "$options" -> "mi"
+          )
+        )
+      case None =>
+    }
+
+    // 状态
+    status match {
+      case Some(status) => {
+        criteria = criteria.+(
+          "status", JsString(status)
+        )
+      }
+      case None => {}
+    }
+
+    logger.debug("criteria -> {}", criteria)
+    search(criteria, skip, limit)
+
+  }
+
+
+    /**
     * 根据医院查询订单
     *
     * @param hospitalId

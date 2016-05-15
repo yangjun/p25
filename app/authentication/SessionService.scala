@@ -51,6 +51,20 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi) {
     cursor
   }
 
+
+  def who(token: String)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    queryByToken(token) map (
+      session =>
+        session match {
+          case Some(session) =>
+            logger.debug("userId -> {}", session.userId)
+            Some(session.userId)
+          case None =>
+            logger.debug("当前会话，无用户信息")
+            None
+        }
+      )
+  }
   /**
     * 判断Token是否过期
     * @param token

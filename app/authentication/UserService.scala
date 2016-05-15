@@ -139,7 +139,8 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi,
 
   def user(username: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
     // 根据用户名查询
-    val criteria = Json.obj("username" -> username)
+    val r = Json.obj("$regex" -> username, "$options" -> "$mi")
+    val criteria = Json.obj("username" -> r)
     import reactivemongo.play.json._
     val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
     cursor
@@ -147,7 +148,8 @@ class UserServiceImpl @Inject()(reactiveMongoApi: ReactiveMongoApi,
 
   def mobile(mobile: String)(implicit ec: ExecutionContext): Future[Option[User]] = {
     // 根据移动号码名查询
-    val criteria = Json.obj("mobile" -> mobile)
+    val r = Json.obj("$regex" -> mobile, "$options" -> "$mi")
+    val criteria = Json.obj("mobile" -> r)
     import reactivemongo.play.json._
     val cursor: Future[Option[User]] = userCollection.flatMap(_.find(criteria).one[User])
     cursor

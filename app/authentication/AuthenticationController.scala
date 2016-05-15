@@ -8,6 +8,7 @@ import play.modules.reactivemongo.{ReactiveMongoApi, ReactiveMongoComponents}
 import scala.concurrent.ExecutionContext
 import authentication._
 import controllers.JsonValidate
+import org.slf4j.LoggerFactory
 import play.api.libs.json.Json
 
 /**
@@ -18,6 +19,8 @@ class AuthenticationController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                                          val userService: UserServiceImpl)
                                         (implicit exec: ExecutionContext)
   extends Controller with ReactiveMongoComponents with Secured with JsonValidate {
+
+  lazy val logger = LoggerFactory.getLogger(classOf[AuthenticationController])
 
   def userProfile = Authenticated.async { implicit req =>
     userService.userProfile(req.token).map(f => {
