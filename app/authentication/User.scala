@@ -63,8 +63,12 @@ object EditUser {
   implicit val format = Json.format[EditUser]
 }
 
+case class Role(k: String,
+                v: String)
+
 //============== 用户角色（一个用户可以有多个角色） ===============
 object Role {
+  implicit val format = Json.format[Role]
   // 系统超级管理员，具有全部操作权限
   val superAdmin = "superAdmin"
   // 来宾，具有最低权限(注册登录用户默认具有的权限)
