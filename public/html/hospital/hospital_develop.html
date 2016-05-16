@@ -1,0 +1,46 @@
+<!--医院：申请开发-->
+<div ng-show="!loading">
+    <form name="form" ng-submit="developHospital(form)">
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title">申请医院</label>
+                                <div class="item-after">{{hospital.name}}</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label" for="day">开发天数</label>
+                                <div class="item-input">
+                                    <input type="number" name="day" id="day" required ng-model="hospital.day">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label" for="salesman">销售人员</label>
+                                <div class="item-input">
+                                    <input type="text" name="salesman" id="salesman" ng-model="hospital.salesman">
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <a class="col-50 button button-big button-fill button-danger"
+                       ui-sref="hospital.info({id:hospital.hospitalId})">取消</a>
+                    <button class="col-50 button button-big button-fill button-success" type="submit">申请</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
