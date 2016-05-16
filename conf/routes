@@ -74,8 +74,8 @@ GET       /crm/v1/sdk/order/:id                   sales.controllers.OrderControl
 
 POST       /crm/v1/sdk/order/:id/commit           sales.controllers.OrderController.commit(id)
 DELETE    /crm/v1/sdk/order/:id                   sales.controllers.OrderController.cancel(id)
-#POST      /crm/v1/sdk/order/:id/permit            sales.controllers.OrderController.permit(id)
-#POST      /crm/v1/sdk/order/:id/reject            sales.controllers.OrderController.reject(id)
+#POST      /crm/v1/sdk/order/:id/permit           sales.controllers.OrderController.permit(id)
+#POST      /crm/v1/sdk/order/:id/reject           sales.controllers.OrderController.reject(id)
 POST      /crm/v1/sdk/order/:id/confirm           sales.controllers.OrderController.confirm(id)
 GET       /crm/v1/sdk/order/:id/goods             sales.controllers.OrderController.queryStockItemByOrder(id)
 
@@ -91,7 +91,7 @@ GET       /crm/v1/sdk/task/:id                    sales.controllers.TaskControll
 POST      /crm/v1/sdk/task/:id/accept             sales.controllers.TaskController.accept(id)
 POST      /crm/v1/sdk/task/:id/permit             sales.controllers.TaskController.permit(id)
 POST      /crm/v1/sdk/task/:id/reject             sales.controllers.TaskController.reject(id)
-GET        /crm/v1/sdk/task/:id/stakeholders      sales.controllers.TaskController.stakeholders(id)
+GET       /crm/v1/sdk/task/:id/stakeholders       sales.controllers.TaskController.stakeholders(id)
 
 # My
 GET       /crm/v1/sdk/my/order                    sales.controllers.MyController.order(no: Option[String], status: Option[String])
@@ -103,6 +103,11 @@ GET       /crm/v1/sdk/private                     sales.controllers.AreaControll
 GET       /crm/v1/sdk/auth/userProfile            authentication.AuthenticationController.userProfile
 GET       /crm/v1/sdk/auth/user                   authentication.AuthenticationController.user(name)
 POST      /crm/v1/sdk/auth/user/:id               authentication.AuthenticationController.editUser(id)
+
+# Role
+GET       /crm/v1/sdk/auth/roles                  authentication.AuthenticationController.roles
+POST      /crm/v1/sdk/auth/user/:id/role          authentication.AuthenticationController.allocationRole(id, role)
+DELETE    /crm/v1/sdk/auth/user/:id/role          authentication.AuthenticationController.removeRole(id, role)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
