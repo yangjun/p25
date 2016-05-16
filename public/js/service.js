@@ -84,8 +84,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param limit
              */
             listHospital: function (name, skip, limit) {
-                //return restClient.get(CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
-                return restClient.get(CTX + '/hospital?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 查询医院信息
@@ -126,7 +125,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param limit
              */
             listDoctor: function (id, name, skip, limit) {
-                return restClient.get(CTX + '/hospital/' + id + '/doctor?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CTX + '/hospital/' + id + '/doctor?name=' + name + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 添加医生
@@ -170,8 +169,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param limit
              */
             listOrder: function (no, status, skip, limit) {
-                //return restClient.get(CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
-                return restClient.get(CTX + '/order?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 创建订单

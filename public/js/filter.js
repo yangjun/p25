@@ -1,6 +1,20 @@
 'use strict';
 var app = angular.module('wxApp');
 
+/*回车事件*/
+app.directive('ngEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if (event.which === 13) {
+                scope.$apply(function () {
+                    scope.$eval(attrs.ngEnter, {'event': event});
+                });
+                event.preventDefault();
+            }
+        });
+    };
+});
+
 /*医院状态*/
 app.filter('hospitalStatus', function () {
     return function (decision) {

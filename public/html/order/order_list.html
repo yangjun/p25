@@ -3,7 +3,7 @@
     <div class="searchbar">
         <div class="search-input">
             <label class="icon icon-search" for="search"></label>
-            <input type="search" id='search' placeholder='订单序号' ng-readonly="loading"/>
+            <input type="search" id="search" ng-model="filter.no" ng-enter="load(0)" placeholder="订单序号"/>
         </div>
     </div>
 </div>
