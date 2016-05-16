@@ -164,7 +164,7 @@ class WxController @Inject()(actorSystem: ActorSystem,
 //            }
             // 查询用户信息
             val userInfo = wxClient.User.infoBySns(token.openid)
-            userInfo.map { u =>
+            userInfo flatMap  { u =>
               logger.debug("用户信息 -> {}", u)
               val wxUserResult = u.validate[RegisterWxUser]
               wxUserResult match {
@@ -175,28 +175,33 @@ class WxController @Inject()(actorSystem: ActorSystem,
                     case Right(userId) => {
                       var jwtSession = JwtSession()
                       logger.debug("userId -> {}", userId)
-                      sessionService.create(userId = userId) map {session => {
+                      sessionService.create(userId = userId) map  {session => {
                         session match {
                           case Some(session) =>
-                            jwtSession = jwtSession +("token", session.token)
-                            jwtSession = jwtSession +("refreshToken", session.refreshToken)
-                            jwtSession = jwtSession +("expiration", session.ttl)
+                            jwtSession = jwtSession + ("token", session.token)
+                            jwtSession = jwtSession + ("refreshToken", session.refreshToken)
+                            jwtSession = jwtSession + ("expiration", session.ttl)
+                            // 响应头添加 JWT
+                            logger.debug("jwt -> {}", jwtSession)
+                            val query = Map("token" -> Seq(jwtSession.serialize))
+                            val result = Redirect("/", query , 302)
+                            result.withJwtSession(jwtSession)
+                            result
                           case None =>
+                            emptySession
                         }
                       }}
-                      val query = Map("token" -> Seq(jwtSession.serialize))
-                      val result = Redirect("/", query , 302)
-                      // 响应头添加 JWT
-                      logger.debug("jwt -> {}", jwtSession)
-                      result.withJwtSession(jwtSession)
-                      result
                     }
                     case Left(x) =>
+                      Future {
                         emptySession
+                      }
                   }
                 } //  end JsSuccess
                 case JsError(err) => {
-                  emptySession
+                  Future {
+                    emptySession
+                  }
                 } // end JsError
               }
             } // end userInfo map
@@ -225,8 +230,10 @@ class WxController @Inject()(actorSystem: ActorSystem,
   // jwt 测试
   def jwt = Action.async { implicit request =>
     Future {
-      val session = JwtSession()
-      session +("user", 1)
+      var session = JwtSession()
+      session = session + ("token", "yangjun")
+      session = session + ("refreshToken", "11")
+      session = session + ("expiration", 7200)
       Ok.withJwtSession(session)
     }
   }
