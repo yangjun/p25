@@ -140,7 +140,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                         hastitle: true,
                         title: '订单信息',
                         hasback: true,
-                        backurl: '#/order/list',
+                        backurl: '#/crm/order/list',
                         hasmenu: true,
                         menufunc: function () {
                             var actionButtons = [];
@@ -154,7 +154,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 actionButtons.push({
                                     text: '接受订单',
                                     onClick: function () {
-                                        $scope.$state.go('order.permit', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.order.permit', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -168,7 +168,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 actionButtons.push({
                                     text: '拒绝订单',
                                     onClick: function () {
-                                        $scope.$state.go('order.reject', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.order.reject', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -182,7 +182,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 actionButtons.push({
                                     text: '确认订单',
                                     onClick: function () {
-                                        $scope.$state.go('order.confirm', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.order.confirm', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -193,7 +193,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 stockButtons.push({
                                     text: '查看出库清单',
                                     onClick: function () {
-                                        $scope.$state.go('order.goods', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.order.goods', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -230,7 +230,7 @@ app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
                 hastitle: true,
                 title: '接受订单',
                 hasback: true,
-                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -249,7 +249,7 @@ app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.permitOrder = function () {
             $.showIndicator($scope);
             orderService.permitOrder($scope.$state.params.oid, $scope.permitOrderReason).then(function (result) {
-                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+                $scope.$state.go('crm.order.info', {oid: $scope.$state.params.oid});
             }).finally(function () {
                 $.hideIndicator($scope);
             });
@@ -269,7 +269,7 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
                 hastitle: true,
                 title: '拒绝订单',
                 hasback: true,
-                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -288,7 +288,7 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.rejectOrder = function () {
             $.showIndicator($scope);
             orderService.rejectOrder($scope.$state.params.oid, $scope.rejectOrderReason).then(function (result) {
-                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+                $scope.$state.go('crm.order.info', {oid: $scope.$state.params.oid});
             }).finally(function () {
                 $.hideIndicator($scope);
             });
@@ -308,7 +308,7 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
                 hastitle: true,
                 title: '确认订单',
                 hasback: true,
-                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -327,7 +327,7 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.confirmOrder = function () {
             $.showIndicator($scope);
             orderService.confirmOrder($scope.$state.params.oid, $scope.confirmOrderReason).then(function (result) {
-                $scope.$state.go('order.info', {oid: $scope.$state.params.oid});
+                $scope.$state.go('crm.order.info', {oid: $scope.$state.params.oid});
             }).finally(function () {
                 $.hideIndicator($scope);
             });
@@ -347,7 +347,7 @@ app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
                 hastitle: true,
                 title: '出库清单',
                 hasback: true,
-                backurl: '#/order/' + $scope.$state.params.oid + '/info'
+                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 

@@ -16,7 +16,7 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
                         {
                             text: '添加医院',
                             onClick: function () {
-                                $scope.$state.go('hospital.create');
+                                $scope.$state.go('crm.hospital.create');
                             }
                         }
                     ];
@@ -85,14 +85,14 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                         hastitle: true,
                         title: '医院信息',
                         hasback: true,
-                        backurl: '#/hospital/list',
+                        backurl: '#/crm/hospital/list',
                         hasmenu: true,
                         menufunc: function () {
                             var actionButtons = [
                                 {
                                     text: '编辑',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.edit', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.edit', {id: $scope.hospital.id});
                                     }
                                 }
                             ];
@@ -100,7 +100,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 {
                                     text: '查看医生',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.doctor.list', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.doctor.list', {id: $scope.hospital.id});
                                     }
                                 }
                             ];
@@ -108,7 +108,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 {
                                     text: '查看订单',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.order.list', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.order.list', {id: $scope.hospital.id});
                                     }
                                 }
                             ];
@@ -124,7 +124,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 var developButton = {
                                     text: '申请开发',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.develop', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.develop', {id: $scope.hospital.id});
                                     }
                                 };
                                 actionButtons.push(developButton);
@@ -135,7 +135,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 var resumeButton = {
                                     text: '记录开发过程',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.resume', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.resume', {id: $scope.hospital.id});
                                     }
                                 };
                                 actionButtons.push(resumeButton);
@@ -146,7 +146,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 var archiveButton = {
                                     text: '编辑归档信息',
                                     onClick: function () {
-                                        $scope.$state.go('hospital.archive', {id: $scope.hospital.id});
+                                        $scope.$state.go('crm.hospital.archive', {id: $scope.hospital.id});
                                     }
                                 };
                                 actionButtons.push(archiveButton);
@@ -175,7 +175,7 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
                 hastitle: true,
                 title: '添加医院',
                 hasback: true,
-                backurl: '#/hospital/list'
+                backurl: '#/crm/hospital/list'
             }
         };
 
@@ -198,7 +198,7 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
             }
             hospitalService.createHospital({'hospital': $scope.hospital}).then(function (result) {
                 $.toast('添加成功');
-                $scope.$state.go('hospital.list');
+                $scope.$state.go('crm.hospital.list');
             });
         };
     }]);
@@ -226,7 +226,7 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
                         hastitle: true,
                         title: '编辑医院信息',
                         hasback: true,
-                        backurl: '#/hospital/' + $scope.$state.params.id + '/info'
+                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -238,7 +238,7 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
 
         $scope.editHospital = function () {
             hospitalService.editHospital($scope.$state.params.id, {'hospital': $scope.hospital}).then(function (result) {
-                $scope.$state.go('hospital.info', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
     }]);
@@ -262,7 +262,7 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
                         hastitle: true,
                         title: '申请开发医院',
                         hasback: true,
-                        backurl: '#/hospital/' + $scope.$state.params.id + '/info'
+                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -282,7 +282,7 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
 
             hospitalService.developHospital($scope.$state.params.id, $scope.hospital).then(function (result) {
                 $.toast('申请成功');
-                $scope.$state.go('hospital.info', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
 
@@ -307,7 +307,7 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
                         hastitle: true,
                         title: '记录开发进度',
                         hasback: true,
-                        backurl: '#/hospital/' + $scope.$state.params.id + '/info'
+                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -319,7 +319,7 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
 
         $scope.resumeHospital = function (form) {
             hospitalService.EditDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
-                $scope.$state.go('hospital.info', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
 
@@ -344,7 +344,7 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
                         hastitle: true,
                         title: '编辑归档信息',
                         hasback: true,
-                        backurl: '#/hospital/' + $scope.$state.params.id + '/info'
+                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -356,7 +356,7 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
 
         $scope.resumeHospital = function (form) {
             hospitalService.EditDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
-                $scope.$state.go('hospital.info', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
 
@@ -372,14 +372,14 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
                 hastitle: true,
                 title: '所有医生',
                 hasback: true,
-                backurl: '#/hospital/' + $scope.$state.params.id + '/info',
+                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info',
                 hasmenu: true,
                 menufunc: function () {
                     var actionButtons = [
                         {
                             text: '添加医生',
                             onClick: function () {
-                                $scope.$state.go('hospital.doctor.create', {id: $scope.$state.params.id});
+                                $scope.$state.go('crm.hospital.doctor.create', {id: $scope.$state.params.id});
                             }
                         }
                     ];
@@ -472,7 +472,7 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
                 hastitle: true,
                 title: '添加医生',
                 hasback: true,
-                backurl: '#/hospital/' + $scope.$state.params.id + '/doctor/list'
+                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/doctor/list'
             }
         };
 
@@ -510,7 +510,7 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
             }
             hospitalService.createDoctor($scope.$state.params.id, $scope.doctor).then(function (result) {
                 $.toast('添加成功');
-                $scope.$state.go('hospital.doctor.list', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.doctor.list', {id: $scope.$state.params.id});
             });
         };
 
@@ -526,14 +526,14 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
                 hastitle: true,
                 title: '所有订单',
                 hasback: true,
-                backurl: '#/hospital/' + $scope.$state.params.id + '/info',
+                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info',
                 hasmenu: true,
                 menufunc: function () {
                     var actionButtons = [
                         {
                             text: '添加订单',
                             onClick: function () {
-                                $scope.$state.go('hospital.order.create', {id: $scope.$state.params.id});
+                                $scope.$state.go('crm.hospital.order.create', {id: $scope.$state.params.id});
                             }
                         }
                     ];
@@ -591,7 +591,7 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
                     text: '删除',
                     onClick: function () {
                         /*点击‘删除’菜单，跳转‘删除订单’页面*/
-                        $scope.$state.go('hospital.order.remove', {id: $scope.$state.params.id, oid: order.id});
+                        $scope.$state.go('crm.hospital.order.remove', {id: $scope.$state.params.id, oid: order.id});
                     }
                 }
             ];
@@ -619,7 +619,7 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                 hastitle: true,
                 title: '添加订单',
                 hasback: true,
-                backurl: '#/hospital/' + $scope.$state.params.id + '/order/list'
+                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
             }
         };
 
@@ -682,7 +682,7 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                 return;
             }
             orderService.createOrder($scope.$state.params.id, $scope.order).then(function (result) {
-                $scope.$state.go('hospital.order.list', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.order.list', {id: $scope.$state.params.id});
             });
         };
 
@@ -698,7 +698,7 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
                 hastitle: true,
                 title: '删除订单',
                 hasback: true,
-                backurl: '#/hospital/' + $scope.$state.params.id + '/order/list'
+                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
             }
         };
 
@@ -717,7 +717,7 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
         $scope.cancelOrder = function () {
             $.showIndicator($scope);
             orderService.cancelOrder($scope.order.id, $scope.cancelOrderReason).then(function (result) {
-                $scope.$state.go('hospital.order.list', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.order.list', {id: $scope.$state.params.id});
             }).finally(function () {
                 $.hideIndicator($scope);
             });
