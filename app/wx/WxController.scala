@@ -184,7 +184,7 @@ class WxController @Inject()(actorSystem: ActorSystem,
                             // 响应头添加 JWT
                             logger.debug("jwt -> {}", jwtSession)
                             val query = Map("token" -> Seq(jwtSession.serialize))
-                            val result = Redirect("/", query , 302)
+                            val result = Redirect("/#/crm/home", query, 302)
                             result.withJwtSession(jwtSession)
                             result
                           case None =>
