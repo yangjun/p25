@@ -54,6 +54,7 @@ app.run(['$rootScope', '$state', function ($rootScope, $state) {
         }
     };
 
+    /*设置菜单*/
     $rootScope.menu = function () {
         if ($rootScope.config.title.hasmenu && $rootScope.config.title.menufunc && (typeof $rootScope.config.title.menufunc === 'function')) {
             $rootScope.config.title.menufunc();

@@ -1,29 +1,53 @@
 'use strict';
 var app = angular.module('wxApp');
 
-app.constant('ROUTER',
-    function ($stateProvider, $urlRouterProvider) {
+app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
+    /**
+     * 权限检查
+     * @param $rootScope
+     * @param $q
+     * @param $http
+     * @param $window
+     * @param CONTEXT
+     * @returns {*}
+     */
+    var auth = function ($rootScope, $q, $http, $window, CONTEXT) {
+        /*------------------------------ 检查并设置JWT_TOKEN信息 ------------------------------*/
+        /*检查本地存储中是否有JWT_TOKEN信息*/
+        var JWT_TOKEN = $window.localStorage.getItem('JWT_TOKEN');
+        if (!JWT_TOKEN || JWT_TOKEN === 'null') {
+            /*检查请求参数中是否有JWT_TOKEN信息*/
+            if ($window.location.hash.indexOf('token=') <= -1) {
+                $window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd1a9eba03a82e959&redirect_uri=http://luotaoyeah.iok.la/wx/callback&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
+            } else {
+                /*将请求参数中的JWT_TOKEN保存到本地存储中*/
+                JWT_TOKEN = $window.location.hash.substring($window.location.hash.indexOf('token=') + 6);
+                $window.localStorage.setItem('JWT_TOKEN', JWT_TOKEN);
+            }
+        }
+
+        /*------------------------------ 获取并保存当前用户信息 ------------------------------*/
+        var deferred = $q.defer();
+        $http.get(CONTEXT.CRM_CTX + '/auth/userProfile?_=' + new Date().getTime()).success(function (result) {
+            console.log(result);
+            deferred.resolve();
+        }).error(function (data, status) {
+            console.log(data);
+            deferred.reject(data, status);
+        });
+        return deferred.promise;
+    };
+
+    /*------------------------------ 首页 ------------------------------*/
         $stateProvider
             .state('home', {
                 url: '/home',
                 templateUrl: '../html/home.html',
-                controller: 'HomeCtrl'
+                controller: 'HomeCtrl',
+                resolve: {auth: auth}
             });
 
-
-        $stateProvider
-        /*系统组织机构*/
-            .state('organization', {
-                url: '/organization',
-                templateUrl: '../html/org/org.html'
-            })
-            /*问题反馈*/
-            .state('problem', {
-                url: '/problem',
-                templateUrl: '../html/feed/problem_feedback.html'
-            });
-
-        /*------------------------------医院------------------------------*/
+    /*------------------------------ 医院 ------------------------------*/
         $stateProvider
             .state('hospital', {
                 url: '/hospital',
@@ -112,7 +136,7 @@ app.constant('ROUTER',
                 controller: 'HospitalOrderRemoveCtrl'
             });
 
-        /*------------------------------订单------------------------------*/
+    /*------------------------------ 订单 ------------------------------*/
         $stateProvider
             .state('order', {
                 url: '/order',
@@ -155,8 +179,10 @@ app.constant('ROUTER',
                 controller: 'OrderGoodsCtrl'
             });
 
-
         $urlRouterProvider.when('', '/home');
     });
 
-app.constant('CTX', "/crm/v1/sdk");
+app.constant('CONTEXT', {
+    CRM_CTX: '/crm/v1/sdk',
+    WX_CTX: '/wx'
+});

@@ -9,6 +9,7 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
 
     return {
         get: function (url) {
+            url += (url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
             var deferred = $q.defer();
             $http.get(url).then(function (data, status, headers, config) {
                 deferred.resolve(data);
@@ -18,6 +19,7 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
             return deferred.promise;
         },
         post: function (url, data) {
+            url += (url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
             var deferred = $q.defer();
             $http.post(url, data).then(function (data, status, headers, config) {
                 deferred.resolve(data);
@@ -27,6 +29,7 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
             return deferred.promise;
         },
         put: function (url, data) {
+            url += (url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
             var deferred = $q.defer();
             $http.put(url, data).then(function (data, status, headers, config) {
                 deferred.resolve(data);
@@ -36,6 +39,7 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
             return deferred.promise;
         },
         patch: function (url, data) {
+            url += (url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
             var deferred = $q.defer();
             $http.patch(url, data).then(function (data, status, headers, config) {
                 deferred.resolve(data);
@@ -45,6 +49,7 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
             return deferred.promise;
         },
         delete: function (url) {
+            url += (url.indexOf('?') > -1 ? '&' : '?') + '_=' + new Date().getTime();
             var deferred = $q.defer();
             $http.delete(url).then(function (data, status, headers, config) {
                 deferred.resolve(data);
@@ -56,26 +61,29 @@ app.factory('restClient', ['$http', '$q', function ($http, $q) {
     };
 }]);
 
-/*通用服务*/
-app.factory('commonService', ['restClient', 'CTX',
-    function (restClient, CTX) {
+/*认证服务*/
+app.factory('authService', ['restClient', 'CONTEXT',
+    function (restClient, CONTEXT) {
         return {
-            test: function () {
-                return restClient.get(CTX);
+            auth: function () {
+                return restClient.get("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd1a9eba03a82e959&redirect_uri=http://www.demo.com/wx/callback&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect");
+            },
+            getUserProfile: function () {
+                return restClient.get(CONTEXT.CRM_CTX + '/crm/v1/sdk/auth/userProfile');
             }
         }
     }]);
 
 /*医院*/
-app.factory('hospitalService', ['restClient', 'CTX',
-    function (restClient, CTX) {
+app.factory('hospitalService', ['restClient', 'CONTEXT',
+    function (restClient, CONTEXT) {
         return {
             /**
              * 新建医院
              * @param obj 医院信息
              */
             createHospital: function (obj) {
-                return restClient.post(CTX + '/hospital', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital', obj);
             },
             /**
              * 查询医院列表
@@ -84,14 +92,14 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param limit
              */
             listHospital: function (name, skip, limit) {
-                return restClient.get(CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/hospital?name=' + name + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 查询医院信息
              * @param id 医院ID
              */
             queryHospital: function (id) {
-                return restClient.get(CTX + '/hospital/' + id);
+                return restClient.get(CONTEXT.CRM_CTX + '/hospital/' + id);
             },
             /**
              * 编辑医院信息
@@ -99,7 +107,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param obj
              */
             editHospital: function (id, obj) {
-                return restClient.patch(CTX + '/hospital/' + id, obj);
+                return restClient.patch(CONTEXT.CRM_CTX + '/hospital/' + id, obj);
             },
             /**
              * 申请开发医院
@@ -107,7 +115,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param obj
              */
             developHospital: function (id, obj) {
-                return restClient.post(CTX + '/hospital/' + id + '/develop', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/develop', obj);
             },
             /**
              * 开发过程中填写开发履历
@@ -115,7 +123,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param obj
              */
             EditDevelopResume: function (id, obj) {
-                return restClient.post(CTX + '/hospital/' + id + '/resume', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/resume', obj);
             },
             /**
              * 查询医生列表
@@ -125,7 +133,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param limit
              */
             listDoctor: function (id, name, skip, limit) {
-                return restClient.get(CTX + '/hospital/' + id + '/doctor?name=' + name + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/hospital/' + id + '/doctor?name=' + name + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 添加医生
@@ -134,7 +142,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @returns {*}
              */
             createDoctor: function (id, obj) {
-                return restClient.post(CTX + '/hospital/' + id + '/doctor', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/doctor', obj);
             },
             /**
              * 删除医生
@@ -142,7 +150,7 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @returns {*}
              */
             removeDoctor: function (id) {
-                return restClient.delete(CTX + '/doctor/' + id);
+                return restClient.delete(CONTEXT.CRM_CTX + '/doctor/' + id);
             },
             /**
              * 查询订单列表：根据医院ID
@@ -152,14 +160,14 @@ app.factory('hospitalService', ['restClient', 'CTX',
              * @param limit
              */
             listHospitalOrder: function (id, name, skip, limit) {
-                return restClient.get(CTX + '/hospital/' + id + '/order?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/hospital/' + id + '/order?skip=' + skip + '&limit=' + limit);
             }
         }
     }]);
 
 /*订单*/
-app.factory('orderService', ['restClient', 'CTX',
-    function (restClient, CTX) {
+app.factory('orderService', ['restClient', 'CONTEXT',
+    function (restClient, CONTEXT) {
         return {
             /**
              * 查询订单列表
@@ -169,7 +177,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param limit
              */
             listOrder: function (no, status, skip, limit) {
-                return restClient.get(CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 创建订单
@@ -177,14 +185,14 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param obj
              */
             createOrder: function (id, obj) {
-                return restClient.post(CTX + '/hospital/' + id + '/order', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/order', obj);
             },
             /**
              * 查询订单信息
              * @param id 订单ID
              */
             queryOrder: function (id) {
-                return restClient.get(CTX + '/order/' + id);
+                return restClient.get(CONTEXT.CRM_CTX + '/order/' + id);
             },
             /**
              * 取消订单
@@ -192,7 +200,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param obj
              */
             cancelOrder: function (id, obj) {
-                return restClient.delete(CTX + '/order/' + id, obj);
+                return restClient.delete(CONTEXT.CRM_CTX + '/order/' + id, obj);
             },
             /**
              * 接受订单
@@ -200,7 +208,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param obj
              */
             permitOrder: function (id, obj) {
-                return restClient.post(CTX + '/order/' + id + '/permit', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/order/' + id + '/permit', obj);
             },
             /**
              * 拒绝订单
@@ -208,7 +216,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param obj
              */
             rejectOrder: function (id, obj) {
-                return restClient.post(CTX + '/order/' + id + '/reject', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/order/' + id + '/reject', obj);
             },
             /**
              * 确认订单
@@ -216,7 +224,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param obj
              */
             confirmOrder: function (id, obj) {
-                return restClient.post(CTX + '/order/' + id + '/confirm', obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/order/' + id + '/confirm', obj);
             },
             /**
              * 根据订单查询出库清单
@@ -225,7 +233,7 @@ app.factory('orderService', ['restClient', 'CTX',
              * @param limit
              */
             queryStockItemByOrder: function (id, skip, limit) {
-                return restClient.get(CTX + '/order/' + id + '/goods?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/order/' + id + '/goods?skip=' + skip + '&limit=' + limit);
             }
         }
     }]);
