@@ -1,0 +1,138 @@
+<!--医院：归档，成为合作伙伴-->
+<div ng-show="!loading">
+    <form name="form"
+          ng-submit="becomePartner(form)">
+        <div class="content">
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title">开发医院</label>
+                                <div class="item-after">{{hospital.name}}</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block-title">医院负责人</div>
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="principal_name">姓名
+                                </label>
+                                <div class="item-input">
+                                    <input type="text"
+                                           name="principal_name"
+                                           id="principal_name"
+                                           ng-model="partner.principal.name"
+                                           required />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="principal_job">职位
+                                </label>
+                                <div class="item-input">
+                                    <input type="text"
+                                           name="principal_job"
+                                           id="principal_job"
+                                           ng-model="partner.principal.job"
+                                           required />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="principal_mobile">手机
+                                </label>
+                                <div class="item-input">
+                                    <input type="tel"
+                                           name="principal_mobile"
+                                           id="principal_mobile"
+                                           ng-model="partner.principal.mobile"
+                                           required
+                                           ng-pattern="/^[0-9]{11}$/" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block-title">主要用药人</div>
+            <div class="list-block">
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="doctor_name">姓名
+                                </label>
+                                <div class="item-input">
+                                    <input type="text"
+                                           name="doctor_name"
+                                           id="doctor_name"
+                                           ng-model="partner.principalDoctor.name"
+                                           required />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="doctor_job">职位
+                                </label>
+                                <div class="item-input">
+                                    <input type="text"
+                                           name="doctor_job"
+                                           id="doctor_job"
+                                           ng-model="partner.principalDoctor.job"
+                                           required />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-inner">
+                                <label class="item-title label"
+                                       for="doctor_mobile">手机
+                                </label>
+                                <div class="item-input">
+                                    <input type="tel"
+                                           name="doctor_mobile"
+                                           id="doctor_mobile"
+                                           ng-model="partner.principalDoctor.mobile"
+                                           required
+                                           ng-pattern="/^[0-9]{11}$/" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="content-block">
+                <div class="row">
+                    <a class="col-50 button button-big button-fill button-danger"
+                       ui-sref="crm.hospital.info({id:hospital.id})">取消
+                    </a>
+                    <button class="col-50 button button-big button-fill button-success"
+                            type="submit">归档
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

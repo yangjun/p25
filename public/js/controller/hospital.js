@@ -130,15 +130,24 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                                 actionButtons.push(developButton);
                             }
 
-                            /*记录开发过程菜单*/
                             if ($scope.hospital.status === 'developing') {
+                                /*记录开发进度菜单*/
                                 var resumeButton = {
-                                    text: '记录开发过程',
+                                    text: '记录开发进度',
                                     onClick: function () {
                                         $scope.$state.go('crm.hospital.resume', {id: $scope.hospital.id});
                                     }
                                 };
                                 actionButtons.push(resumeButton);
+
+                                /*归档，成为合作伙伴菜单*/
+                                var partnerButton = {
+                                    text: '归档',
+                                    onClick: function () {
+                                        $scope.$state.go('crm.hospital.partner', {id: $scope.hospital.id});
+                                    }
+                                };
+                                actionButtons.push(partnerButton);
                             }
 
                             /*编辑归档信息菜单*/
@@ -318,7 +327,93 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
         $scope.load();
 
         $scope.resumeHospital = function (form) {
-            hospitalService.EditDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
+            hospitalService.editDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
+                $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
+            });
+        };
+
+    }]);
+
+/**
+ * 医院：归档，成为合作伙伴
+ */
+app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService',
+    function ($rootScope, $scope, hospitalService) {
+        $scope.load = function () {
+            $.showIndicator($scope);
+            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+                $scope.hospital = {
+                    id: result.data.id,
+                    name: result.data.base.name
+                };
+
+                $rootScope.config = {
+                    title: {
+                        hastitle: true,
+                        title: '归档',
+                        hasback: true,
+                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                    }
+                };
+
+                $scope.partner = {
+                    id: result.data.id,
+                    principal: {
+                        name: '',
+                        job: '',
+                        mobile: ''
+                    },
+                    principalDoctor: {
+                        name: '',
+                        job: '',
+                        mobile: ''
+                    }
+                };
+            }).finally(function () {
+                $.hideIndicator($scope);
+            });
+        };
+
+        $scope.load();
+
+        /*归档*/
+        $scope.becomePartner = function (form) {
+            if (form.$invalid) {
+                if (form.principal_name.$error.required) {
+                    $.toast('负责人姓名不能为空');
+                    return;
+                }
+                if (form.principal_job.$error.required) {
+                    $.toast('负责人职位不能为空');
+                    return;
+                }
+                if (form.principal_mobile.$error.required) {
+                    $.toast('负责人手机不能为空');
+                    return;
+                }
+                if (form.principal_mobile.$error.pattern) {
+                    $.toast('负责人手机格式错误');
+                    return;
+                }
+
+                if (form.doctor_name.$error.required) {
+                    $.toast('用药人姓名不能为空');
+                    return;
+                }
+                if (form.doctor_job.$error.required) {
+                    $.toast('用药人职位不能为空');
+                    return;
+                }
+                if (form.doctor_mobile.$error.required) {
+                    $.toast('用药人手机不能为空');
+                    return;
+                }
+                if (form.doctor_mobile.$error.pattern) {
+                    $.toast('用药人手机格式错误');
+                    return;
+                }
+            }
+            hospitalService.becomePartner($scope.$state.params.id, $scope.partner).then(function (result) {
                 $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
@@ -355,7 +450,7 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
         $scope.load();
 
         $scope.resumeHospital = function (form) {
-            hospitalService.EditDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
+            hospitalService.editDevelopResume($scope.$state.params.id, $scope.hospital).then(function (result) {
                 $scope.$state.go('crm.hospital.info', {id: $scope.$state.params.id});
             });
         };
@@ -722,7 +817,7 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
                 $.hideIndicator($scope);
             });
         };
-        
+
         $scope.load();
 
     }]);

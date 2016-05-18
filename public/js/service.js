@@ -111,19 +111,27 @@ app.factory('hospitalService', ['restClient', 'CONTEXT',
             },
             /**
              * 申请开发医院
-             * @param id
+             * @param id 医院ID
              * @param obj
              */
             developHospital: function (id, obj) {
                 return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/develop', obj);
             },
             /**
-             * 开发过程中填写开发履历
-             * @param id
+             * 记录开发过程；开发过程中填写开发履历
+             * @param id 医院ID
              * @param obj
              */
-            EditDevelopResume: function (id, obj) {
+            editDevelopResume: function (id, obj) {
                 return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/resume', obj);
+            },
+            /**
+             * 归档，成为合作伙伴
+             * @param id 医院ID
+             * @param obj
+             */
+            becomePartner: function (id, obj) {
+                return restClient.post(CONTEXT.CRM_CTX + '/hospital/' + id + '/partner', obj);
             },
             /**
              * 查询医生列表
@@ -177,7 +185,8 @@ app.factory('orderService', ['restClient', 'CONTEXT',
              * @param limit
              */
             listOrder: function (no, status, skip, limit) {
-                return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
+                // return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/order?skip=' + skip + '&limit=' + limit);
             },
             /**
              * 创建订单
