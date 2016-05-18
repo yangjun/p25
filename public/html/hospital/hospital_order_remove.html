@@ -1,6 +1,7 @@
 <!--医院：订单：删除订单-->
 <div ng-show="!loading">
-    <form name="form" ng-submit="cancelOrder(form)">
+    <form name="form"
+          ng-submit="cancelOrder(form)">
         <div class="content">
             <div class="content-block-title">订单编号</div>
             <div class="list-block">
@@ -22,7 +23,9 @@
                         <div class="item-content">
                             <div class="item-inner">
                                 <div class="item-input">
-                                    <textarea name="reason" id="reason" ng-model="cancelOrderReason.reason"></textarea>
+                                    <textarea name="reason"
+                                              id="reason"
+                                              ng-model="cancelOrderReason.reason"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -32,8 +35,11 @@
             <div class="content-block">
                 <div class="row">
                     <a class="col-50 button button-big button-fill button-danger"
-                       ui-sref="crm.hospital.order.list({id:$state.params.id})">取消</a>
-                    <button class="col-50 button button-big button-fill button-success" type="submit">删除</button>
+                       ui-sref="crm.hospital.order.list({id:$state.params.id})">取消
+                    </a>
+                    <button class="col-50 button button-big button-fill button-success"
+                            type="submit">删除
+                    </button>
                 </div>
             </div>
         </div>

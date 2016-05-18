@@ -1,6 +1,7 @@
-<!--医院：记录开发过程-->
+<!--医院：记录开发进度-->
 <div ng-show="!loading">
-    <form name="form" ng-submit="resumeHospital(form)">
+    <form name="form"
+          ng-submit="resumeHospital(form)">
         <div class="content">
             <div class="list-block">
                 <ul>
@@ -21,7 +22,8 @@
                         <div class="item-content">
                             <div class="item-inner">
                                 <div class="item-input">
-                                    <textarea name="hospitalDescription" id="hospitalDescription"
+                                    <textarea name="hospitalDescription"
+                                              id="hospitalDescription"
                                               ng-model="hospital.hospitalDescription"></textarea>
                                 </div>
                             </div>
@@ -36,7 +38,8 @@
                         <div class="item-content">
                             <div class="item-inner">
                                 <div class="item-input">
-                                    <textarea name="scheduleDescription" id="scheduleDescription"
+                                    <textarea name="scheduleDescription"
+                                              id="scheduleDescription"
                                               ng-model="hospital.scheduleDescription"></textarea>
                                 </div>
                             </div>
@@ -47,8 +50,11 @@
             <div class="content-block">
                 <div class="row">
                     <a class="col-50 button button-big button-fill button-danger"
-                       ui-sref="crm.hospital.info({id:hospital.hospitalId})">取消</a>
-                    <button class="col-50 button button-big button-fill button-success" type="submit">保存</button>
+                       ui-sref="crm.hospital.info({id:hospital.hospitalId})">取消
+                    </a>
+                    <button class="col-50 button button-big button-fill button-success"
+                            type="submit">保存
+                    </button>
                 </div>
             </div>
         </div>

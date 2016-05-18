@@ -106,6 +106,13 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
             controller: 'HospitalResumeCtrl',
             resolve: {auth: auth}
         })
+        /*归档，成为合作伙伴*/
+        .state('crm.hospital.partner', {
+            url: '/:id/partner',
+            templateUrl: '../html/hospital/hospital_partner.html',
+            controller: 'HospitalPartnerCtrl',
+            resolve: {auth: auth}
+        })
         /*编辑归档信息*/
         .state('crm.hospital.archive', {
             url: '/:id/archive',

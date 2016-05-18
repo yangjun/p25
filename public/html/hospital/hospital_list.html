@@ -2,18 +2,26 @@
 <div class="bar">
     <div class="searchbar">
         <div class="search-input">
-            <label class="icon icon-search" for="search"></label>
-            <input type="search" ng-model="filter.name" id='search' ng-enter="load(0)" placeholder='搜索'/>
+            <label class="icon icon-search"
+                   for="search"></label>
+            <input type="search"
+                   ng-model="filter.name"
+                   id='search'
+                   ng-enter="load(0)"
+                   placeholder='搜索' />
         </div>
     </div>
 </div>
-<div class="content" style="margin: 2.2rem 0 0;">
-    <div class="card" ng-repeat="hospital in hospitals">
+<div class="content"
+     style="margin: 2.2rem 0 0;">
+    <div class="card"
+         ng-repeat="hospital in hospitals">
         <div class="card-content">
             <div class="list-block">
                 <ul>
                     <li>
-                        <a class="item-link item-content" ui-sref="crm.hospital.info({id:hospital.id})">
+                        <a class="item-link item-content"
+                           ui-sref="crm.hospital.info({id:hospital.id})">
                             <div class="item-media"><i class="icon icon-f7"></i></div>
                             <div class="item-inner">
                                 <div class="item-title">{{hospital.base.name}}</div>
@@ -22,11 +30,14 @@
                     </li>
                 </ul>
             </div>
-            </div>
+        </div>
     </div>
-    <div class="content-block" ng-show="!loading&&hasmore">
+    <div class="content-block"
+         ng-show="!loading&&hasmore">
         <p class="buttons-row">
-            <button class="button button-big" ng-click="loadMore()">加载更多</button>
+            <button class="button button-big"
+                    ng-click="loadMore()">加载更多
+            </button>
         </p>
     </div>
 </div>
