@@ -146,7 +146,7 @@ class OrderService @Inject()(
                 case le if le.ok =>
                   // 生成待办任务
                   taskItemService.create(update.task(updateCommitOrder))
-                  val notes  = reason match {
+                  val notes = reason match {
                     case Some(reason) =>
                       s"附言【$reason】"
                     case None =>
@@ -217,12 +217,12 @@ class OrderService @Inject()(
           order.flatMap(_.update(criteria, update)) flatMap {
             case le if le.ok =>
               logger.debug("order -> {}", item)
-              val notes = s"审核通过，附言【$reason】"
+              val notes = s"附言【$reason】"
               logger.debug("notes -> {}", notes)
               taskItemService.create(update.task(permitOrder.commitOrder(sender)))
               createOrderAudit(id, sender, notes)
             case le =>
-              throw new RuntimeException("审核通过订单失败")
+              throw new RuntimeException("操作订单失败")
           }
         case None =>
           throw new RuntimeException("订单不存在")
@@ -247,7 +247,7 @@ class OrderService @Inject()(
           val criteria = Json.obj("id" -> id)
           order.flatMap(_.update(criteria, update)) flatMap {
             case le if le.ok =>
-              val notes = s"拒绝通过，原因【$reason】"
+              val notes = s"原因【$reason】"
               logger.debug("notes -> {}", notes)
               // 已经回退给订单申请者
               update.status match {
@@ -259,7 +259,7 @@ class OrderService @Inject()(
               }
               createOrderAudit(id, who, notes)
             case le =>
-              throw new RuntimeException("审核拒绝订单失败")
+              throw new RuntimeException("操作订单失败")
           }
         case None =>
           throw new RuntimeException("订单不存在")
@@ -268,16 +268,24 @@ class OrderService @Inject()(
   }
 
   /**
-    * 创建出库单
+    * 为一个订单创建出库单
     *
-    * @param id
+    * @param id  订单标识
+    * @param who 操作者
+    * @param createStockOrder
     * @param ec
     * @return 出库单标识
     */
-  def createStockOrder(id: String, createStockOrder: CreateStockOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+  def createStockOrder(id: String, who: String, createStockOrder: CreateStockOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
     pk(id) flatMap { item =>
       item match {
         case Some(item) =>
+          // 判断订单状态
+          item.status match {
+            case status if OrderStatus.stock.equals(status) =>
+            case status =>
+              throw new RuntimeException("订单状态错误")
+          }
           // 是否已经生成出库单
           val optStockOrderId = item.stockOrderId
           optStockOrderId match {
@@ -311,6 +319,7 @@ class OrderService @Inject()(
   }
 
   /**
+    * 为订单添加出库清单
     *
     * @param id 出库单标识
     * @param addGoodsItem
@@ -407,15 +416,87 @@ class OrderService @Inject()(
 
   }
 
+
+  /**
+    * 出库
+    *
+    * @param id
+    * @param permitOrder
+    * @param ec
+    * @return
+    */
+  def delivery(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
+    pk(id) flatMap (item =>
+      item match {
+        case Some(item) =>
+          item.status match {
+            case status if OrderStatus.stock.equals(status) =>
+              item.stockOrderId match {
+                case stockId if "".equals(stockId) =>
+                  throw new RuntimeException("还未生成出库单")
+                case _ =>
+                  logger.debug("order -> {}", item)
+                  val reason = permitOrder.reason
+                  logger.debug("reason -> {}", reason)
+                  // 更新订单状态
+                  val update = item.permit()
+                  logger.debug("update -> {}", item)
+                  val criteria = Json.obj("id" -> id)
+                  order.flatMap(_.update(criteria, update)) flatMap {
+                    case le if le.ok =>
+                      logger.debug("order -> {}", item)
+                      val notes = s"订单出库，附言【$reason】"
+                      logger.debug("notes -> {}", notes)
+                      createOrderAudit(id, permitOrder.who, notes)
+                    case le =>
+                      throw new RuntimeException("操作订单失败")
+                  }
+              }
+            case _ =>
+              throw new RuntimeException("订单状态错误")
+          }
+        case None =>
+          throw new RuntimeException("订单不存在")
+      }
+      )
+  }
+
+
   /**
     * 收货确认
     *
-    * @param id
+    * @param id 订单标识
     * @param ec
     * @return
     */
   def confirm(id: String, permitOrder: PermitOrder)(implicit ec: ExecutionContext): Future[Option[String]] = {
-    permit(id, User.mockUser, permitOrder)
+    pk(id) flatMap (item =>
+      item match {
+        case Some(item) =>
+          item.status match {
+            case status if OrderStatus.goodsReceipt.equals(status) =>
+              logger.debug("order -> {}", item)
+              val reason = permitOrder.reason
+              logger.debug("reason -> {}", reason)
+              // 更新订单状态
+              val update = item.permit()
+              logger.debug("update -> {}", item)
+              val criteria = Json.obj("id" -> id)
+              order.flatMap(_.update(criteria, update)) flatMap {
+                case le if le.ok =>
+                  logger.debug("order -> {}", item)
+                  val notes = s"订单已收货，附言【$reason】"
+                  logger.debug("notes -> {}", notes)
+                  createOrderAudit(id, permitOrder.who, notes)
+                case le =>
+                  throw new RuntimeException("操作订单失败")
+              }
+            case _ =>
+              throw new RuntimeException("订单状态错误")
+          }
+        case None =>
+          throw new RuntimeException("订单不存在")
+      })
   }
 
   /**
@@ -456,9 +537,14 @@ class OrderService @Inject()(
     // 状态
     status match {
       case Some(status) => {
-        criteria = criteria.+(
-          "status", JsString(status)
-        )
+        status match {
+          // 过滤空字符串情况
+          case s if "".equals(status.trim) =>
+          case s =>
+            criteria = criteria.+(
+              "status", JsString(status)
+            )
+        }
       }
       case None => {}
     }
@@ -488,9 +574,15 @@ class OrderService @Inject()(
     // 状态
     status match {
       case Some(status) => {
-        criteria = criteria.+(
-          "status", JsString(status)
-        )
+        logger.debug("status -> {}", status)
+        status match {
+          // 过滤空字符串情况
+          case s if "".equals(status.trim) =>
+          case s =>
+            criteria = criteria.+(
+              "status", JsString(status)
+            )
+        }
       }
       case None => {}
     }
@@ -501,7 +593,7 @@ class OrderService @Inject()(
   }
 
 
-    /**
+  /**
     * 根据医院查询订单
     *
     * @param hospitalId
