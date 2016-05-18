@@ -3,14 +3,14 @@ package sales.controllers
 import javax.inject.Inject
 import javax.inject.{Inject, Singleton}
 
-import authentication.{Secured, SessionService, User}
+import authentication._
 import controllers.JsonValidate
 import org.slf4j.LoggerFactory
 import pdi.jwt._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import sales.models.{CommitOrder, _}
+import sales.models.{CommitOrder, PermitOrder, _}
 import sales.services.{DoctorService, HospitalService, OrderService}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +25,7 @@ class OrderController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
                                 val hospitalService: HospitalService,
                                 val orderService: OrderService,
                                 val sessionService: SessionService,
+                                val userService: UserServiceImpl,
                                 val doctorService: DoctorService)
                                (implicit exec: ExecutionContext)
   extends Controller with MongoController with ReactiveMongoComponents with JsonValidate with Secured {
@@ -151,43 +152,6 @@ class OrderController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
-  /**
-    *
-    * 正常流程
-    *
-    * @param id
-    * @return
-    */
-  //  def permit(id: String) = Action.async(parse.json) { implicit req =>
-  //    validateAndThen[PermitOrder] {
-  //      param =>
-  //        logger.debug("permitOrder -> {}", param)
-  //        orderService.permit(id, User.mockUser, param) map {
-  //          p => {
-  //            val data = Json.obj("id" -> p)
-  //            Ok(Json.toJson(data))
-  //          }
-  //        }
-  //    }
-  //  }
-
-  /**
-    * 回退流程
-    *
-    * @param id
-    * @return
-    */
-  //  def reject(id: String) = Action.async(parse.json) { implicit req =>
-  //    validateAndThen[RejectOrder] {
-  //      param =>
-  //        orderService.reject(id, User.mockUser, param) map {
-  //          p => {
-  //            val data = Json.obj("id" -> p)
-  //            Ok(Json.toJson(data))
-  //          }
-  //        }
-  //    }
-  //  }
 
   /**
     * 创建出库单
@@ -198,7 +162,7 @@ class OrderController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   def createStockOrder(id: String) = Action.async(parse.json) { implicit req =>
     validateAndThen[CreateStockOrder] {
       param =>
-        orderService.createStockOrder(id, param) map {
+        orderService.createStockOrder(id, User.mockUser, param) map {
           p => {
             val data = Json.obj("id" -> p)
             Ok(Json.toJson(data))
@@ -274,20 +238,66 @@ class OrderController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
   }
 
   /**
+    * 出库
+    *
+    * @param id
+    * @return
+    */
+  def delivery(id: String) = Authenticated.async(parse.json) { implicit req =>
+    validateAndThen[Notes] {
+      param =>
+        val token = req.token
+        userService.userProfile(token) flatMap (
+          user => user match {
+            case Some(user) =>
+              user.roles match {
+                // 角色 库管
+                case roles if roles.exists(r => Role.stock.equals(r) || Role.superAdmin.equals(r)) =>
+                  val permitOrder = PermitOrder(user.id, param.reason.getOrElse(""))
+                  orderService.delivery(id, permitOrder) map {
+                    p => {
+                      val data = Json.obj("id" -> p)
+                      Ok(Json.toJson(data))
+                    }
+                  }
+              }
+            case None =>
+              Future {
+                val data = Json.obj()
+                BadRequest(Json.toJson(data))
+              }
+          })
+    }
+  }
+
+
+  /**
     * 收货后订单确认
     *
     * @param id
     * @return
     */
-  def confirm(id: String) = Action.async(parse.json) { implicit req =>
-    validateAndThen[PermitOrder] {
+  def confirm(id: String) = Authenticated.async(parse.json) { implicit req =>
+    validateAndThen[Notes] {
       param =>
-        orderService.confirm(id, param) map {
-          p => {
-            val data = Json.obj("id" -> p)
-            Ok(Json.toJson(data))
-          }
-        }
+        val token = req.token
+        sessionService.who(token) flatMap (
+          userId =>
+            userId match {
+              case Some(userId) =>
+                val permitOrder = PermitOrder(userId, param.reason.getOrElse(""))
+                orderService.confirm(id, permitOrder) map {
+                  p => {
+                    val data = Json.obj("id" -> p)
+                    Ok(Json.toJson(data))
+                  }
+                }
+              case None =>
+                Future {
+                  val data = Json.obj()
+                  BadRequest(Json.toJson(data))
+                }
+            })
     }
   }
 

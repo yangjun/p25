@@ -869,3 +869,10 @@ case class CommitNewOrder(
 object CommitNewOrder {
   implicit val format = Json.format[CommitNewOrder]
 }
+
+// 备注
+case class Notes(reason: Option[String])
+
+object Notes {
+  implicit val format = Json.format[Notes]
+}

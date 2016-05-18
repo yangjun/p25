@@ -14,7 +14,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * Created by yangjungis@126.com on 2016/5/12.
   */
 @Singleton
-class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi) {
+class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
+                              ) {
 
   lazy val  session = sessionCollection
   private val logger = LoggerFactory.getLogger(classOf[SessionService])
@@ -65,6 +66,7 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi) {
         }
       )
   }
+
   /**
     * 判断Token是否过期
     * @param token
