@@ -109,5 +109,16 @@ GET       /crm/v1/sdk/auth/roles                  authentication.AuthenticationC
 POST      /crm/v1/sdk/auth/user/:id/role          authentication.AuthenticationController.allocationRole(id, role)
 DELETE    /crm/v1/sdk/auth/user/:id/role          authentication.AuthenticationController.removeRole(id, role)
 
+# Prescription
+GET      /crm/v1/sdk/prescription                 sales.controllers.PrescriptionController.query(tag: Option[String])
+GET      /crm/v1/sdk/prescription/:id             sales.controllers.PrescriptionController.read(id)
+POST     /crm/v1/sdk/prescription                 sales.controllers.PrescriptionController.create
+POST     /crm/v1/sdk/prescription/:id             sales.controllers.PrescriptionController.edit(id)
+DELETE   /crm/v1/sdk/prescription/:id             sales.controllers.PrescriptionController.delete(id)
+
+POST     /crm/v1/sdk/prescription/:id/praise      sales.controllers.PrescriptionController.praise(id)
+POST     /crm/v1/sdk/prescription/:id/disagree    sales.controllers.PrescriptionController.disagree(id)
+POST     /crm/v1/sdk/prescription/:id/swap      sales.controllers.PrescriptionController.swapHot(id)
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

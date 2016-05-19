@@ -41,5 +41,5 @@ class TaskItemService @Inject()(
     reactiveMongoApi.database.map(_.collection("task"))
   }
 
-  private lazy val logger = LoggerFactory.getLogger(classOf[TaskService])
+  private lazy val logger = LoggerFactory.getLogger(classOf[TaskItemService])
 }

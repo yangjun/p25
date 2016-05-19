@@ -186,6 +186,7 @@ object Hospital {
 
     def next: String = UUID.randomUUID() toString
   }
+
 }
 
 // 医院开发过程
@@ -875,4 +876,51 @@ case class Notes(reason: Option[String])
 
 object Notes {
   implicit val format = Json.format[Notes]
+}
+
+//========================处方管理================================
+
+case class PrescriptionInfo(
+                             title: String,
+                             // 内容
+                             content: String,
+                             // 标签
+                             tags: String
+
+                           )
+
+object PrescriptionInfo {
+  implicit val format = Json.format[PrescriptionInfo]
+}
+
+// 处方
+case class Prescription(
+                         // 标识
+                         id: String,
+                         // 医生标识
+                         doctorId: String,
+                         // 处方
+                         prescription: PrescriptionInfo,
+                         // 创建时间
+                         created: Option[DateTime],
+                         // 是否热门
+                         hot: Boolean,
+                         // 点赞数
+                         praiseNum: Long,
+                         // 吐槽数
+                         disagreeNum: Long
+                       )
+
+object Prescription {
+  implicit val format = Json.format[Prescription]
+}
+
+case class CreatePrescription(doctorId: Option[String],  prescription: PrescriptionInfo)
+object CreatePrescription {
+  implicit val format = Json.format[CreatePrescription]
+}
+
+case class EditPrescription(doctorId: Option[String],  prescription: PrescriptionInfo)
+object EditPrescription {
+  implicit val format = Json.format[EditPrescription]
 }
