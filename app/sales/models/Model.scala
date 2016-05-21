@@ -878,20 +878,20 @@ object Notes {
   implicit val format = Json.format[Notes]
 }
 
-//========================处方管理================================
+case class Content(
+                    title: String,
+                    // 内容
+                    content: String,
+                    // 标签
+                    tags: String
+                  )
 
-case class PrescriptionInfo(
-                             title: String,
-                             // 内容
-                             content: String,
-                             // 标签
-                             tags: String
-
-                           )
-
-object PrescriptionInfo {
-  implicit val format = Json.format[PrescriptionInfo]
+object Content {
+  implicit val format = Json.format[Content]
 }
+
+
+//========================处方管理================================
 
 // 处方
 case class Prescription(
@@ -900,7 +900,7 @@ case class Prescription(
                          // 医生标识
                          doctorId: String,
                          // 处方
-                         prescription: PrescriptionInfo,
+                         prescription: Content,
                          // 创建时间
                          created: Option[DateTime],
                          // 是否热门
@@ -915,12 +915,105 @@ object Prescription {
   implicit val format = Json.format[Prescription]
 }
 
-case class CreatePrescription(doctorId: Option[String],  prescription: PrescriptionInfo)
+case class CreatePrescription(doctorId: Option[String], prescription: Content)
+
 object CreatePrescription {
   implicit val format = Json.format[CreatePrescription]
 }
 
-case class EditPrescription(doctorId: Option[String],  prescription: PrescriptionInfo)
+case class EditPrescription(doctorId: Option[String], prescription: Content)
+
 object EditPrescription {
   implicit val format = Json.format[EditPrescription]
+}
+
+//========================FAQ==================================================
+
+// 问题
+case class Question(
+                     // 标识
+                     id: String,
+                     // 提问者
+                     proposer: String,
+                     // 内容
+                     question: Content,
+                     // 创建时间
+                     created: Option[DateTime],
+                     // 最后一次更新时间
+                     updated: Option[DateTime]
+                   )
+
+object Question {
+  implicit val format = Json.format[Question]
+}
+
+// 问题答案
+case class Answer(
+                   // 标识
+                   id: String,
+                   // 问题
+                   questionId: String,
+                   // 回答者
+                   answerer: String,
+                   // 内容
+                   answer: Content,
+                   // 创建时间
+                   created: Option[DateTime],
+                   // 最后一次更新时间
+                   updated: Option[DateTime]
+                 )
+
+
+object Answer {
+  implicit val format = Json.format[Answer]
+}
+
+// 创建问题
+case class CreateQuestion(proposer: String, question: Content) {
+  def build: Question = {
+    val now = Some(DateTime.now())
+    Question(id = Utils.nextId(),
+      proposer = proposer,
+      question = question,
+      created = now,
+      updated = now
+    )
+  }
+}
+
+object CreateQuestion {
+  implicit val format = Json.format[CreateQuestion]
+}
+
+// 编辑问题
+case class EditQuestion(id: String, question: Content)
+
+object EditQuestion {
+  implicit val format = Json.format[EditQuestion]
+}
+
+// 回答问题
+case class AnswerQuestion(id: String, answerer: String, answer: Content) {
+  def build(): Answer = {
+    val now = Some(DateTime.now())
+    Answer(
+      id = Utils.nextId(),
+      questionId = id,
+      answerer = answerer,
+      answer = answer,
+      created = now,
+      updated = now
+    )
+  }
+}
+
+object AnswerQuestion {
+  implicit val format = Json.format[AnswerQuestion]
+}
+
+// 编辑答案
+case class EditAnswer(id: String, answerer: String, answer: Content)
+
+object EditAnswer {
+  implicit val format = Json.format[EditAnswer]
 }

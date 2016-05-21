@@ -118,7 +118,18 @@ DELETE   /crm/v1/sdk/prescription/:id             sales.controllers.Prescription
 
 POST     /crm/v1/sdk/prescription/:id/praise      sales.controllers.PrescriptionController.praise(id)
 POST     /crm/v1/sdk/prescription/:id/disagree    sales.controllers.PrescriptionController.disagree(id)
-POST     /crm/v1/sdk/prescription/:id/swap      sales.controllers.PrescriptionController.swapHot(id)
+POST     /crm/v1/sdk/prescription/:id/swap        sales.controllers.PrescriptionController.swapHot(id)
+
+#FAQ
+GET       /crm/v1/sdk/faq                          sales.controllers.FAQController.query(key: Option[String])
+GET       /crm/v1/sdk/faq/:id                      sales.controllers.FAQController.readQuestion(id)
+POST      /crm/v1/sdk/faq                          sales.controllers.FAQController.crateQuestion
+POST      /crm/v1/sdk/faq/:id                      sales.controllers.FAQController.editQuestion(id)
+DELETE    /crm/v1/sdk/faq/:id                      sales.controllers.FAQController.deleteQuestion(id)
+
+GET       /crm/v1/sdk/faq/:id/answer               sales.controllers.FAQController.queryAnswer(id)
+POST      /crm/v1/sdk/faq/:id/answer               sales.controllers.FAQController.answerQuestion(id)
+POST      /crm/v1/sdk/faq/answer/:id               sales.controllers.FAQController.editAnswer(id)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

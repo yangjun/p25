@@ -8,6 +8,7 @@ import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.play.json.collection.JSONCollection
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import reactivemongo.play.json._
 
 /**
   * 用户登录后回话管理
@@ -15,13 +16,16 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
-                              ) {
+                              )(implicit ec: ExecutionContext) {
 
-  lazy val  session = sessionCollection
+  lazy val session = sessionCollection
+  lazy val user = userCollection
+
   private val logger = LoggerFactory.getLogger(classOf[SessionService])
 
   /**
     * 创建
+    *
     * @param userId
     * @param ec
     * @return
@@ -41,11 +45,12 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
 
   /**
     * 根据token查询
+    *
     * @param token
     * @param ec
     * @return
     */
-   def queryByToken(token: String)(implicit ec: ExecutionContext): Future[Option[Session]] = {
+  def queryByToken(token: String)(implicit ec: ExecutionContext): Future[Option[Session]] = {
     import reactivemongo.play.json._
     val criteria = Json.obj("token" -> token)
     val cursor = session.flatMap(_.find(criteria).one[Session])
@@ -68,7 +73,43 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
   }
 
   /**
+    * 是否拥有角色
+    * @param token
+    * @param roles 角色列表
+    * @return
+    */
+  def isRoles(token: String, roles: Set[String]): Future[Boolean] = {
+    who(token) flatMap {
+      userId =>
+        userId match {
+          case Some(userId) =>
+            val criteria = Json.obj("id" -> userId)
+            user.flatMap(_.find(criteria).one[User]) map {
+              u =>
+                u match {
+                  case Some(u) =>
+                      u.roles match {
+                        case Some(rs) =>
+                          // 交集不为空，表示包含
+                          !rs.intersect(roles).isEmpty
+                        case None =>
+                          false
+                      }
+                  case None =>
+                    false
+                }
+            }
+          case None =>
+            Future {
+              false
+            }
+        }
+    }
+  }
+
+  /**
     * 判断Token是否过期
+    *
     * @param token
     * @param ec
     * @return
@@ -85,8 +126,12 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
   }
 
 
-  private  def sessionCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+  private def sessionCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
     reactiveMongoApi.database.map(_.collection("session"))
+  }
+
+  private def userCollection()(implicit ec: ExecutionContext): Future[JSONCollection] = {
+    reactiveMongoApi.database.map(_.collection("users"))
   }
 
 }

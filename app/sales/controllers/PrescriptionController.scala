@@ -69,21 +69,13 @@ class PrescriptionController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     }
   }
 
-  def read(id: String) = Authenticated.async { implicit req =>
-    sessionService.who(req.token) flatMap (_ match {
-      case Some(who) =>
-        prescriptionService.read(id) map (_ match {
-          case Some(prescription) =>
-            Ok(Json.toJson(prescription))
-          case None =>
-            val data = Json.obj()
-            BadRequest(Json.toJson(data))
-        })
+  def read(id: String) = Action.async { implicit req =>
+    prescriptionService.read(id) map (_ match {
+      case Some(prescription) =>
+        Ok(Json.toJson(prescription))
       case None =>
-        Future {
-          val data = Json.obj()
-          BadRequest(Json.toJson(data))
-        }
+        val data = Json.obj("error" -> "未发现")
+        BadRequest(Json.toJson(data))
     })
 
   }
@@ -145,19 +137,11 @@ class PrescriptionController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
     })
   }
 
-  def query(tag: Option[String]) = Authenticated.async { implicit req =>
+  def query(tag: Option[String]) = Action.async { implicit req =>
     val skip = req.queryString.get("skip").getOrElse(DEFAULT_SKIP).head.toInt
     val limit = req.queryString.get("limit").getOrElse(DEFAULT_LIMIT).head.toInt
-    sessionService.who(req.token) flatMap (_ match {
-      case Some(who) =>
-        prescriptionService.query(tag, skip, limit) map (items => {
-          Ok(Json.toJson(items))
-        })
-      case None =>
-        Future {
-          val data = Json.obj()
-          BadRequest(Json.toJson(data))
-        }
+    prescriptionService.query(tag, skip, limit) map (items => {
+      Ok(Json.toJson(items))
     })
   }
 
