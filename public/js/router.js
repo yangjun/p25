@@ -31,7 +31,7 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
         if (!$rootScope.user) {
             console.log('获取用户信息…');
             var deferred = $q.defer();
-            $http.get(CONTEXT.CRM_CTX + '/auth/userProfile?_=' + new Date().getTime()).success(function (result) {
+            $http.get(CONTEXT.CRM_CTX + '/auth/userProfile').success(function (result) {
                 $rootScope.user = result;
                 deferred.resolve();
             }).error(function (data, status) {
@@ -160,7 +160,7 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
             controller: 'HospitalOrderCreateCtrl',
             resolve: {auth: auth}
         })
-        /*订单：删除订单*/
+        /*订单：取消订单*/
         .state('crm.hospital.order.remove', {
             url: '/:oid/remove',
             templateUrl: '../html/hospital/hospital_order_remove.html',
@@ -189,11 +189,11 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
             controller: 'OrderInfoCtrl',
             resolve: {auth: auth}
         })
-        /*接受订单*/
-        .state('crm.order.permit', {
-            url: '/:oid/permit',
-            templateUrl: '../html/order/order_permit.html',
-            controller: 'OrderPermitCtrl',
+        /*提交订单*/
+        .state('crm.order.commit', {
+            url: '/:oid/commit',
+            templateUrl: '../html/order/order-commit.html',
+            controller: 'OrderCommitCtrl',
             resolve: {auth: auth}
         })
         /*拒绝订单*/

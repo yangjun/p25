@@ -97,7 +97,7 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            orderService.listOrder($scope.filter.no, $scope.filter.status, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            orderService.pageOrder($scope.filter.no, $scope.filter.status, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -114,7 +114,7 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            orderService.listOrder($scope.filter.no, $scope.filter.status, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            orderService.pageOrder($scope.filter.no, $scope.filter.status, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = $scope.orders.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -133,7 +133,7 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
     function ($rootScope, $scope, orderService, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+            orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
                 $rootScope.config = {
                     title: {
@@ -145,16 +145,11 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                         menufunc: function () {
                             var actionButtons = [];
 
-                            if ($scope.order.status === 'idle'
-                                || $scope.order.status === 'firstReview'
-                                || $scope.order.status === 'review'
-                                || $scope.order.status === 'stock'
-                                || $scope.order.status === 'goodsReceipt'
-                                || $scope.order.status === 'achieve') {
+                            if ($scope.order.status === 'idle') {
                                 actionButtons.push({
-                                    text: '接受订单',
+                                    text: '提交订单',
                                     onClick: function () {
-                                        $scope.$state.go('crm.order.permit', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.order.commit', {oid: $scope.$state.params.oid});
                                     }
                                 });
                             }
@@ -205,12 +200,21 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 }
                             ];
 
-                            $.actions([actionButtons, stockButtons, cancelButton]);
+                            var actions = [];
+                            if (actionButtons.length > 0) {
+                                actions.push(actionButtons);
+                            }
+                            if (stockButtons.length > 0) {
+                                actions.push(stockButtons);
+                            }
+                            actions.push(cancelButton);
+
+                            $.actions(actions);
                         }
                     }
                 };
 
-                hospitalService.queryHospital($scope.order.hospitalId).then(function (result) {
+                hospitalService.getHospital($scope.order.hospitalId).then(function (result) {
                     $scope.order.hospital = result.data;
                 }).finally(function () {
                     $.hideIndicator($scope);
@@ -221,37 +225,40 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
     }]);
 
 /**
- * 订单：接受订单
+ * 订单：提交订单
  */
-app.controller('OrderPermitCtrl', ['$rootScope', '$scope', 'orderService',
+app.controller('OrderCommitCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
                 hastitle: true,
-                title: '接受订单',
+                title: '提交订单',
                 hasback: true,
                 backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
-        $scope.permitOrderReason = {reason: ''};
+        $scope.commitOrderRequest = {who: '', reason: ''};
 
         $scope.load = function () {
             $.showIndicator($scope);
-            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+            orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
             }).finally(function () {
                 $.hideIndicator($scope);
             });
         };
 
-        /*接受订单*/
-        $scope.permitOrder = function () {
-            $.showIndicator($scope);
-            orderService.permitOrder($scope.$state.params.oid, $scope.permitOrderReason).then(function (result) {
+        /*提交订单*/
+        $scope.commitOrder = function (form) {
+            if (form.$invalid) {
+                if (form.who.$error.required) {
+                    $.toast('订单接收人不能为空');
+                    return;
+                }
+            }
+            orderService.commitOrder($scope.$state.params.oid, $scope.commitOrderRequest).then(function (result) {
                 $scope.$state.go('crm.order.info', {oid: $scope.$state.params.oid});
-            }).finally(function () {
-                $.hideIndicator($scope);
             });
         };
 
@@ -277,7 +284,7 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
 
         $scope.load = function () {
             $.showIndicator($scope);
-            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+            orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
             }).finally(function () {
                 $.hideIndicator($scope);
@@ -286,12 +293,6 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
 
         /*拒绝订单*/
         $scope.rejectOrder = function () {
-            $.showIndicator($scope);
-            orderService.rejectOrder($scope.$state.params.oid, $scope.rejectOrderReason).then(function (result) {
-                $scope.$state.go('crm.order.info', {oid: $scope.$state.params.oid});
-            }).finally(function () {
-                $.hideIndicator($scope);
-            });
         };
 
         $scope.load();
@@ -316,7 +317,7 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
 
         $scope.load = function () {
             $.showIndicator($scope);
-            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+            orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
             }).finally(function () {
                 $.hideIndicator($scope);
@@ -362,7 +363,7 @@ app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            orderService.queryStockItemByOrder($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            orderService.pageStock($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.stocks = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -374,7 +375,7 @@ app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            orderService.queryStockItemByOrder($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            orderService.pageStock($scope.$state.params.oid, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.stocks = $scope.stocks.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {

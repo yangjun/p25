@@ -220,7 +220,7 @@ app.factory('orderService', ['restClient', 'CONTEXT',
              * @param obj
              */
             cancelOrder: function (id, obj) {
-                return restClient.delete(CONTEXT.CRM_CTX + '/order/' + id, obj);
+                return restClient.post(CONTEXT.CRM_CTX + '/order/' + id + '/cancel', obj);
             },
             /**
              * 分页查询库存

@@ -42,7 +42,7 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            hospitalService.listHospital($scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageHospital($scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.hospitals = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -59,7 +59,7 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            hospitalService.listHospital($scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageHospital($scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.hospitals = $scope.hospitals.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -78,7 +78,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = result.data;
                 $rootScope.config = {
                     title: {
@@ -219,7 +219,7 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     id: result.data.id,
                     name: result.data.base.name,
@@ -259,7 +259,7 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     hospitalId: result.data.id,
                     name: result.data.base.name,
@@ -304,7 +304,7 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     hospitalId: result.data.id,
                     name: result.data.base.name,
@@ -341,7 +341,7 @@ app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService'
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     id: result.data.id,
                     name: result.data.base.name
@@ -427,7 +427,7 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     hospitalId: result.data.id,
                     name: result.data.base.name,
@@ -500,7 +500,7 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            hospitalService.listDoctor($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageDoctor($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.doctors = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -517,7 +517,7 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            hospitalService.listDoctor($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageDoctor($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.doctors = $scope.doctors.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -573,7 +573,7 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
 
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.doctor = {
                     name: '',
                     email: '',
@@ -654,7 +654,7 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            hospitalService.listHospitalOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -671,7 +671,7 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            hospitalService.listHospitalOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = $scope.orders.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -683,9 +683,9 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
         $scope.popupMenu = function (order) {
             var actionButtons = [
                 {
-                    text: '删除',
+                    text: '取消订单',
                     onClick: function () {
-                        /*点击‘删除’菜单，跳转‘删除订单’页面*/
+                        /*点击‘删除’菜单，跳转‘取消订单’页面*/
                         $scope.$state.go('crm.hospital.order.remove', {id: $scope.$state.params.id, oid: order.id});
                     }
                 }
@@ -720,7 +720,7 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
 
         $scope.load = function () {
             $.showIndicator($scope);
-            hospitalService.queryHospital($scope.$state.params.id).then(function (result) {
+            hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = result.data;
                 $scope.order = {
                     hospitalId: $scope.$state.params.id,
@@ -776,7 +776,7 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                 $.toast('订单项不能为空');
                 return;
             }
-            orderService.createOrder($scope.$state.params.id, $scope.order).then(function (result) {
+            hospitalService.createOrder($scope.$state.params.id, $scope.order).then(function (result) {
                 $scope.$state.go('crm.hospital.order.list', {id: $scope.$state.params.id});
             });
         };
@@ -784,14 +784,14 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
     }]);
 
 /**
- * 医院：订单：删除订单
+ * 医院：订单：取消订单
  */
 app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
                 hastitle: true,
-                title: '删除订单',
+                title: '取消订单',
                 hasback: true,
                 backurl: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
             }
@@ -801,14 +801,14 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
 
         $scope.load = function () {
             $.showIndicator($scope);
-            orderService.queryOrder($scope.$state.params.oid).then(function (result) {
+            orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
             }).finally(function () {
                 $.hideIndicator($scope);
             });
         };
 
-        /*删除订单*/
+        /*取消订单*/
         $scope.cancelOrder = function () {
             $.showIndicator($scope);
             orderService.cancelOrder($scope.order.id, $scope.cancelOrderReason).then(function (result) {
