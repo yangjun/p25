@@ -53,6 +53,7 @@ class SessionService @Inject()(reactiveMongoApi: ReactiveMongoApi
   def queryByToken(token: String)(implicit ec: ExecutionContext): Future[Option[Session]] = {
     import reactivemongo.play.json._
     val criteria = Json.obj("token" -> token)
+    logger.debug("criteria -> {}", criteria)
     val cursor = session.flatMap(_.find(criteria).one[Session])
     cursor
   }

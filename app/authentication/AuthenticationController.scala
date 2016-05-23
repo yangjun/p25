@@ -37,7 +37,7 @@ class AuthenticationController @Inject()(val reactiveMongoApi: ReactiveMongoApi,
           Ok(Json.toJson(u))
         }
         case None => {
-          BadRequest(Json.obj())
+          BadRequest(Json.obj("error" -> "未发现用户信息"))
         }
       }
     })
