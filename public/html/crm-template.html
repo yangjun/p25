@@ -1,14 +1,14 @@
 <div class="page-group">
     <div class="page page-current">
         <header class="bar bar-nav"
-                ng-if="config.title.hastitle">
+                ng-if="!!config.title.title">
             <a class="icon btn-back pull-left"
-               ng-if="config.title.hasback"
-               ng-href="{{config.title.backurl}}">
+               ng-if="!!config.title.back"
+               ng-href="{{config.title.back}}">
                 <i class="fa fa-arrow-left"></i>
             </a>
             <a class="icon btn-menu pull-right"
-               ng-if="config.title.hasmenu"
+               ng-if="!!config.title.menu"
                ng-click="menu()"><i class="fa fa-bars"></i></a>
             <h1 class="title">{{config.title.title}}</h1>
         </header>
@@ -38,8 +38,8 @@
                 <span class="tab-label">订单</span>
             </a>
             <a class="tab-item"
-               ui-sref="crm.order.list"
-               ng-class="{'active':$state.includes('crm.order')}">
+               ui-sref="crm.self.home"
+               ng-class="{'active':$state.includes('crm.self')}">
                 <span class="icon">
                     <i class="fa fa-user"></i>
                 </span>

@@ -16,10 +16,8 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
 
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '所有订单',
-                hasmenu: true,
-                menufunc: function () {
+                menu: function () {
                     var actionButtons = [
                         {
                             text: '按订单状态过滤',
@@ -137,12 +135,9 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                 $scope.order = result.data;
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '订单信息',
-                        hasback: true,
-                        backurl: '#/crm/order/list',
-                        hasmenu: true,
-                        menufunc: function () {
+                        back: '#/crm/order/list',
+                        menu: function () {
                             var actionButtons = [];
 
                             if ($scope.order.status === 'idle') {
@@ -231,10 +226,8 @@ app.controller('OrderCommitCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '提交订单',
-                hasback: true,
-                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
+                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -273,10 +266,8 @@ app.controller('OrderRejectCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '拒绝订单',
-                hasback: true,
-                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
+                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -306,10 +297,8 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '确认订单',
-                hasback: true,
-                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
+                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 
@@ -345,10 +334,8 @@ app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '出库清单',
-                hasback: true,
-                backurl: '#/crm/order/' + $scope.$state.params.oid + '/info'
+                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
             }
         };
 

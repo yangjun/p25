@@ -159,11 +159,10 @@ app.factory('hospitalService', ['restClient', 'CONTEXT',
             /**
              * 分页查询订单
              * @param id 医院ID
-             * @param name
              * @param skip
              * @param limit
              */
-            pageOrder: function (id, name, skip, limit) {
+            pageOrder: function (id, skip, limit) {
                 return restClient.get(CONTEXT.CRM_CTX + '/hospital/' + id + '/order?skip=' + skip + '&limit=' + limit);
             }
         }
@@ -196,8 +195,8 @@ app.factory('orderService', ['restClient', 'CONTEXT',
              * @param limit
              */
             pageOrder: function (no, status, skip, limit) {
-                // return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
-                return restClient.get(CONTEXT.CRM_CTX + '/order?skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
+                // return restClient.get(CONTEXT.CRM_CTX + '/order?skip=' + skip + '&limit=' + limit);
             },
             /**
              * 获取订单

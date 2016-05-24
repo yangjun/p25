@@ -8,10 +8,8 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '所有医院',
-                hasmenu: true,
-                menufunc: function () {
+                menu: function () {
                     var actionButtons = [
                         {
                             text: '添加医院',
@@ -82,12 +80,9 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                 $scope.hospital = result.data;
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '医院信息',
-                        hasback: true,
-                        backurl: '#/crm/hospital/list',
-                        hasmenu: true,
-                        menufunc: function () {
+                        back: '#/crm/hospital/list',
+                        menu: function () {
                             var actionButtons = [
                                 {
                                     text: '编辑',
@@ -181,10 +176,8 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '添加医院',
-                hasback: true,
-                backurl: '#/crm/hospital/list'
+                back: '#/crm/hospital/list'
             }
         };
 
@@ -232,10 +225,8 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
                 };
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '编辑医院信息',
-                        hasback: true,
-                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -268,10 +259,8 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
                 };
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '申请开发医院',
-                        hasback: true,
-                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -313,10 +302,8 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
                 };
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '记录开发进度',
-                        hasback: true,
-                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -349,10 +336,8 @@ app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService'
 
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '归档',
-                        hasback: true,
-                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
 
@@ -436,10 +421,8 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
                 };
                 $rootScope.config = {
                     title: {
-                        hastitle: true,
                         title: '编辑归档信息',
-                        hasback: true,
-                        backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info'
+                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
                     }
                 };
             }).finally(function () {
@@ -464,12 +447,9 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
     function ($rootScope, $scope, hospitalService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '所有医生',
-                hasback: true,
-                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info',
-                hasmenu: true,
-                menufunc: function () {
+                back: '#/crm/hospital/' + $scope.$state.params.id + '/info',
+                menu: function () {
                     var actionButtons = [
                         {
                             text: '添加医生',
@@ -564,10 +544,8 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
     function ($rootScope, $scope, hospitalService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '添加医生',
-                hasback: true,
-                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/doctor/list'
+                back: '#/crm/hospital/' + $scope.$state.params.id + '/doctor/list'
             }
         };
 
@@ -618,12 +596,9 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
     function ($rootScope, $scope, hospitalService, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
-                title: '所有订单',
-                hasback: true,
-                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/info',
-                hasmenu: true,
-                menufunc: function () {
+                title: '医院订单',
+                back: '#/crm/hospital/' + $scope.$state.params.id + '/info',
+                menu: function () {
                     var actionButtons = [
                         {
                             text: '添加订单',
@@ -646,7 +621,6 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
 
         $scope.hasmore = true;
         $scope.filter = {
-            name: '',
             skip: 0,
             limit: 10
         };
@@ -654,7 +628,7 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
         $scope.load = function (skip) {
             $.showIndicator($scope);
             $scope.filter.skip = skip;
-            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = result.data;
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -662,16 +636,11 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
             });
         };
 
-        /*搜索框失去焦点后立即加载新数据*/
-        $(document).on("blur", ".searchbar input", function (b) {
-            $scope.load(0);
-        });
-
         /*加载更多*/
         $scope.loadMore = function () {
             $.showIndicator($scope);
             $scope.filter.skip += $scope.filter.limit;
-            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.name, $scope.filter.skip, $scope.filter.limit).then(function (result) {
+            hospitalService.pageOrder($scope.$state.params.id, $scope.filter.skip, $scope.filter.limit).then(function (result) {
                 $scope.orders = $scope.orders.concat(result.data);
                 $scope.hasmore = result.data && result.data.length > 0;
             }).finally(function () {
@@ -697,7 +666,9 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
                 }
             ];
 
-            $.actions([actionButtons, cancelButton]);
+            if (order.status != 'cancel') {
+                $.actions([actionButtons, cancelButton]);
+            }
         };
 
         $scope.load(0);
@@ -711,10 +682,8 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
     function ($rootScope, $scope, hospitalService, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '添加订单',
-                hasback: true,
-                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
+                back: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
             }
         };
 
@@ -746,6 +715,11 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                 notes: ''
             };
             $scope.order.items.push(item);
+        };
+
+        /*移除订单项*/
+        $scope.removeOrderItem = function (item) {
+            $scope.order.items.splice($scope.order.items.indexOf(item), 1);
         };
 
         /*创建订单*/
@@ -790,14 +764,12 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
     function ($rootScope, $scope, orderService) {
         $rootScope.config = {
             title: {
-                hastitle: true,
                 title: '取消订单',
-                hasback: true,
-                backurl: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
+                back: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
             }
         };
 
-        $scope.cancelOrderReason = {reason: ''};
+        $scope.cancelOrderRequest = {reason: ''};
 
         $scope.load = function () {
             $.showIndicator($scope);
@@ -811,7 +783,7 @@ app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService
         /*取消订单*/
         $scope.cancelOrder = function () {
             $.showIndicator($scope);
-            orderService.cancelOrder($scope.order.id, $scope.cancelOrderReason).then(function (result) {
+            orderService.cancelOrder($scope.$state.params.oid, $scope.cancelOrderRequest).then(function (result) {
                 $scope.$state.go('crm.hospital.order.list', {id: $scope.$state.params.id});
             }).finally(function () {
                 $.hideIndicator($scope);

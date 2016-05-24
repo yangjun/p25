@@ -11,8 +11,8 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowPro
          * 可支持 refresh token。
          */
         jwtInterceptorProvider.tokenGetter = ['jwtHelper', '$http', function (jwtHelper, $http) {
-            var JWT_TOKEN = $window.localStorage.getItem('JWT_TOKEN');
-            return JWT_TOKEN;
+            var TOKEN = $window.localStorage.getItem('TOKEN');
+            return TOKEN;
 
             /* TODO REFRESH TOKEN
             var refreshToken = $window.localStorage.getItem('refresh_token');
@@ -45,19 +45,16 @@ app.run(['$rootScope', '$state', function ($rootScope, $state) {
     /*页面相关设置*/
     $rootScope.config = {
         title: {
-            hastitle: false, /*是否显示标题*/
-            title: '', /*标题内容*/
-            hasback: false, /*是否显示返回按钮*/
-            backurl: '', /*返回按钮地址*/
-            hasmenu: false, /*是否显示菜单*/
-            menufunc: undefined/*菜单回掉方法*/
+            title: false, /*标题*/
+            back: false, /*返回按钮地址*/
+            menu: false /*菜单回调方法*/
         }
     };
 
     /*设置菜单*/
     $rootScope.menu = function () {
-        if ($rootScope.config.title.hasmenu && $rootScope.config.title.menufunc && (typeof $rootScope.config.title.menufunc === 'function')) {
-            $rootScope.config.title.menufunc();
+        if (!!$rootScope.config.title.menu && (typeof $rootScope.config.title.menu === 'function')) {
+            $rootScope.config.title.menu();
         }
     };
 

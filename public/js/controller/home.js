@@ -6,9 +6,4 @@ var app = angular.module('wxApp');
  */
 app.controller('HomeCtrl', ['$rootScope', '$scope',
     function ($rootScope, $scope) {
-        $rootScope.config = {
-            title: {
-                hastitle: false
-            }
-        };
     }]);

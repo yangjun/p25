@@ -1,0 +1,55 @@
+<!--我：首页-->
+<div class="card">
+    <div class="card-content">
+        <div class="list-block media-list">
+            <ul>
+                <li class="item-content">
+                    <div class="item-media">
+                        <img ng-src="{{user.avatar}}"
+                             width="44">
+                    </div>
+                    <div class="item-inner">
+                        <div class="item-title-row">
+                            <div class="item-title">{{user.displayName}}</div>
+                        </div>
+                        <div class="item-subtitle">{{user.username}}</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-content">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <a ui-sref="crm.self.orders"
+                       class="item-link item-content">
+                        <div class="item-media"><i class="icon icon-f7"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title">我的订单</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-content">
+        <div class="list-block">
+            <ul>
+                <li>
+                    <a ui-sref="crm.self.tasks"
+                       class="item-link item-content">
+                        <div class="item-media"><i class="icon icon-f7"></i></div>
+                        <div class="item-inner">
+                            <div class="item-title">我的任务</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-<!--医院：订单：所有订单-->
+<!--我：任务列表-->
+
 <div class="bar">
     <div class="searchbar">
         <div class="search-input">
@@ -6,23 +7,25 @@
                    for="search"></label>
             <input type="search"
                    id="search"
-                   placeholder="搜索" />
+                   ng-model="filter.no"
+                   ng-enter="load(0)"
+                   placeholder="订单序号" />
         </div>
     </div>
 </div>
 <div class="content"
      style="margin: 2.2rem 0 0;">
     <div class="card"
-         ng-repeat="order in orders">
+         ng-repeat="task in tasks">
         <div class="card-content">
             <div class="list-block">
                 <ul>
                     <li>
                         <a class="item-link item-content"
-                           ng-click="popupMenu(order)">
+                           ui-sref="crm.order.info({oid:task.id})">
                             <div class="item-media"><i class="icon icon-f7"></i></div>
                             <div class="item-inner">
-                                <div class="item-title">{{order.no}}</div>
+                                <div class="item-title">{{task.no}}</div>
                             </div>
                         </a>
                     </li>
