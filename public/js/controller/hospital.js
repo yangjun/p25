@@ -9,6 +9,8 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
         $rootScope.config = {
             title: {
                 title: '所有医院',
+                back: '#/home',
+                backtext: '首页',
                 menu: function () {
                     var actionButtons = [
                         {

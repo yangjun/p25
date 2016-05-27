@@ -8,7 +8,9 @@ app.controller('SelfHomeCtrl', ['$rootScope', '$scope', 'selfService',
     function ($rootScope, $scope, selfService) {
         $rootScope.config = {
             title: {
-                title: '我'
+                title: ' ',
+                back: '#/home',
+                backtext: '首页'
             }
         };
     }]);

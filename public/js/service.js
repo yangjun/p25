@@ -270,7 +270,8 @@ app.factory('taskService', ["restClient", "CONTEXT",
              * @returns {*}
              */
             pageTask: function (status, action, skip, limit) {
-                return restClient.get(CONTEXT.CRM_CTX + '/task?status=' + status + '&action=' + action + '&skip=' + skip + '&limit=' + limit);
+                return restClient.get(CONTEXT.CRM_CTX + '/task?skip=' + skip + '&limit=' + limit);
+                // return restClient.get(CONTEXT.CRM_CTX + '/task?status=' + status + '&action=' + action + '&skip=' + skip + '&limit=' + limit);
             },
             /**
              * 获取任务
@@ -407,7 +408,7 @@ app.factory('authService', ['restClient', 'CONTEXT',
     }]);
 
 /*处方*/
-app.factory('prescriptionService', ["restClient", "CONTEXT",
+app.factory('prescService', ["restClient", "CONTEXT",
     function (restClient, CONTEXT) {
         return {
             /**
@@ -511,8 +512,8 @@ app.factory('stockService', ["restClient", "CONTEXT",
         }
     }]);
 
-/*问题*/
-app.factory('questionService', ["restClient", "CONTEXT",
+/*问答*/
+app.factory('faqService', ["restClient", "CONTEXT",
     function (restClient, CONTEXT) {
         return {
             /**

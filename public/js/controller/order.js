@@ -17,6 +17,8 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
         $rootScope.config = {
             title: {
                 title: '所有订单',
+                back: '#/home',
+                backtext: '首页',
                 menu: function () {
                     var actionButtons = [
                         {
@@ -149,30 +151,14 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
                                 });
                             }
 
-                            if ($scope.order.status === 'idle'
-                                || $scope.order.status === 'firstReview'
-                                || $scope.order.status === 'review'
-                                || $scope.order.status === 'stock'
-                                || $scope.order.status === 'goodsReceipt'
-                                || $scope.order.status === 'achieve') {
+                            if (true) {
                                 actionButtons.push({
-                                    text: '拒绝订单',
+                                    text: '取消订单',
                                     onClick: function () {
-                                        $scope.$state.go('crm.order.reject', {oid: $scope.$state.params.oid});
-                                    }
-                                });
-                            }
-
-                            if ($scope.order.status === 'idle'
-                                || $scope.order.status === 'firstReview'
-                                || $scope.order.status === 'review'
-                                || $scope.order.status === 'stock'
-                                || $scope.order.status === 'goodsReceipt'
-                                || $scope.order.status === 'achieve') {
-                                actionButtons.push({
-                                    text: '确认订单',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.order.confirm', {oid: $scope.$state.params.oid});
+                                        $scope.$state.go('crm.hospital.order.remove', {
+                                            id: $scope.$state.params.id,
+                                            oid: $scope.$state.params.oid
+                                        });
                                     }
                                 });
                             }

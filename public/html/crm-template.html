@@ -6,46 +6,13 @@
                ng-if="!!config.title.back"
                ng-href="{{config.title.back}}">
                 <i class="fa fa-arrow-left"></i>
+                <span class="back-label">{{config.title.backtext}}</span>
             </a>
             <a class="icon btn-menu pull-right"
                ng-if="!!config.title.menu"
                ng-click="menu()"><i class="fa fa-bars"></i></a>
             <h1 class="title">{{config.title.title}}</h1>
         </header>
-        <nav class="bar bar-tab">
-            <a class="tab-item"
-               ui-sref="crm.home"
-               ui-sref-active="active">
-                <span class="icon">
-                    <i class="fa fa-home"></i>
-                </span>
-                <span class="tab-label">首页</span>
-            </a>
-            <a class="tab-item"
-               ui-sref="crm.hospital.list"
-               ng-class="{'active':$state.includes('crm.hospital')}">
-                <span class="icon">
-                    <i class="fa fa-ambulance"></i>
-                </span>
-                <span class="tab-label">医院</span>
-            </a>
-            <a class="tab-item"
-               ui-sref="crm.order.list"
-               ng-class="{'active':$state.includes('crm.order')}">
-                <span class="icon">
-                    <i class="fa fa-shopping-cart"></i>
-                </span>
-                <span class="tab-label">订单</span>
-            </a>
-            <a class="tab-item"
-               ui-sref="crm.self.home"
-               ng-class="{'active':$state.includes('crm.self')}">
-                <span class="icon">
-                    <i class="fa fa-user"></i>
-                </span>
-                <span class="tab-label">我</span>
-            </a>
-        </nav>
         <div class="content">
             <ui-view></ui-view>
         </div>
@@ -64,5 +31,11 @@
         padding: .55rem .8rem !important;
         margin-left: -.5rem;
         margin-right: 0;
+    }
+
+    .back-label {
+        font-size: .8rem;
+        top: -.05rem;
+        position: relative;
     }
 </style>

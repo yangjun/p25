@@ -6,4 +6,10 @@ var app = angular.module('wxApp');
  */
 app.controller('HomeCtrl', ['$rootScope', '$scope',
     function ($rootScope, $scope) {
+        $rootScope.config = {
+            title: {
+                title: false,
+                menu: false
+            }
+        };
     }]);
