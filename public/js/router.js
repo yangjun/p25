@@ -20,6 +20,7 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
             if ($window.location.hash.indexOf('token=') <= -1) {
                 $.toast('获取JWT_TOKEN…');
                 $window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxd1a9eba03a82e959&redirect_uri=http://luotaoyeah.iok.la/wx/callback&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect';
+                return;
             } else {
                 /*将请求参数中的JWT_TOKEN保存到本地存储中*/
                 TOKEN = $window.location.hash.substring($window.location.hash.indexOf('token=') + 6);
