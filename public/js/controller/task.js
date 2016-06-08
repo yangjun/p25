@@ -18,7 +18,10 @@ app.controller('TaskListCtrl', ['$rootScope', '$scope', 'taskService',
             title: {
                 title: '待办任务',
                 back: '#/home',
-                backtext: '首页'
+                backtext: '首页',
+                menu:function () {
+                    $.popup('.popup-about');
+                }
             }
         };
 

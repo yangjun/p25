@@ -1,100 +1,97 @@
 <!--首页-->
-<div class="page-group">
-    <div class="page page-current">
-        <nav class="bar bar-tab">
-            <a class="tab-item"
-               ui-sref="home"
-               ui-sref-active="active">
+<div class="page page-current">
+    <nav class="bar bar-tab">
+        <a class="tab-item active"
+           ui-sref="crm.home">
                 <span class="icon">
                     <i class="fa fa-home"></i>
                 </span>
-                <span class="tab-label">首页</span>
-            </a>
-            <a class="tab-item"
-               ui-sref="home">
+            <span class="tab-label">首页</span>
+        </a>
+        <a class="tab-item"
+           ui-sref="crm.home">
                 <span class="icon">
                     <i class="fa fa-comment"></i>
                 </span>
-                <span class="tab-label">消息</span>
-            </a>
-            <a class="tab-item"
-               ui-sref="crm.self.home"
-               ng-class="{'active':$state.includes('crm.self')}">
+            <span class="tab-label">消息</span>
+        </a>
+        <a class="tab-item"
+           ui-sref="crm.me.home"
+           ng-class="{'active':$state.includes('self')}">
                 <span class="icon">
                     <i class="fa fa-user"></i>
                 </span>
-                <span class="tab-label">我</span>
-            </a>
-        </nav>
-        <div class="content">
-            <div class="feature">
-                <div class="row no-gutter">
-                    <div class="col-25">
-                        <a ui-sref="crm.hospital.list">
-                            <div class="feature-icon">
-                                <i class="fa fa-ambulance"></i>
-                            </div>
-                            <div class="feature-label">医院</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="crm.order.list">
-                            <div class="feature-icon">
-                                <i class="fa fa-shopping-cart"></i>
-                            </div>
-                            <div class="feature-label">订单</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="home">
-                            <div class="feature-icon">
-                                <i class="fa fa-file-text"></i>
-                            </div>
-                            <div class="feature-label">待办任务</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="home">
-                            <div class="feature-icon">
-                                <i class="fa fa-file-text"></i>
-                            </div>
-                            <div class="feature-label">处方</div>
-                        </a>
-                    </div>
+            <span class="tab-label">我</span>
+        </a>
+    </nav>
+    <div class="content">
+        <div class="feature">
+            <div class="row no-gutter">
+                <div class="col-25">
+                    <a ui-sref="crm.hospital.list">
+                        <div class="feature-icon">
+                            <i class="fa fa-ambulance"></i>
+                        </div>
+                        <div class="feature-label">医院</div>
+                    </a>
                 </div>
-                <div class="row no-gutter">
-                    <div class="col-25">
-                        <a ui-sref="crm.hospital.list">
-                            <div class="feature-icon">
-                                <i class="fa fa-comment"></i>
-                            </div>
-                            <div class="feature-label">问答</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="crm.order.list">
-                            <div class="feature-icon">
-                                <i class="fa fa-shopping-cart"></i>
-                            </div>
-                            <div class="feature-label">ETC</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="home">
-                            <div class="feature-icon">
-                                <i class="fa fa-file-text"></i>
-                            </div>
-                            <div class="feature-label">ETC</div>
-                        </a>
-                    </div>
-                    <div class="col-25">
-                        <a ui-sref="home">
-                            <div class="feature-icon">
-                                <i class="fa fa-comment"></i>
-                            </div>
-                            <div class="feature-label">ETC</div>
-                        </a>
-                    </div>
+                <div class="col-25">
+                    <a ui-sref="crm.order.list">
+                        <div class="feature-icon">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="feature-label">订单</div>
+                    </a>
+                </div>
+                <div class="col-25">
+                    <a ui-sref="crm.task.list">
+                        <div class="feature-icon">
+                            <i class="fa fa-file-text"></i>
+                        </div>
+                        <div class="feature-label">待办任务</div>
+                    </a>
+                </div>
+                <div class="col-25">
+                    <a ui-sref="crm.home">
+                        <div class="feature-icon">
+                            <i class="fa fa-file-text"></i>
+                        </div>
+                        <div class="feature-label">处方</div>
+                    </a>
+                </div>
+            </div>
+            <div class="row no-gutter">
+                <div class="col-25">
+                    <a ui-sref="crm.home">
+                        <div class="feature-icon">
+                            <i class="fa fa-comment"></i>
+                        </div>
+                        <div class="feature-label">问答</div>
+                    </a>
+                </div>
+                <div class="col-25">
+                    <a ui-sref="crm.order.list">
+                        <div class="feature-icon">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="feature-label">ETC</div>
+                    </a>
+                </div>
+                <div class="col-25">
+                    <a ui-sref="crm.home">
+                        <div class="feature-icon">
+                            <i class="fa fa-file-text"></i>
+                        </div>
+                        <div class="feature-label">ETC</div>
+                    </a>
+                </div>
+                <div class="col-25">
+                    <a ui-sref="crm.home">
+                        <div class="feature-icon">
+                            <i class="fa fa-comment"></i>
+                        </div>
+                        <div class="feature-label">ETC</div>
+                    </a>
                 </div>
             </div>
         </div>

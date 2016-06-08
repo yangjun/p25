@@ -47,12 +47,12 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
         .state('crm', {
             abstract: true,
             url: '/crm',
-            templateUrl: '../html/crm-template.html'
+            template: '<ui-view></ui-view>'
         });
 
     /*------------------------------ 首页 ------------------------------*/
     $stateProvider
-        .state('home', {
+        .state('crm.home', {
             url: '/home',
             templateUrl: '../html/home.html',
             controller: 'HomeCtrl',
@@ -64,7 +64,7 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
         .state('crm.hospital', {
             abstract: true,
             url: '/hospital',
-            template: '<div ui-view></div>'
+            template: '<ui-view></ui-view>'
         })
         /*所有医院*/
         .state('crm.hospital.list', {
@@ -353,34 +353,34 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
 
     /*------------------------------ 我的 ------------------------------*/
     $stateProvider
-        .state('crm.self', {
+        .state('crm.me', {
             abstract: true,
-            url: '/self',
+            url: '/me',
             template: '<div ui-view></div>'
         })
         /*首页*/
-        .state('crm.self.home', {
+        .state('crm.me.home', {
             url: '/home',
-            templateUrl: '../html/self/self-home.html',
-            controller: 'SelfHomeCtrl',
+            templateUrl: '../html/me/me-home.html',
+            controller: 'MeHomeCtrl',
             resolve: {auth: auth}
         })
         /*订单列表*/
-        .state('crm.self.orders', {
+        .state('crm.me.orders', {
             url: '/orders',
-            templateUrl: '../html/self/self-order-list.html',
-            controller: 'SelfOrdersCtrl',
+            templateUrl: '../html/me/me-order-list.html',
+            controller: 'MeOrdersCtrl',
             resolve: {auth: auth}
         })
         /*任务列表*/
-        .state('crm.self.tasks', {
+        .state('crm.me.tasks', {
             url: '/tasks',
-            templateUrl: '../html/self/self-task-list.html',
-            controller: 'SelfTasksCtrl',
+            templateUrl: '../html/me/me-task-list.html',
+            controller: 'MeTasksCtrl',
             resolve: {auth: auth}
         });
 
-    $urlRouterProvider.when('', '/home');
+    $urlRouterProvider.when('', '/crm/home');
 });
 
 app.constant('CONTEXT', {

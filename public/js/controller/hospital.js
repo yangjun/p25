@@ -4,34 +4,8 @@ var app = angular.module('wxApp');
 /**
  * 医院：所有医院
  */
-app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
-        $rootScope.config = {
-            title: {
-                title: '所有医院',
-                back: '#/home',
-                backtext: '首页',
-                menu: function () {
-                    var actionButtons = [
-                        {
-                            text: '添加医院',
-                            onClick: function () {
-                                $scope.$state.go('crm.hospital.create');
-                            }
-                        }
-                    ];
-                    var cancelButton = [
-                        {
-                            text: '取消',
-                            color: 'danger'
-                        }
-                    ];
-
-                    $.actions([actionButtons, cancelButton]);
-                }
-            }
-        };
-
+app.controller('HospitalListCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.hasmore = false;
         $scope.filter = {
             name: '',
@@ -48,6 +22,26 @@ app.controller('HospitalListCtrl', ['$rootScope', '$scope', 'hospitalService',
             }).finally(function () {
                 $.hideIndicator($scope);
             });
+        };
+
+        /*菜单*/
+        $scope.menu = function () {
+            var actionButtons = [
+                {
+                    text: '添加医院',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.create');
+                    }
+                }
+            ];
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            $.actions([actionButtons, cancelButton]);
         };
 
         /*搜索框失去焦点后立即加载新数据*/
@@ -83,7 +77,7 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
                 $rootScope.config = {
                     title: {
                         title: '医院信息',
-                        back: '#/crm/hospital/list',
+                        back: '#/hospital/list',
                         menu: function () {
                             var actionButtons = [
                                 {
@@ -179,7 +173,7 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
         $rootScope.config = {
             title: {
                 title: '添加医院',
-                back: '#/crm/hospital/list'
+                back: '#/hospital/list'
             }
         };
 
@@ -202,7 +196,7 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
             }
             hospitalService.createHospital({'hospital': $scope.hospital}).then(function (result) {
                 $.toast('添加成功');
-                $scope.$state.go('crm.hospital.list');
+                $scope.$state.go('hospital.list');
             });
         };
     }]);

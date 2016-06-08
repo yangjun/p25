@@ -4,21 +4,14 @@ var app = angular.module('wxApp');
 /**
  * 我的：首页
  */
-app.controller('SelfHomeCtrl', ['$rootScope', '$scope', 'selfService',
+app.controller('MeHomeCtrl', ['$rootScope', '$scope', 'selfService',
     function ($rootScope, $scope, selfService) {
-        $rootScope.config = {
-            title: {
-                title: ' ',
-                back: '#/home',
-                backtext: '首页'
-            }
-        };
     }]);
 
 /**
  * 我的：订单列表
  */
-app.controller('SelfOrdersCtrl', ['$rootScope', '$scope', 'selfService',
+app.controller('MeOrdersCtrl', ['$rootScope', '$scope', 'selfService',
     function ($rootScope, $scope, selfService) {
         $scope.hasmore = false;
         $scope.filter = {
@@ -31,7 +24,7 @@ app.controller('SelfOrdersCtrl', ['$rootScope', '$scope', 'selfService',
         $rootScope.config = {
             title: {
                 title: '我的订单',
-                back: '#/crm/self/home',
+                back: '#/me/home',
                 menu: function () {
                     var actionButtons = [
                         {
@@ -141,7 +134,7 @@ app.controller('SelfOrdersCtrl', ['$rootScope', '$scope', 'selfService',
 /**
  * 我的：任务列表
  */
-app.controller('SelfTasksCtrl', ['$rootScope', '$scope', 'selfService',
+app.controller('MeTasksCtrl', ['$rootScope', '$scope', 'selfService',
     function ($rootScope, $scope, selfService) {
         $scope.hasmore = false;
         $scope.filter = {
@@ -154,7 +147,7 @@ app.controller('SelfTasksCtrl', ['$rootScope', '$scope', 'selfService',
         $rootScope.config = {
             title: {
                 title: '我的任务',
-                back: '#/crm/self/home',
+                back: '#/me/home',
                 menu: function () {
                     var actionButtons = [];
                     var cancelButton = [
