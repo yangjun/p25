@@ -4,8 +4,7 @@ import java.security.MessageDigest
 import java.util.UUID
 
 import org.joda.time.DateTime
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, DateTimeFormatterBuilder}
-import sun.misc.BASE64Encoder
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, DateTimeFormatterBuil}
 
 /**
  * Created by 军 on 2016/4/11.
