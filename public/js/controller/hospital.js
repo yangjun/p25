@@ -534,31 +534,25 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
 /**
  * 医院：订单：所有订单
  */
-app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalService', 'orderService',
-    function ($rootScope, $scope, hospitalService, orderService) {
-        $rootScope.config = {
-            title: {
-                title: '医院订单',
-                back: '#/crm/hospital/' + $scope.$state.params.id + '/info',
-                menu: function () {
-                    var actionButtons = [
-                        {
-                            text: '添加订单',
-                            onClick: function () {
-                                $scope.$state.go('crm.hospital.order.create', {id: $scope.$state.params.id});
-                            }
-                        }
-                    ];
-                    var cancelButton = [
-                        {
-                            text: '取消',
-                            color: 'danger'
-                        }
-                    ];
-
-                    $.actions([actionButtons, cancelButton]);
+app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalService',
+    function ($rootScope, $scope, hospitalService) {
+        $rootScope.menu = function () {
+            var actionButtons = [
+                {
+                    text: '添加订单',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.order.create', {id: $scope.$state.params.id});
+                    }
                 }
-            }
+            ];
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            $.actions([actionButtons, cancelButton]);
         };
 
         $scope.hasmore = true;
@@ -588,29 +582,6 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
             }).finally(function () {
                 $.hideIndicator($scope);
             });
-        };
-
-        /*点击订单时，弹出菜单*/
-        $scope.popupMenu = function (order) {
-            var actionButtons = [
-                {
-                    text: '取消订单',
-                    onClick: function () {
-                        /*点击‘删除’菜单，跳转‘取消订单’页面*/
-                        $scope.$state.go('crm.hospital.order.remove', {id: $scope.$state.params.id, oid: order.id});
-                    }
-                }
-            ];
-            var cancelButton = [
-                {
-                    text: '取消',
-                    color: 'danger'
-                }
-            ];
-
-            if (order.status != 'cancel') {
-                $.actions([actionButtons, cancelButton]);
-            }
         };
 
         $scope.load(0);

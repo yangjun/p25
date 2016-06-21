@@ -1,31 +1,47 @@
 <!--医院：订单：所有订单-->
-<div class="content">
-    <div class="card"
-         ng-repeat="order in orders">
-        <div class="card-content">
-            <div class="list-block">
-                <ul>
-                    <li>
-                        <a class="item-link item-content"
-                           ui-sref="crm.order.info({oid:order.id})">
-                            <div class="item-inner">
-                                <div class="item-title">{{order.no}}</div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.info({id:$state.params.id})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label">医院</span>
+        </a>
+        <a class="icon btn-menu pull-right"
+           ng-click="menu()">
+            <i class="fa fa-bars"></i>
+        </a>
+        <h1 class="title">所有订单</h1>
+    </header>
+    <div class="content">
+        <div class="card"
+             ng-repeat="order in orders">
+            <div class="card-content">
+                <div class="list-block">
+                    <ul>
+                        <li>
+                            <a class="item-link item-content"
+                               ui-sref="crm.order.info({oid:order.id})">
+                                <div class="item-inner">
+                                    <div class="item-title">{{order.no}}</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
+        <div class="content-block"
+             ng-show="!loading&&hasmore">
+            <p class="buttons-row">
+                <button class="button button-big"
+                        ng-click="loadMore()">加载更多
+                </button>
+            </p>
+        </div>
+        <div class="no-content"
+             ng-show="!loading&&orders.length<=0">暂无数据
+        </div>
     </div>
-    <div class="content-block"
-         ng-show="!loading&&hasmore">
-        <p class="buttons-row">
-            <button class="button button-big"
-                    ng-click="loadMore()">加载更多
-            </button>
-        </p>
-    </div>
-    <div class="no-content" ng-show="!loading&&orders.length<=0">暂无数据。</div>
 </div>
 <style>
     .content-block {
