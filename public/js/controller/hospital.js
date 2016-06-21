@@ -297,17 +297,11 @@ app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService'
     function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
+            /*加载医院信息*/
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = {
                     id: result.data.id,
                     name: result.data.base.name
-                };
-
-                $rootScope.config = {
-                    title: {
-                        title: '归档',
-                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
-                    }
                 };
 
                 $scope.partner = {
