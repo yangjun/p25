@@ -400,31 +400,25 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
 /**
  * 医院：医生：所有医生
  */
-app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
-        $rootScope.config = {
-            title: {
-                title: '所有医生',
-                back: '#/crm/hospital/' + $scope.$state.params.id + '/info',
-                menu: function () {
-                    var actionButtons = [
-                        {
-                            text: '添加医生',
-                            onClick: function () {
-                                $scope.$state.go('crm.hospital.doctor.create', {id: $scope.$state.params.id});
-                            }
-                        }
-                    ];
-                    var cancelButton = [
-                        {
-                            text: '取消',
-                            color: 'danger'
-                        }
-                    ];
-
-                    $.actions([actionButtons, cancelButton]);
+app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalService', 'doctorService',
+    function ($rootScope, $scope, hospitalService, doctorService) {
+        $rootScope.menu = function () {
+            var actionButtons = [
+                {
+                    text: '添加医生',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.doctor.create', {id: $scope.$state.params.id});
+                    }
                 }
-            }
+            ];
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            $.actions([actionButtons, cancelButton]);
         };
 
         $scope.hasmore = true;
@@ -468,13 +462,11 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
                 {
                     text: '删除',
                     onClick: function () {
-                        $.confirm('确认删除 ？',
+                        $.confirm('确认删除 ?',
                             function () {
-                                hospitalService.removeDoctor(doctor.id).then(function (result) {
+                                doctorService.deleteDoctor(doctor.id).then(function (result) {
                                     $scope.load(0);
                                 });
-                            },
-                            function () {
                             }
                         );
                     }
