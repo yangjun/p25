@@ -234,12 +234,6 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
                     day: '',
                     salesman: ''
                 };
-                $rootScope.config = {
-                    title: {
-                        title: '申请开发医院',
-                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
-                    }
-                };
             }).finally(function () {
                 $.hideIndicator($scope);
             });
@@ -251,6 +245,10 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
             if (form.$invalid) {
                 if (form.day.$error.required) {
                     $.toast('开发天数不能为空');
+                    return;
+                }
+                if (form.day.$error.number) {
+                    $.toast('开发天数必须为正整数');
                     return;
                 }
             }

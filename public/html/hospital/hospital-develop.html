@@ -1,8 +1,18 @@
 <!--医院：申请开发-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="developHospital(form)">
-        <div class="content">
+
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.info({id:hospital.hospitalId})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">申请开发</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="developHospital(form)">
             <div class="list-block">
                 <ul>
                     <li>
@@ -56,6 +66,12 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>
