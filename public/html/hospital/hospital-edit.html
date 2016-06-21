@@ -1,8 +1,17 @@
 <!--医院：编辑医院-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="editHospital()">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.info({id:hospital.id})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">编辑医院</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="editHospital()">
             <div class="list-block">
                 <ul>
                     <li>
@@ -91,14 +100,19 @@
             <div class="content-block">
                 <div class="row">
                     <a class="col-50 button button-big button-fill button-danger"
-                       ui-sref="crm.hospital.info({id:hospital.id})"
-                    >取消
+                       ui-sref="crm.hospital.info({id:hospital.id})">取消
                     </a>
                     <button class="col-50 button button-big button-fill button-success"
                             type="submit">保存
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>

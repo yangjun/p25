@@ -206,12 +206,6 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
                         longitude: result.data.base.loc.longitude
                     }
                 };
-                $rootScope.config = {
-                    title: {
-                        title: '编辑医院信息',
-                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
-                    }
-                };
             }).finally(function () {
                 $.hideIndicator($scope);
             });
