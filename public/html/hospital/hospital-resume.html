@@ -1,14 +1,23 @@
 <!--医院：记录开发进度-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="resumeHospital(form)">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.info({id:hospital.hospitalId})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">记录开发进度</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="resumeHospital(form)">
             <div class="list-block">
                 <ul>
                     <li>
                         <div class="item-content">
                             <div class="item-inner">
-                                <div class="item-title"></div>
+                                <div class="item-title">医院</div>
                                 <div class="item-after">{{hospital.name}}</div>
                             </div>
                         </div>
@@ -24,7 +33,8 @@
                                 <div class="item-input">
                                     <textarea name="hospitalDescription"
                                               id="hospitalDescription"
-                                              ng-model="hospital.hospitalDescription"></textarea>
+                                              ng-model="hospital.hospitalDescription"
+                                              title="对接情况"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -40,7 +50,8 @@
                                 <div class="item-input">
                                     <textarea name="scheduleDescription"
                                               id="scheduleDescription"
-                                              ng-model="hospital.scheduleDescription"></textarea>
+                                              ng-model="hospital.scheduleDescription"
+                                              title="开发进度"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -57,6 +68,12 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>

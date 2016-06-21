@@ -275,12 +275,6 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
                     hospitalDescription: result.data.lastDevelopResume.hospitalDescription,
                     scheduleDescription: result.data.lastDevelopResume.scheduleDescription
                 };
-                $rootScope.config = {
-                    title: {
-                        title: '记录开发进度',
-                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
-                    }
-                };
             }).finally(function () {
                 $.hideIndicator($scope);
             });
