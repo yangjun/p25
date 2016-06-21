@@ -491,13 +491,6 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
  */
 app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
-        $rootScope.config = {
-            title: {
-                title: '添加医生',
-                back: '#/crm/hospital/' + $scope.$state.params.id + '/doctor/list'
-            }
-        };
-
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -532,7 +525,7 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
             }
             hospitalService.createDoctor($scope.$state.params.id, $scope.doctor).then(function (result) {
                 $.toast('添加成功');
-                $scope.$state.go('crm.hospital.doctor.list', {id: $scope.$state.params.id});
+                $scope.$state.go('crm.hospital.doctor.list');
             });
         };
 
