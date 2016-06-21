@@ -382,12 +382,6 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
                     hospitalDescription: result.data.lastDevelopResume.hospitalDescription,
                     scheduleDescription: result.data.lastDevelopResume.scheduleDescription
                 };
-                $rootScope.config = {
-                    title: {
-                        title: '编辑归档信息',
-                        back: '#/crm/hospital/' + $scope.$state.params.id + '/info'
-                    }
-                };
             }).finally(function () {
                 $.hideIndicator($scope);
             });

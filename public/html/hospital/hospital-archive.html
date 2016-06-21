@@ -1,8 +1,17 @@
 <!--医院：编辑归档信息-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="resumeHospital(form)">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.info({id:hospital.hospitalId})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">编辑归档信息</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="resumeHospital(form)">
             <div class="list-block">
                 <ul>
                     <li>
@@ -13,31 +22,37 @@
                             </div>
                         </div>
                     </li>
+                </ul>
+            </div>
+            <div class="content-block-title">对接情况</div>
+            <div class="list-block">
+                <ul>
                     <li class="align-top">
                         <div class="item-content">
                             <div class="item-inner">
-                                <label class="item-title label"
-                                       for="hospitalDescription">对接情况
-                                </label>
                                 <div class="item-input">
                                     <textarea name="hospitalDescription"
                                               id="hospitalDescription"
                                               required
-                                              ng-model="hospital.hospitalDescription"></textarea>
+                                              ng-model="hospital.hospitalDescription"
+                                              title="对接情况"></textarea>
                                 </div>
                             </div>
                         </div>
                     </li>
+                </ul>
+            </div>
+            <div class="content-block-title">开发进度</div>
+            <div class="list-block">
+                <ul>
                     <li class="align-top">
                         <div class="item-content">
                             <div class="item-inner">
-                                <label class="item-title label"
-                                       for="scheduleDescription">开发进度
-                                </label>
                                 <div class="item-input">
                                     <textarea name="scheduleDescription"
                                               id="scheduleDescription"
-                                              ng-model="hospital.scheduleDescription"></textarea>
+                                              ng-model="hospital.scheduleDescription"
+                                              title="开发进度"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -54,6 +69,12 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>
