@@ -1,14 +1,23 @@
 <!--医院：订单：添加订单-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="createOrder(form)">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.order.list">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">添加订单</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="createOrder(form)">
             <div class="list-block">
                 <ul>
                     <li>
                         <div class="item-content">
                             <div class="item-inner">
-                                <div class="item-title"></div>
+                                <div class="item-title">医院</div>
                                 <div class="item-after">{{hospital.base.name}}</div>
                             </div>
                         </div>
@@ -27,7 +36,7 @@
                                     <input type="text"
                                            name="proposer"
                                            id="proposer"
-                                           ng-model="order.proposer">
+                                           ng-model="order.proposer" />
                                 </div>
                             </div>
                         </div>
@@ -42,7 +51,7 @@
                                     <input type="text"
                                            name="notes"
                                            id="notes"
-                                           ng-model="order.notes">
+                                           ng-model="order.notes" />
                                 </div>
                             </div>
                         </div>
@@ -64,7 +73,7 @@
                                                name="no"
                                                id="no"
                                                required
-                                               ng-model="item.no">
+                                               ng-model="item.no" />
                                     </div>
                                 </div>
                             </div>
@@ -80,7 +89,7 @@
                                                name="goodsName"
                                                id="goodsName"
                                                required
-                                               ng-model="item.goodsName">
+                                               ng-model="item.goodsName" />
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +105,7 @@
                                                name="specification"
                                                id="specification"
                                                required
-                                               ng-model="item.specification">
+                                               ng-model="item.specification" />
                                     </div>
                                 </div>
                             </div>
@@ -112,7 +121,7 @@
                                                name="unit"
                                                id="unit"
                                                required
-                                               ng-model="item.unit">
+                                               ng-model="item.unit" />
                                     </div>
                                 </div>
                             </div>
@@ -124,11 +133,11 @@
                                            for="quantity">数量
                                     </label>
                                     <div class="item-input">
-                                        <input type="text"
+                                        <input type="number"
                                                name="quantity"
                                                id="quantity"
                                                required
-                                               ng-model="item.quantity">
+                                               ng-model="item.quantity" />
                                     </div>
                                 </div>
                             </div>
@@ -143,7 +152,7 @@
                                         <input type="text"
                                                name="notes"
                                                id="itemnotes"
-                                               ng-model="item.notes">
+                                               ng-model="item.notes" />
                                     </div>
                                 </div>
                             </div>
@@ -181,10 +190,15 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 <style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+
     .btn-add-orderitem {
         display: block;
         height: 2.2rem;

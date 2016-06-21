@@ -591,15 +591,8 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
 /**
  * 医院：订单：添加订单
  */
-app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalService', 'orderService',
-    function ($rootScope, $scope, hospitalService, orderService) {
-        $rootScope.config = {
-            title: {
-                title: '添加订单',
-                back: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
-            }
-        };
-
+app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
+    function ($rootScope, $scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -656,6 +649,10 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
                 }
                 if (form.quantity.$error.required) {
                     $.toast('数量不能为空');
+                    return;
+                }
+                if (form.quantity.$error.number) {
+                    $.toast('数量必须为正整数');
                     return;
                 }
             }
