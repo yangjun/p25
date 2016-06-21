@@ -68,8 +68,8 @@ app.controller('HospitalListCtrl', ['$scope', 'hospitalService',
 /**
  * 医院：医院信息
  */
-app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalInfoCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -162,8 +162,8 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
 /**
  * 医院：新建医院
  */
-app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalCreateCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.hospital = {
             name: '',
             area: '',
@@ -191,8 +191,8 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
 /**
  * 医院：编辑医院
  */
-app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalEditCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -223,8 +223,8 @@ app.controller('HospitalEditCtrl', ['$rootScope', '$scope', 'hospitalService',
 /**
  * 医院：申请开发
  */
-app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalDevelopCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -264,8 +264,8 @@ app.controller('HospitalDevelopCtrl', ['$rootScope', '$scope', 'hospitalService'
 /**
  * 医院：记录开发进度
  */
-app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalResumeCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -293,8 +293,8 @@ app.controller('HospitalResumeCtrl', ['$rootScope', '$scope', 'hospitalService',
 /**
  * 医院：归档，成为合作伙伴
  */
-app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalPartnerCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             /*加载医院信息*/
@@ -371,8 +371,8 @@ app.controller('HospitalPartnerCtrl', ['$rootScope', '$scope', 'hospitalService'
 /**
  * 医院：编辑归档信息
  */
-app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalArchiveCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -400,9 +400,9 @@ app.controller('HospitalArchiveCtrl', ['$rootScope', '$scope', 'hospitalService'
 /**
  * 医院：医生：所有医生
  */
-app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalService', 'doctorService',
-    function ($rootScope, $scope, hospitalService, doctorService) {
-        $rootScope.menu = function () {
+app.controller('HospitalDoctorListCtrl', ['$scope', 'hospitalService', 'doctorService',
+    function ($scope, hospitalService, doctorService) {
+        $scope.menu = function () {
             var actionButtons = [
                 {
                     text: '添加医生',
@@ -489,8 +489,8 @@ app.controller('HospitalDoctorListCtrl', ['$rootScope', '$scope', 'hospitalServi
 /**
  * 医院：医生：添加医生
  */
-app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalDoctorCreateCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -534,9 +534,9 @@ app.controller('HospitalDoctorCreateCtrl', ['$rootScope', '$scope', 'hospitalSer
 /**
  * 医院：订单：所有订单
  */
-app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
-        $rootScope.menu = function () {
+app.controller('HospitalOrderListCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
+        $scope.menu = function () {
             var actionButtons = [
                 {
                     text: '添加订单',
@@ -591,8 +591,8 @@ app.controller('HospitalOrderListCtrl', ['$rootScope', '$scope', 'hospitalServic
 /**
  * 医院：订单：添加订单
  */
-app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
-    function ($rootScope, $scope, hospitalService) {
+app.controller('HospitalOrderCreateCtrl', ['$scope', 'hospitalService',
+    function ($scope, hospitalService) {
         $scope.load = function () {
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
@@ -670,15 +670,8 @@ app.controller('HospitalOrderCreateCtrl', ['$rootScope', '$scope', 'hospitalServ
 /**
  * 医院：订单：取消订单
  */
-app.controller('HospitalOrderRemoveCtrl', ['$rootScope', '$scope', 'orderService',
-    function ($rootScope, $scope, orderService) {
-        $rootScope.config = {
-            title: {
-                title: '取消订单',
-                back: '#/crm/hospital/' + $scope.$state.params.id + '/order/list'
-            }
-        };
-
+app.controller('HospitalOrderDeleteCtrl', ['$scope', 'orderService',
+    function ($scope, orderService) {
         $scope.cancelOrderRequest = {reason: ''};
 
         $scope.load = function () {

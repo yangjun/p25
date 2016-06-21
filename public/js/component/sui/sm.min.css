@@ -1699,7 +1699,7 @@ a:active {
 }
 
 .list-block .item-subtitle {
-    font-size: .75rem;
+    font-size: .6rem;
     position: relative;
     overflow: hidden;
     white-space: nowrap;
@@ -1733,12 +1733,12 @@ a:active {
 }
 
 .list-block.media-list .item-media {
-    padding-top: .45rem;
-    padding-bottom: .5rem
+    padding: .45rem;
 }
 
 .list-block.media-list .item-media img {
-    display: block
+    display: block;
+    border-radius: 3px;
 }
 
 .list-block.media-list .item-title-row {
@@ -3223,7 +3223,7 @@ input[type=button].button, input[type=submit].button {
 .actions-modal-button {
     cursor: pointer;
     line-height: 2.15rem;
-    font-size: .8rem;
+    font-size: .7rem;
     color: #0894ec
 }
 

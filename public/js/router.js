@@ -163,10 +163,10 @@ app.constant('ROUTER', function ($stateProvider, $urlRouterProvider) {
             resolve: {auth: auth}
         })
         /*订单：取消订单*/
-        .state('crm.hospital.order.remove', {
-            url: '/:oid/remove',
+        .state('crm.hospital.order.delete', {
+            url: '/:oid/delete',
             templateUrl: '../html/hospital/order/hospital-order-delete.html',
-            controller: 'HospitalOrderRemoveCtrl',
+            controller: 'HospitalOrderDeleteCtrl',
             resolve: {auth: auth}
         });
 

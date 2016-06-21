@@ -1,8 +1,21 @@
 <!--订单：订单信息-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="createOrder(form)">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.order.list">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <a class="icon btn-menu pull-right"
+           ng-click="menu()">
+            <i class="fa fa-bars"></i>
+        </a>
+        <h1 class="title">订单信息</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="createOrder(form)">
             <div class="content-block-title">医院</div>
             <div class="list-block">
                 <ul>
@@ -91,6 +104,6 @@
                     </ul>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>

@@ -1,8 +1,17 @@
 <!--订单：接受订单-->
-<div ng-show="!loading">
-    <form name="form"
-          ng-submit="commitOrder(form)">
-        <div class="content">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.order.info({oid:$state.params.oid})">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">接受订单</h1>
+    </header>
+    <div class="content"
+         ng-show="!loading">
+        <form name="form"
+              ng-submit="commitOrder(form)">
             <div class="content-block-title">订单编号</div>
             <div class="list-block">
                 <ul>
@@ -27,7 +36,8 @@
                                            name="who"
                                            id="who"
                                            ng-model="commitOrderRequest.who"
-                                           required />
+                                           required
+                                           title="提交给" />
                                 </div>
                             </div>
                         </div>
@@ -43,7 +53,8 @@
                                 <div class="item-input">
                                     <textarea name="reason"
                                               id="reason"
-                                              ng-model="commitOrderRequest.reason"></textarea>
+                                              ng-model="commitOrderRequest.reason"
+                                              title="留言"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -60,6 +71,12 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>

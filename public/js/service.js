@@ -196,7 +196,6 @@ app.factory('orderService', ['restClient', 'CONTEXT',
              */
             pageOrder: function (no, status, skip, limit) {
                 return restClient.get(CONTEXT.CRM_CTX + '/order?no=' + no + '&status=' + status + '&skip=' + skip + '&limit=' + limit);
-                // return restClient.get(CONTEXT.CRM_CTX + '/order?skip=' + skip + '&limit=' + limit);
             },
             /**
              * 获取订单

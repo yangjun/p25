@@ -14,84 +14,84 @@ app.controller('OrderListCtrl', ['$rootScope', '$scope', 'orderService',
             limit: 10
         };
 
-        $rootScope.config = {
-            title: {
-                title: '所有订单',
-                back: '#/home',
-                backtext: '首页',
-                menu: function () {
-                    var actionButtons = [
-                        {
-                            text: '按订单状态过滤',
-                            label: true
-                        },
-                        {
-                            text: '申请中',
-                            color: $scope.filter.status == 'idle' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'idle';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '初审中',
-                            color: $scope.filter.status == 'firstReview' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'firstReview';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '审核中',
-                            color: $scope.filter.status == 'review' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'review';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '出库中',
-                            color: $scope.filter.status == 'stock' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'stock';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '收货中',
-                            color: $scope.filter.status == 'goodsReceipt' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'goodsReceipt';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '已完成',
-                            color: $scope.filter.status == 'achieve' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'achieve';
-                                $scope.load(0);
-                            }
-                        },
-                        {
-                            text: '已取消',
-                            color: $scope.filter.status == 'cancel' ? 'danger' : '',
-                            onClick: function () {
-                                $scope.filter.status = 'cancel';
-                                $scope.load(0);
-                            }
-                        }
-                    ];
-                    var cancelButton = [
-                        {
-                            text: '取消',
-                            color: 'danger'
-                        }
-                    ];
-
-                    $.actions([actionButtons, cancelButton]);
+        $scope.menu = function () {
+            var actionButtons = [
+                {
+                    text: '按订单状态过滤',
+                    label: true
+                },
+                {
+                    text: '所有状态',
+                    color: $scope.filter.status == '' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = '';
+                        $scope.load(0);
+                    }
+                }, {
+                    text: '申请中',
+                    color: $scope.filter.status == 'idle' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'idle';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '初审中',
+                    color: $scope.filter.status == 'firstReview' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'firstReview';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '审核中',
+                    color: $scope.filter.status == 'review' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'review';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '出库中',
+                    color: $scope.filter.status == 'stock' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'stock';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '收货中',
+                    color: $scope.filter.status == 'goodsReceipt' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'goodsReceipt';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '已完成',
+                    color: $scope.filter.status == 'achieve' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'achieve';
+                        $scope.load(0);
+                    }
+                },
+                {
+                    text: '已取消',
+                    color: $scope.filter.status == 'cancel' ? 'danger' : '',
+                    onClick: function () {
+                        $scope.filter.status = 'cancel';
+                        $scope.load(0);
+                    }
                 }
-            }
+            ];
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            $.actions([actionButtons, cancelButton]);
         };
 
         $scope.load = function (skip) {
@@ -135,66 +135,6 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
             $.showIndicator($scope);
             orderService.getOrder($scope.$state.params.oid).then(function (result) {
                 $scope.order = result.data;
-                $rootScope.config = {
-                    title: {
-                        title: '订单信息',
-                        back: '#/crm/order/list',
-                        menu: function () {
-                            var actionButtons = [];
-
-                            if ($scope.order.status === 'idle') {
-                                actionButtons.push({
-                                    text: '提交订单',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.order.commit', {oid: $scope.$state.params.oid});
-                                    }
-                                });
-                            }
-
-                            if (true) {
-                                actionButtons.push({
-                                    text: '取消订单',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.order.remove', {
-                                            id: $scope.$state.params.id,
-                                            oid: $scope.$state.params.oid
-                                        });
-                                    }
-                                });
-                            }
-
-                            var stockButtons = [];
-
-                            if ($scope.stockOrderId) {
-                                stockButtons.push({
-                                    text: '查看出库清单',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.order.goods', {oid: $scope.$state.params.oid});
-                                    }
-                                });
-                            }
-
-                            var cancelButton = [
-                                {
-                                    text: '取消',
-                                    color: 'danger'
-                                }
-                            ];
-
-                            var actions = [];
-                            if (actionButtons.length > 0) {
-                                actions.push(actionButtons);
-                            }
-                            if (stockButtons.length > 0) {
-                                actions.push(stockButtons);
-                            }
-                            actions.push(cancelButton);
-
-                            $.actions(actions);
-                        }
-                    }
-                };
-
                 hospitalService.getHospital($scope.order.hospitalId).then(function (result) {
                     $scope.order.hospital = result.data;
                 }).finally(function () {
@@ -203,6 +143,62 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
             });
         };
         $scope.load();
+
+        $scope.menu = function () {
+            var actionButtons = [];
+
+            if ($scope.order.status === 'idle') {
+                actionButtons.push({
+                    text: '提交订单',
+                    onClick: function () {
+                        $scope.$state.go('crm.order.commit', {oid: $scope.$state.params.oid});
+                    }
+                });
+            }
+
+            if ($scope.order.status !== 'cancel') {
+                actionButtons.push({
+                    text: '取消订单',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.order.delete', {
+                            id: $scope.order.hospital.id,
+                            oid: $scope.$state.params.oid
+                        });
+                    }
+                });
+            }
+
+            var stockButtons = [];
+
+            if ($scope.stockOrderId) {
+                stockButtons.push({
+                    text: '查看出库清单',
+                    onClick: function () {
+                        $scope.$state.go('crm.order.goods', {oid: $scope.$state.params.oid});
+                    }
+                });
+            }
+
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            var actions = [];
+            if (actionButtons.length > 0) {
+                actions.push(actionButtons);
+            }
+            if (stockButtons.length > 0) {
+                actions.push(stockButtons);
+            }
+
+            if (actions.length > 0) {
+                actions.push(cancelButton);
+                $.actions(actions);
+            }
+        }
     }]);
 
 /**
@@ -210,13 +206,6 @@ app.controller('OrderInfoCtrl', ['$rootScope', '$scope', 'orderService', 'hospit
  */
 app.controller('OrderCommitCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
-        $rootScope.config = {
-            title: {
-                title: '提交订单',
-                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
-            }
-        };
-
         $scope.commitOrderRequest = {who: '', reason: ''};
 
         $scope.load = function () {
@@ -318,13 +307,6 @@ app.controller('OrderConfirmCtrl', ['$rootScope', '$scope', 'orderService',
  */
 app.controller('OrderGoodsCtrl', ['$rootScope', '$scope', 'orderService',
     function ($rootScope, $scope, orderService) {
-        $rootScope.config = {
-            title: {
-                title: '出库清单',
-                back: '#/crm/order/' + $scope.$state.params.oid + '/info'
-            }
-        };
-
         $scope.hasmore = false;
         $scope.filter = {
             no: '',
