@@ -74,88 +74,6 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
             $.showIndicator($scope);
             hospitalService.getHospital($scope.$state.params.id).then(function (result) {
                 $scope.hospital = result.data;
-                $rootScope.config = {
-                    title: {
-                        title: '医院信息',
-                        back: '#/hospital/list',
-                        menu: function () {
-                            var actionButtons = [
-                                {
-                                    text: '编辑',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.edit', {id: $scope.hospital.id});
-                                    }
-                                }
-                            ];
-                            var doctorButtons = [
-                                {
-                                    text: '查看医生',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.doctor.list', {id: $scope.hospital.id});
-                                    }
-                                }
-                            ];
-                            var orderButtons = [
-                                {
-                                    text: '查看订单',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.order.list', {id: $scope.hospital.id});
-                                    }
-                                }
-                            ];
-                            var cancelButton = [
-                                {
-                                    text: '取消',
-                                    color: 'danger'
-                                }
-                            ];
-
-                            /*申请开发菜单*/
-                            if ($scope.hospital.status === 'idle') {
-                                var developButton = {
-                                    text: '申请开发',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.develop', {id: $scope.hospital.id});
-                                    }
-                                };
-                                actionButtons.push(developButton);
-                            }
-
-                            if ($scope.hospital.status === 'developing') {
-                                /*记录开发进度菜单*/
-                                var resumeButton = {
-                                    text: '记录开发进度',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.resume', {id: $scope.hospital.id});
-                                    }
-                                };
-                                actionButtons.push(resumeButton);
-
-                                /*归档，成为合作伙伴菜单*/
-                                var partnerButton = {
-                                    text: '归档',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.partner', {id: $scope.hospital.id});
-                                    }
-                                };
-                                actionButtons.push(partnerButton);
-                            }
-
-                            /*编辑归档信息菜单*/
-                            if ($scope.hospital.status === 'partner') {
-                                var archiveButton = {
-                                    text: '编辑归档信息',
-                                    onClick: function () {
-                                        $scope.$state.go('crm.hospital.archive', {id: $scope.hospital.id});
-                                    }
-                                };
-                                actionButtons.push(archiveButton);
-                            }
-
-                            $.actions([actionButtons, doctorButtons, orderButtons, cancelButton]);
-                        }
-                    }
-                };
             }).finally(function () {
                 $.hideIndicator($scope);
             });
@@ -163,6 +81,82 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
 
         $scope.load();
 
+        $scope.menu = function () {
+            var actionButtons = [
+                {
+                    text: '编辑',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.edit', {id: $scope.hospital.id});
+                    }
+                }
+            ];
+            var doctorButtons = [
+                {
+                    text: '查看医生',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.doctor.list', {id: $scope.hospital.id});
+                    }
+                }
+            ];
+            var orderButtons = [
+                {
+                    text: '查看订单',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.order.list', {id: $scope.hospital.id});
+                    }
+                }
+            ];
+            var cancelButton = [
+                {
+                    text: '取消',
+                    color: 'danger'
+                }
+            ];
+
+            /*申请开发菜单*/
+            if ($scope.hospital.status === 'idle') {
+                var developButton = {
+                    text: '申请开发',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.develop', {id: $scope.hospital.id});
+                    }
+                };
+                actionButtons.push(developButton);
+            }
+
+            if ($scope.hospital.status === 'developing') {
+                /*记录开发进度菜单*/
+                var resumeButton = {
+                    text: '记录开发进度',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.resume', {id: $scope.hospital.id});
+                    }
+                };
+                actionButtons.push(resumeButton);
+
+                /*归档，成为合作伙伴菜单*/
+                var partnerButton = {
+                    text: '归档',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.partner', {id: $scope.hospital.id});
+                    }
+                };
+                actionButtons.push(partnerButton);
+            }
+
+            /*编辑归档信息菜单*/
+            if ($scope.hospital.status === 'partner') {
+                var archiveButton = {
+                    text: '编辑归档信息',
+                    onClick: function () {
+                        $scope.$state.go('crm.hospital.archive', {id: $scope.hospital.id});
+                    }
+                };
+                actionButtons.push(archiveButton);
+            }
+
+            $.actions([actionButtons, doctorButtons, orderButtons, cancelButton]);
+        }
     }]);
 
 /**
@@ -170,13 +164,6 @@ app.controller('HospitalInfoCtrl', ['$rootScope', '$scope', 'hospitalService',
  */
 app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
     function ($rootScope, $scope, hospitalService) {
-        $rootScope.config = {
-            title: {
-                title: '添加医院',
-                back: '#/hospital/list'
-            }
-        };
-
         $scope.hospital = {
             name: '',
             area: '',
@@ -196,7 +183,7 @@ app.controller('HospitalCreateCtrl', ['$rootScope', '$scope', 'hospitalService',
             }
             hospitalService.createHospital({'hospital': $scope.hospital}).then(function (result) {
                 $.toast('添加成功');
-                $scope.$state.go('hospital.list');
+                $scope.$state.go('crm.hospital.list');
             });
         };
     }]);

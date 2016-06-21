@@ -1,102 +1,119 @@
 <!--医院：新建医院-->
-<form name="form"
-      ng-submit="createHospital(form)">
+<div class="page page-current">
+    <header class="bar bar-nav">
+        <a class="icon btn-back pull-left"
+           ui-sref="crm.hospital.list">
+            <i class="fa fa-arrow-left"></i>
+            <span class="back-label"></span>
+        </a>
+        <h1 class="title">新建医院</h1>
+    </header>
     <div class="content">
-        <div class="list-block">
-            <ul>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <label class="item-title label"
-                                   for="name">医院名称
-                            </label>
-                            <div class="item-input">
-                                <input type="text"
-                                       name="name"
-                                       id="name"
-                                       required
-                                       ng-model="hospital.name">
+        <form name="form"
+              ng-submit="createHospital(form)">
+            <div class="content">
+                <div class="list-block">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <label class="item-title label"
+                                           for="name">医院名称
+                                    </label>
+                                    <div class="item-input">
+                                        <input type="text"
+                                               name="name"
+                                               id="name"
+                                               required
+                                               ng-model="hospital.name">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <label class="item-title label"
-                                   for="area">所在地区
-                            </label>
-                            <div class="item-input">
-                                <input type="text"
-                                       name="area"
-                                       id="area"
-                                       ng-model="hospital.area">
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <label class="item-title label"
+                                           for="area">所在地区
+                                    </label>
+                                    <div class="item-input">
+                                        <input type="text"
+                                               name="area"
+                                               id="area"
+                                               ng-model="hospital.area">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <label class="item-title label"
-                                   for="address">地址
-                            </label>
-                            <div class="item-input">
-                                <input type="text"
-                                       name="address"
-                                       id="address"
-                                       ng-model="hospital.address">
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <label class="item-title label"
+                                           for="address">地址
+                                    </label>
+                                    <div class="item-input">
+                                        <input type="text"
+                                               name="address"
+                                               id="address"
+                                               ng-model="hospital.address">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-        <div class="content-block-title">坐标</div>
-        <div class="list-block">
-            <ul>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <label class="item-title label"
-                                   for="latitude">纬度
-                            </label>
-                            <div class="item-input">
-                                <input type="number"
-                                       name="latitude"
-                                       id="latitude"
-                                       ng-model="hospital.loc.latitude" />
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-block-title">坐标</div>
+                <div class="list-block">
+                    <ul>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <label class="item-title label"
+                                           for="latitude">纬度
+                                    </label>
+                                    <div class="item-input">
+                                        <input type="number"
+                                               name="latitude"
+                                               id="latitude"
+                                               ng-model="hospital.loc.latitude" />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="item-content">
-                        <div class="item-inner">
-                            <label class="item-title label"
-                                   for="longitude">经度
-                            </label>
-                            <div class="item-input">
-                                <input type="number"
-                                       name="longitude"
-                                       id="longitude"
-                                       ng-model="hospital.loc.longitude" />
+                        </li>
+                        <li>
+                            <div class="item-content">
+                                <div class="item-inner">
+                                    <label class="item-title label"
+                                           for="longitude">经度
+                                    </label>
+                                    <div class="item-input">
+                                        <input type="number"
+                                               name="longitude"
+                                               id="longitude"
+                                               ng-model="hospital.loc.longitude" />
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="content-block">
+                    <div class="row">
+                        <a class="col-50 button button-big button-fill button-danger"
+                           ui-sref="crm.hospital.list">取消
+                        </a>
+                        <button class="col-50 button button-big button-fill button-success"
+                                type="submit">添加
+                        </button>
                     </div>
-                </li>
-            </ul>
-        </div>
-        <div class="content-block">
-            <div class="row">
-                <a class="col-50 button button-big button-fill button-danger"
-                   ui-sref="hospital.list"
-                >取消
-                </a>
-                <button class="col-50 button button-big button-fill button-success"
-                        type="submit">添加
-                </button>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
-</form>
+</div>
+<style>
+    .content-block {
+        margin: .75rem 0;
+        padding: 0 .5rem;
+    }
+</style>

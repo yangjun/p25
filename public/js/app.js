@@ -41,21 +41,4 @@ app.config(['$stateProvider', '$urlRouterProvider', '$httpProvider', '$windowPro
 
 app.run(['$rootScope', '$state', function ($rootScope, $state) {
     $rootScope.$state = $state;
-
-    /*页面相关设置*/
-    $rootScope.config = {
-        title: {
-            title: false, /*标题*/
-            back: false, /*返回按钮地址*/
-            menu: false /*菜单回调方法*/
-        }
-    };
-
-    /*设置菜单*/
-    $rootScope.menu = function () {
-        if (!!$rootScope.config.title.menu && (typeof $rootScope.config.title.menu === 'function')) {
-            $rootScope.config.title.menu();
-        }
-    };
-
 }]);
